@@ -314,6 +314,16 @@
 - 남은 위험: GitHub CLI 부재 또는 인증 범위, Vercel Preview 보호, Git 자동 배포 지연, 연결 Vercel 계정과 실제 production 소유 팀 불일치 가능성
 - 다음 작업: 원격 main 동기화 확인→검증 파일만 stage→diff/비밀정보 재검사→커밋·feature push→PR/checks/merge→production 검증
 
+### 2026-11-24 00:31 KST — R10 배포 진행
+- 상태: IN_PROGRESS
+- 변경 파일: R10 코드/테스트/자산/문서 9개 파일, 후속 `PROGRESS.md`
+- 구현 결과: 원격 `main`과 로컬 기준점이 `5eeb58a91ea45f968b18c32a4871c9b12555e1a4`로 일치함을 확인하고 검증 파일만 커밋 `bfc062d35bba1e23e859d9eef2e86383fdcb2246`(`feat: add RPG dialogue cutscenes`)으로 고정했다. 새 원격 `feature/rpg-dialogue-cutscene` 브랜치에 정상 푸시했으며 Vercel Git Preview commit status는 `success / Deployment has completed`다.
+- 수행 명령 / 종료코드: `git fetch origin main` `0`; HEAD/origin main/merge-base 확인 `0`(모두 `5eeb58a`); 명시 파일 `git add` `0`; `git diff --cached --check` `0`; staged diff/stat 검토 `0`(9파일, +492/-47, PNG 950,146 bytes); 변경 텍스트 비밀정보 패턴 검색 `1`(일치 없음); `git commit` `0`; `git push -u origin feature/rpg-dialogue-cutscene` `0`; GitHub 공개 commit status 조회 `0`(Vercel success, 2026-11-24 00:29 KST)
+- 수락 조건 PASS/FAIL/NOT_RUN: feature commit/push PASS; Vercel Preview build PASS; PR 생성·검사/병합·production deploy·공개 전체 플레이 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 로컬 GitHub CLI가 설치되지 않았고 ChatGPT GitHub 연결도 미설치 상태라 인증이 필요한 PR 생성/병합 API를 실행할 수 없다. feature push와 공개 status 확인은 정상 완료됐다.
+- 남은 위험: PR이 아직 없어 branch protection과 main 병합/production 배포가 시작되지 않았다. Preview build는 성공했지만 보호된 Preview의 실제 브라우저 본문 검증은 production 병합 후 수행한다.
+- 다음 작업: 사용자가 GitHub 웹에서 PR 생성 후 알려주면 PR 상태/check 확인→승인 범위 내 정상 병합→Vercel production 완료 대기→공개 전체 플레이 재검증
+
 ## 작업 로그 템플릿
 ### 2026-11-23 17:36 KST — T01
 - 상태: IN_PROGRESS
