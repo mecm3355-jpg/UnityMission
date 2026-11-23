@@ -1,0 +1,342 @@
+[
+  {
+    "id": "mission-1",
+    "order": 1,
+    "title": "분단의 역사를 따라가요",
+    "summary": "광복부터 정부 수립과 정전협정까지 주요 시점을 살펴봅니다.",
+    "background": "한반도의 분단은 한 번의 사건으로 생긴 결과가 아닙니다. 광복 이후 국제 정세와 남북의 정부 수립, 한국전쟁과 정전협정으로 이어진 과정을 시간순으로 이해합니다.",
+    "learningObjectives": [
+      "1945년 광복과 1948년 대한민국 정부 수립의 시점을 구분한다.",
+      "1953년 정전협정이 전투를 멈춘 합의임을 설명한다."
+    ],
+    "rewardXp": 100,
+    "questions": [
+      {
+        "id": "mission-1-q1",
+        "prompt": "우리역사넷이 설명하는 1945년 8월 15일의 사건은 무엇인가요?",
+        "options": [
+          "일본의 지배에서 벗어나 광복을 맞음",
+          "대한민국 정부 수립을 선포함",
+          "한국전쟁 정전협정을 체결함",
+          "제헌 국회의 첫 총선거를 실시함"
+        ],
+        "correctIndex": 0,
+        "explanation": "1945년 8월 15일 한국은 일본의 지배에서 벗어나 광복을 맞았습니다. 대한민국 정부 수립 선포는 그로부터 3년 뒤인 1948년 8월 15일입니다.",
+        "source": {
+          "title": "대한민국 정부 수립",
+          "organization": "국사편찬위원회 우리역사넷",
+          "url": "https://contents.history.go.kr/mobile/kc/view.do?levelId=kc_i502100",
+          "reviewedAt": "2026-11-23"
+        }
+      },
+      {
+        "id": "mission-1-q2",
+        "prompt": "1948년 8월 15일에 선포된 것은 무엇인가요?",
+        "options": [
+          "한글 맞춤법 통일안",
+          "대한민국 정부 수립",
+          "한국전쟁 정전협정",
+          "유엔 창설"
+        ],
+        "correctIndex": 1,
+        "explanation": "제헌국회 구성과 대통령·부통령 선출, 내각 구성을 거쳐 1948년 8월 15일 대한민국 정부 수립이 선포되었습니다.",
+        "source": {
+          "title": "대한민국 정부 수립",
+          "organization": "국사편찬위원회 우리역사넷",
+          "url": "https://contents.history.go.kr/mobile/kc/view.do?levelId=kc_i502100",
+          "reviewedAt": "2026-11-23"
+        }
+      },
+      {
+        "id": "mission-1-q3",
+        "prompt": "1953년 7월 27일 체결된 정전협정을 가장 정확하게 설명한 것은 무엇인가요?",
+        "options": [
+          "한반도의 모든 갈등을 법적으로 끝낸 평화조약",
+          "남북이 하나의 정부를 세우기로 한 합의",
+          "한국전쟁의 전투를 중지하기 위한 합의",
+          "한국전쟁이 시작되었음을 알린 선언"
+        ],
+        "correctIndex": 2,
+        "explanation": "정전협정은 교전 당사자들이 한국전쟁의 전투를 중지하기로 한 합의입니다. 전투를 멈추는 정전은 전쟁 상태를 법적으로 끝내는 평화조약과 같지 않습니다.",
+        "source": {
+          "title": "정전협정의 체결",
+          "organization": "국사편찬위원회 우리역사넷",
+          "url": "https://contents.history.go.kr/mobile/kc/view.do?code=kc_age_50&levelId=kc_i502950",
+          "reviewedAt": "2026-11-23"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mission-2",
+    "order": 2,
+    "title": "남북의 말과 일상을 이해해요",
+    "summary": "같은 뿌리를 가진 말이 분단 이후 어떻게 달라졌는지 알아봅니다.",
+    "background": "남과 북은 한국어를 사용하지만 오랜 분단으로 규범어의 기준 지역, 어휘, 발음과 표기 일부가 달라졌습니다. 차이를 우열로 판단하지 않고 정확한 의미를 확인하는 태도를 배웁니다.",
+    "learningObjectives": [
+      "남측 표준어와 북측 문화어의 기준 지역을 구분한다.",
+      "남북 언어 차이가 여러 규범과 어휘에서 나타남을 사례로 확인한다."
+    ],
+    "rewardXp": 100,
+    "questions": [
+      {
+        "id": "mission-2-q1",
+        "prompt": "국립국어원 자료가 설명하는 남북 규범어의 기준 지역 연결로 옳은 것은 무엇인가요?",
+        "options": [
+          "남측 표준어-서울, 북측 문화어-평양",
+          "남측 표준어-평양, 북측 문화어-서울",
+          "남측 표준어-부산, 북측 문화어-개성",
+          "남측 표준어-제주, 북측 문화어-함흥"
+        ],
+        "correctIndex": 0,
+        "explanation": "남측은 서울말을 중심으로 표준어와 표준 발음을 설정하고, 북측은 평양말을 중심으로 문화어와 그 발음 기준을 설정했습니다.",
+        "source": {
+          "title": "남북 규범어의 통합 방안",
+          "organization": "국립국어원",
+          "url": "https://www.korean.go.kr/nkview/kyear/2007/2007_12.html",
+          "reviewedAt": "2026-11-23"
+        }
+      },
+      {
+        "id": "mission-2-q2",
+        "prompt": "국립국어원 자료가 남북 어문 규범의 차이로 다룬 항목은 무엇인가요?",
+        "options": [
+          "숫자의 계산 순서",
+          "악기의 조율 방식",
+          "두음법칙과 띄어쓰기",
+          "달력의 월별 날짜 수"
+        ],
+        "correctIndex": 2,
+        "explanation": "국립국어원 자료는 두음법칙, 사이시옷, 형태 표기, 띄어쓰기 등에서 남북 규범의 차이가 나타난다고 설명합니다.",
+        "source": {
+          "title": "남북 규범어의 통합 방안",
+          "organization": "국립국어원",
+          "url": "https://www.korean.go.kr/nkview/kyear/2007/2007_12.html",
+          "reviewedAt": "2026-11-23"
+        }
+      },
+      {
+        "id": "mission-2-q3",
+        "prompt": "국립국어원의 남북한 언어 차이 조사에서 형태가 다른 사례로 제시된 짝은 무엇인가요?",
+        "options": [
+          "바다(남)-산(북)",
+          "가겟방(남)-가게방(북)",
+          "하늘(남)-땅(북)",
+          "아침(남)-저녁(북)"
+        ],
+        "correctIndex": 1,
+        "explanation": "국립국어원은 형태 차이의 사례로 남측의 ‘가겟방’과 북측의 ‘가게방’을 제시합니다. 이런 차이를 알면 서로의 표현을 성급히 틀렸다고 판단하지 않고 의미를 확인할 수 있습니다.",
+        "source": {
+          "title": "남북한 언어 차이 조사 Ⅰ·Ⅱ 발간",
+          "organization": "국립국어원",
+          "url": "https://www.korean.go.kr/niklintro/10years05_01_05.jsp",
+          "reviewedAt": "2026-11-23"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mission-3",
+    "order": 3,
+    "title": "갈등을 평화롭게 풀어요",
+    "summary": "협상과 중재가 갈등을 다루는 평화적 방법임을 배웁니다.",
+    "background": "갈등이 있다는 사실 자체보다 갈등을 어떤 방식으로 다루는지가 중요합니다. 당사자의 동의, 공정한 절차, 대화와 협상은 폭력 대신 해결책을 찾는 기반입니다.",
+    "learningObjectives": [
+      "유엔 헌장이 제시하는 평화적 분쟁 해결 방법을 식별한다.",
+      "효과적인 중재에 필요한 동의와 공정성의 의미를 설명한다."
+    ],
+    "rewardXp": 100,
+    "questions": [
+      {
+        "id": "mission-3-q1",
+        "prompt": "유엔 헌장 제33조가 제시하는 평화적 분쟁 해결 방법에 해당하는 것은 무엇인가요?",
+        "options": [
+          "협상",
+          "일방적 위협",
+          "사실 은폐",
+          "상대방 배제"
+        ],
+        "correctIndex": 0,
+        "explanation": "유엔 헌장 제33조는 협상, 조사, 중재, 조정, 중재재판, 사법적 해결 등을 평화적 해결 방법으로 제시합니다.",
+        "source": {
+          "title": "United Nations Charter: Chapter VI, Article 33",
+          "organization": "United Nations",
+          "url": "https://legal.un.org/repertory/art33.shtml",
+          "reviewedAt": "2026-11-23"
+        }
+      },
+      {
+        "id": "mission-3-q2",
+        "prompt": "유엔의 효과적인 중재 지침에 따르면 중재가 효과적이기 위해 필요한 것은 무엇인가요?",
+        "options": [
+          "갈등 당사자의 동의",
+          "한쪽의 비밀 강요",
+          "결과를 미리 정하는 것",
+          "당사자의 참여를 막는 것"
+        ],
+        "correctIndex": 0,
+        "explanation": "중재는 자발적인 과정이므로 갈등 당사자의 동의가 중요합니다. 동의가 없으면 성실한 협상과 과정에 대한 책임 있는 참여를 기대하기 어렵습니다.",
+        "source": {
+          "title": "United Nations Guidance for Effective Mediation",
+          "organization": "United Nations",
+          "url": "https://digitallibrary.un.org/nanna/record/4026222/files/1387704EN.pdf?registerDownload=1&version=1&withMetadata=0&withWatermark=0",
+          "reviewedAt": "2026-11-23"
+        }
+      },
+      {
+        "id": "mission-3-q3",
+        "prompt": "유엔 중재 지침의 ‘공정성’에 가장 가까운 중재자의 행동은 무엇인가요?",
+        "options": [
+          "힘이 센 쪽의 요구만 전달한다.",
+          "모든 관련 당사자를 공정하고 균형 있게 대한다.",
+          "중재자 자신의 이익을 우선한다.",
+          "불리한 사실은 한쪽에만 숨긴다."
+        ],
+        "correctIndex": 1,
+        "explanation": "공정한 중재자는 결과에 사적 이해관계를 두지 않고, 관련 당사자들을 공정하고 균형 있게 대하며 대화할 수 있어야 합니다.",
+        "source": {
+          "title": "United Nations Guidance for Effective Mediation",
+          "organization": "United Nations",
+          "url": "https://digitallibrary.un.org/nanna/record/4026222/files/1387704EN.pdf?registerDownload=1&version=1&withMetadata=0&withWatermark=0",
+          "reviewedAt": "2026-11-23"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mission-4",
+    "order": 4,
+    "title": "함께할 수 있는 협력을 찾아요",
+    "summary": "인도적 지원, 문화 교류, 환경 협력의 원칙을 살펴봅니다.",
+    "background": "협력은 서로의 입장이 모두 같을 때만 가능한 일이 아닙니다. 사람의 필요를 우선하는 인도주의, 문화를 존중하는 교류, 공유 환경을 함께 관리하는 실천은 신뢰를 쌓는 통로가 될 수 있습니다.",
+    "learningObjectives": [
+      "인도적 지원의 공평성 원칙을 사례에 적용한다.",
+      "문화와 환경 분야의 협력이 신뢰 형성에 기여할 수 있음을 설명한다."
+    ],
+    "rewardXp": 100,
+    "questions": [
+      {
+        "id": "mission-4-q1",
+        "prompt": "국제적십자위원회가 설명하는 인도주의의 ‘공평성’ 원칙에 맞는 지원 방식은 무엇인가요?",
+        "options": [
+          "정치적 견해가 같은 사람만 돕는다.",
+          "국적과 신념을 따지지 않고 필요와 긴급성에 따라 돕는다.",
+          "지원 기관에 이익이 되는 지역만 돕는다.",
+          "언론에 많이 보도된 사람만 돕는다."
+        ],
+        "correctIndex": 1,
+        "explanation": "공평성은 국적, 인종, 종교, 계급, 정치적 견해로 차별하지 않고 오직 필요에 따라 지원하며 가장 긴급한 고통을 우선하는 원칙입니다.",
+        "source": {
+          "title": "IHL and humanitarian principles",
+          "organization": "International Committee of the Red Cross",
+          "url": "https://www.icrc.org/en/ihl-and-humanitarian-principles",
+          "reviewedAt": "2026-11-23"
+        }
+      },
+      {
+        "id": "mission-4-q2",
+        "prompt": "유네스코 문화 다양성 선언의 취지에 가장 잘 맞는 활동은 무엇인가요?",
+        "options": [
+          "서로 다른 문화 표현을 존중하며 대화하고 교류한다.",
+          "한쪽 문화만 가치 있다고 정한다.",
+          "다른 생활방식을 보지 못하게 막는다.",
+          "문화 차이에 대한 대화를 금지한다."
+        ],
+        "correctIndex": 0,
+        "explanation": "유네스코는 문화 다양성에 대한 존중, 관용, 대화와 협력이 상호 신뢰와 이해 속에서 평화와 안전에 기여한다고 설명합니다.",
+        "source": {
+          "title": "UNESCO Universal Declaration on Cultural Diversity",
+          "organization": "UNESCO",
+          "url": "https://www.unesco.org/en/legal-affairs/unesco-universal-declaration-cultural-diversity",
+          "reviewedAt": "2026-11-23"
+        }
+      },
+      {
+        "id": "mission-4-q3",
+        "prompt": "유엔환경계획이 설명하는 공유 자연자원의 평화적 활용 방식은 무엇인가요?",
+        "options": [
+          "정보를 각자 숨기고 따로 관리한다.",
+          "자원을 먼저 차지한 쪽이 모두 사용한다.",
+          "공동 조사와 협력으로 신뢰와 공동 이익을 만든다.",
+          "환경 문제를 갈등과 무관하다고 본다."
+        ],
+        "correctIndex": 2,
+        "explanation": "유엔환경계획은 공유 자연자원이 협력과 신뢰 형성의 기반이 될 수 있으며, 기술적 전문성과 공동 이익을 활용해 자원 갈등을 협력의 기회로 바꿀 수 있다고 설명합니다.",
+        "source": {
+          "title": "Environmental cooperation and peacebuilding",
+          "organization": "United Nations Environment Programme",
+          "url": "https://www.unep.org/en/what-we-do/disasters-and-conflicts/environment-security/environmental-cooperation-and-peacebuilding",
+          "reviewedAt": "2026-11-23"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mission-5",
+    "order": 5,
+    "title": "평화로운 미래에 참여해요",
+    "summary": "다양한 관점과 근거를 살피고 포용적인 참여 방법을 생각합니다.",
+    "background": "평화로운 미래는 하나의 정답을 외우는 것보다 다양한 관점을 존중하고, 정보를 비판적으로 확인하며, 모두가 참여할 수 있는 방법을 만드는 과정에서 가까워집니다.",
+    "learningObjectives": [
+      "다양한 관점과 정보를 비판적으로 검토하는 태도를 설명한다.",
+      "포용적이고 참여적인 의사결정의 의미를 사례에 적용한다."
+    ],
+    "rewardXp": 100,
+    "questions": [
+      {
+        "id": "mission-5-q1",
+        "prompt": "유네스코 세계시민교육이 강조하는 학습 태도에 가장 가까운 것은 무엇인가요?",
+        "options": [
+          "다른 관점은 듣지 않고 내 생각만 반복한다.",
+          "배경이 다른 사람의 관점을 이해하고 함께 해결책을 찾는다.",
+          "갈등을 피하기 위해 모든 질문을 금지한다.",
+          "세계 문제는 개인과 전혀 관계없다고 본다."
+        ],
+        "correctIndex": 1,
+        "explanation": "유네스코 세계시민교육은 비판적으로 질문하고, 다른 관점과 의견을 이해하며, 다양한 배경의 사람들과 협력해 문제를 해결하는 역량을 강조합니다.",
+        "source": {
+          "title": "Global citizenship education and peace education: what you need to know",
+          "organization": "UNESCO",
+          "url": "https://www.unesco.org/en/global-citizenship-peace-education/need-know",
+          "reviewedAt": "2026-11-23"
+        }
+      },
+      {
+        "id": "mission-5-q2",
+        "prompt": "유엔 지속가능발전목표 16.7이 지향하는 의사결정은 무엇인가요?",
+        "options": [
+          "소수만 참여하고 과정을 공개하지 않는 결정",
+          "가장 빠른 사람만 의견을 내는 결정",
+          "포용적이고 참여적이며 대표성을 갖춘 결정",
+          "반대 의견을 처음부터 제외하는 결정"
+        ],
+        "correctIndex": 2,
+        "explanation": "지속가능발전목표 16.7은 모든 수준에서 대응성 있고 포용적이며 참여적이고 대표성 있는 의사결정을 보장하는 것을 목표로 합니다.",
+        "source": {
+          "title": "Sustainable Development Goal 16",
+          "organization": "United Nations Department of Economic and Social Affairs",
+          "url": "https://sdgs.un.org/goals/goal16",
+          "reviewedAt": "2026-11-23"
+        }
+      },
+      {
+        "id": "mission-5-q3",
+        "prompt": "서로 다른 주장이 온라인에 올라왔을 때 유네스코 미디어·정보 리터러시 취지에 맞는 첫 행동은 무엇인가요?",
+        "options": [
+          "제목만 보고 곧바로 공유한다.",
+          "내 생각과 같은 주장만 남긴다.",
+          "작성 주체와 근거를 확인하고 여러 정보를 비교한다.",
+          "가장 자극적인 표현을 사실로 선택한다."
+        ],
+        "correctIndex": 2,
+        "explanation": "미디어·정보 리터러시는 정보를 찾고 평가하며 책임 있게 활용하는 역량입니다. 작성 주체와 근거를 확인하고 다른 신뢰할 만한 정보와 비교해야 합니다.",
+        "source": {
+          "title": "Media and information literacy",
+          "organization": "UNESCO",
+          "url": "https://www.unesco.org/en/articles/media-and-information-literacy",
+          "reviewedAt": "2026-11-23"
+        }
+      }
+    ]
+  }
+]
