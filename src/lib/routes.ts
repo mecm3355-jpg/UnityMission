@@ -1,5 +1,6 @@
 export const APP_ROUTES = [
   "/",
+  "/game",
   "/dashboard",
   "/mission/[id]",
   "/mission/[id]/play",

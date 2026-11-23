@@ -78,6 +78,20 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.mobile-game-controls {
+  display: none;
+}
+
+canvas {
+  image-rendering: pixelated;
+}
+
+@media (max-width: 767px) {
+  .mobile-game-controls {
+    display: flex;
+  }
+}
+
 progress::-webkit-progress-bar {
   background: #0d1730;
   border-radius: 999px;

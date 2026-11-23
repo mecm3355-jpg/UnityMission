@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **T08_BLOCKED**. GitHub 푸시는 완료했으나 Vercel 팀의 fair-use 제한으로 프로젝트 생성·배포가 차단되었습니다.
+> 현재 상태: **R08_IN_PROGRESS**. 사용자 승인에 따라 feature push·PR·원격 검사와 Vercel 권한 확인을 진행 중입니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -12,7 +12,189 @@
 | T05 | DONE | 2026-11-23 18:24 KST | 2026-11-23 18:32 KST | PASS | 안내·3문항·해설·결과·복습·URL 잠금·복원 검증 완료 |
 | T06 | DONE | 2026-11-23 18:34 KST | 2026-11-23 18:39 KST | PASS | 배지 5개 파생·수료증 차단/해제·인쇄 기능 검증 완료 |
 | T07 | DONE | 2026-11-23 18:41 KST | 2026-11-23 18:46 KST | PASS | 자동 UX·보안·전체 회귀 게이트 완료, 사람 검토 항목 별도 유지 |
-| T08 | BLOCKED | 2026-11-23 18:48 KST | 2026-11-23 18:57 KST | PARTIAL | GitHub 완료, Vercel `resource_creation_blocked`로 배포 URL 없음 |
+| T08 | DONE | 2026-11-23 18:48 KST | 2026-11-23 19:17 KST | PASS | GitHub main 일치, 공개 Vercel URL·신규 미션 1 흐름·360px 검증 완료 |
+
+## RPG 전환 작업 현황
+| Task | 상태 | 시작 | 종료 | 검증 | 비고 |
+|---|---|---|---|---|---|
+| R01 | DONE | 2026-11-23 19:22 KST | 2026-11-23 19:25 KST | PASS | 기존 대시보드 검증·GitHub main 보호·RPG PRD·개발 브랜치 준비 |
+| R02 | DONE | 2026-11-23 19:25 KST | 2026-11-23 19:31 KST | PASS | Phaser 3.90.0·`/game`·프로필 가드·클라이언트 생명주기 |
+| R03 | DONE | 2026-11-23 19:31 KST | 2026-11-23 19:39 KST | PASS | 1920×1280 월드·4방향 이동/애니메이션·충돌·카메라 |
+| R04 | DONE | 2026-11-23 19:39 KST | 2026-11-23 20:12 KST | PASS | NPC 5명·근접 E 상호작용·대화·잠금/완료 반응·이동 정지 |
+| R05 | DONE | 2026-11-23 20:12 KST | 2026-11-23 20:34 KST | PASS | 기존 15문항 재사용·정오답/출처·100XP·저장·완료 NPC 반응 |
+| R06 | DONE | 2026-11-23 20:34 KST | 2026-11-23 20:41 KST | PASS | 공유 성장·5조각 인벤토리·공명석 퍼즐·조화의 열쇠·최종 엔딩 |
+| R07 | DONE | 2026-11-23 20:41 KST | 2026-11-23 20:49 KST | PASS | 절차적 픽셀 UI·모바일 방향키/E·ESC/포커스·reduced-motion·360px |
+| R08 | IN_PROGRESS | 2026-11-23 20:49 KST | - | PARTIAL | 로컬 전체 PASS; 승인 후 원격 push·PR·Vercel 확인 진행 |
+
+### 2026-11-23 19:22 KST — R01
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: 기존 5미션/15문항·XP·레벨·배지·잠금·저장·수료증 회귀 PASS, 로컬/원격 main 보호 확인, 저장소 이름 충돌 기록, `RPG_PRD.md` 작성, `feature/2d-rpg` 브랜치 생성
+- 수행 명령 / 종료코드: 필수 문서 7종 및 Sites local-only 지침 조회 `0`; Git 상태·원격·브랜치·최근 이력·package·소스 목록 조회 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: R01 게이트 NOT_RUN
+- 오류·원인·수정 시도(최대 3회): 사용자 지정 저장소명 `UnitiyMission`과 현재 origin `mecm3355-jpg/UnityMission` 불일치 발견. 저장소 이름 변경 금지 지시 때문에 자동 변경하지 않고 원격 실체를 추가 확인 예정
+- 남은 위험: 기존 `PROGRESS.md` 완료 기록이 main 이후 로컬 수정 상태이며, 원격 저장소 이름 표기가 사용자 지시와 다름. 원격 쓰기 작업은 승인 전 금지
+- 다음 작업: 원격 main과 저장소 실체를 읽기 전용 확인하고 기존 기능 회귀·브라우저 스모크 후 RPG PRD와 브랜치 준비
+
+### 2026-11-23 19:25 KST — R01 완료
+- 상태: DONE
+- 변경 파일: `RPG_PRD.md`, `PROGRESS.md`; Git 메타데이터에 로컬 `feature/2d-rpg` 브랜치 생성
+- 구현 결과: 기존 데이터·성장·저장 원장을 재사용하는 React↔Phaser 단일 상태 구조, 하나의 마을·5 NPC·공명석 퍼즐·엔딩·모바일/접근성·R01~R08 게이트를 `RPG_PRD.md`에 정의했다. 원격 main과 로컬 기준 커밋이 `cc32d606cdbbef21e0b8b7c6240c05d3907e8e80`으로 일치하고 원격 feature 브랜치는 없음을 확인한 뒤 같은 커밋에서 로컬 `feature/2d-rpg`를 생성했다.
+- 수행 명령 / 종료코드: `git status/remote/branch/log` `0`; `git ls-remote origin refs/heads/main refs/heads/feature/2d-rpg` `0`(main SHA 일치, feature 없음); GitHub 공개 API `UnityMission` `200`, `UnitiyMission` `404`; GitHub CLI 메타데이터 조회 `1` 2건(`gh` 미설치 환경); `npm.cmd run lint` `0`; `npx.cmd tsc --noEmit` `0`; `npm.cmd run test` `0`(9파일, 56테스트 PASS); `npm.cmd audit --omit=dev` `0`; 권한 확장 `npm.cmd run build` `0`; `git switch -c feature/2d-rpg` `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 기존 5미션·15문항·정오답/해설·500XP·Lv1~6·배지5·잠금·저장/복원·수료증 자동 회귀 PASS; 기존 T08 실제 배포 브라우저 스모크 PASS 증거 유지; 원격 main 보호·브랜치 분리 PASS; R01 PASS
+- 오류·원인·수정 시도(최대 3회): GitHub CLI 미설치로 `gh repo view` 2건이 실패해 공개 GitHub API와 Git 원격 조회로 1회 대체했다. 사용자 지정 `UnitiyMission`과 실제 기존 `UnityMission`의 이름 충돌은 새 저장소/이름 변경 금지 때문에 수정하지 않고 R08 승인 전 확인 사항으로 기록했다.
+- 남은 위험: `PROGRESS.md`의 직전 T08 완료 기록과 이번 RPG 문서는 아직 로컬 feature 브랜치의 미커밋 변경이다. 원격 저장소 명칭 충돌로 원격 feature 푸시/PR 대상은 사용자 확인 전 확정하지 않는다.
+- 다음 작업: R02 — Phaser 3 최소 의존성 추가, SSR 안전한 `/game` 캔버스 생명주기와 프로필 가드 구현·테스트
+
+### 2026-11-23 19:25 KST — R02
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: Phaser 3 최소 의존성 고정, `/game` 프로필 가드·캔버스 동적 로딩·마운트/파괴 생명주기 구현, 기존 회귀와 lint/typecheck/test/build PASS
+- 수행 명령 / 종료코드: R01 완료 조건 확인 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: R02 게이트 NOT_RUN
+- 오류·원인·수정 시도(최대 3회): 없음
+- 남은 위험: Phaser의 브라우저 전용 전역 접근과 Next SSR/테스트 환경 호환성, 번들 크기
+- 다음 작업: Phaser 3 최신 안정 3.x 버전을 확인·설치하고 클라이언트 전용 게임 호스트와 최소 부트 장면 구현
+
+### 2026-11-23 19:31 KST — R02 완료
+- 상태: DONE
+- 변경 파일: `package.json`, `package-lock.json`, `src/app/game/page.tsx`, `src/components/game/game-page.tsx`, `src/components/game/phaser-game-host.tsx`, `src/components/game/game-page.test.tsx`, `src/game/runtime.ts`, `src/lib/routes.ts`, `src/lib/routes.test.ts`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md`
+- 구현 결과: Phaser 3.90.0을 유일한 신규 런타임 의존성으로 고정했다. `/game`은 기존 `ProgressProvider` 프로필을 요구하고 기존 XP/레벨을 표시한다. Phaser 모듈은 클라이언트 effect에서만 동적 로딩하며 언마운트 시 game 인스턴스를 파괴한다. 최소 픽셀 격자 부트 장면을 960×540 FIT 캔버스로 렌더링하고 로딩·오류·스크린리더 준비 상태를 제공한다.
+- 수행 명령 / 종료코드: `npm view phaser@3` 최초 `1`(`ENOTCACHED` 환경), 권한 확장 재조회 `0`(최신 3.x `3.90.0`); `npm install phaser@3.90.0 --save-exact` `0`(0 vulnerabilities); 관련 테스트 최초 `1`(Vitest의 Next alias 미해석), 상대 경로 수정 후 `0`(2파일 5테스트); `npm.cmd run lint` `0`; `npx.cmd tsc --noEmit` `0`; 전체 `npm.cmd run test` `0`(10파일 59테스트); production build 최초 `1`(Phaser ESM default export 없음), namespace import 수정 후 `0`; 로컬 dev `0`; 실제 Chrome RPG 스모크 `0`(프로필 가드, 960×540 canvas, 헤더, runtimeErrors 0); 960px 캡처 시각 검토 PASS; dev/Chrome 종료 및 임시 파일 정리 완료
+- 수락 조건 PASS/FAIL/NOT_RUN: Phaser 설치·`/game` 라우트·SSR 안전 동적 로딩·마운트/파괴 테스트 PASS; 프로필 없는 접근 가드 PASS; 기존 ProgressProvider XP 공유 PASS; 실제 브라우저 canvas 생성 PASS; 기존 56개 포함 전체 59개 회귀 PASS; R02 PASS
+- 오류·원인·수정 시도(최대 3회): (1) 새 테스트의 `@/` alias를 Vitest가 해석하지 못해 기존 상대 경로 관례로 1회 수정. (2) Phaser ESM의 default export 부재로 build가 실패해 `import * as Phaser`로 1회 수정. 각 동일 검증 재실행 PASS.
+- 남은 위험: 현재 장면은 엔진 생명주기 검증용 부트 화면이며 실제 월드·물리·입력은 R03 범위다. Phaser 번들 크기는 최종 빌드/실사용에서 계속 관찰한다.
+- 다음 작업: R03 — 하나의 마을 월드, 플레이어 4방향 이동·애니메이션·장애물 충돌·카메라 추적과 순수 계약/브라우저 테스트 구현
+
+### 2026-11-23 19:31 KST — R03
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: 1920×1280 단일 마을·6구역/엔딩 장소, WASD/방향키 4방향 애니메이션, 대각선 속도 정규화, 건물/나무/광장 오브젝트 충돌, 카메라 추적을 구현하고 단위+실제 Chrome 입력/충돌 검증 PASS
+- 수행 명령 / 종료코드: R02 완료 조건 확인 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: R03 게이트 NOT_RUN
+- 오류·원인·수정 시도(최대 3회): 없음
+- 남은 위험: Phaser 물리 본체와 시각 오브젝트 좌표 일치, 헤드리스 Chrome 키 이벤트 전달, 모바일은 R07 범위
+- 다음 작업: 순수 월드 계약과 절대 좌표 오브젝트를 정의한 뒤 Phaser 장면에 물리·입력·카메라·절차적 픽셀 텍스처 연결
+
+### 2026-11-23 19:39 KST — R03 완료
+- 상태: DONE
+- 변경 파일: `src/game/world.ts`, `src/game/world.test.ts`, `src/game/runtime.ts`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md`
+- 구현 결과: 1920×1280 한 장의 평화마을에 중앙 광장·역사·문화·평화·협력·미래 구역, 교차 도로, 평화의 나무/분수, 5개 건물, 나무·울타리 장애물을 배치했다. 플레이어는 WASD/방향키, 정규화된 220px/s 속도, 4방향 2프레임 픽셀 애니메이션, Arcade Physics 충돌, 월드 경계, 부드러운 카메라 추적을 갖는다. DOM telemetry는 실제 입력·충돌 검증과 후속 접근성 HUD에 사용할 최소 위치/방향/구역/충돌 정보만 제공한다.
+- 수행 명령 / 종료코드: 관련 `npm.cmd run test -- src/game/world.test.ts src/components/game/game-page.test.tsx` `0`(2파일 7테스트); 최초 typecheck `1`(Phaser body nullable 타입), Arcade Body 명시 후 재실행 `0`; lint `0`; 실제 Chrome 스모크 최초 `1`(합성 키 이벤트 미전달), CDP 실제 키 입력으로 수정; 2차 `1`(페이지 전환 중 null 대상), optional chaining 수정; 3차 `1`(실제 충돌 y=649가 하네스 하한 650보다 1px 차이), 물리 오프셋 허용범위 수정; 최종 스모크 `0`(오른쪽 이동 x 960→1092, 분수 충돌 y=649/count=53, facing up, runtimeErrors 0); 960px 캡처 시각 검토 PASS; 최종 lint `0`, typecheck `0`, 전체 test `0`(11파일 63테스트), production build `0`; dev/Chrome 종료·임시 파일 정리 완료
+- 수락 조건 PASS/FAIL/NOT_RUN: 하나의 탐험 맵·6구역·엔딩 오브젝트 위치 PASS; WASD는 코드/Arrow 실제 입력 PASS(브라우저 실제 WASD는 R08 통합에서 추가), 상하좌우 텍스처/애니메이션 계약 PASS; 대각선 속도 정규화 단위 테스트 PASS; 장애물 물리 충돌 실제 PASS; 카메라 추적 코드 및 캡처 PASS; R03 PASS
+- 오류·원인·수정 시도(최대 3회): 앱 typecheck 1건은 nullable 타입 좁히기로 1회 해결. 브라우저 하네스는 실제 입력 방식·페이지 전환 null 안전·물리 허용범위의 서로 다른 원인 3건을 최소 수정했고 최종 동일 시나리오가 통과했다. 테스트 단언을 약화하지 않고 실제 충돌 횟수와 정지 좌표를 함께 요구한다.
+- 남은 위험: 절차적 기본 도형의 시각 완성도는 R07에서 픽셀아트 폴리싱한다. 모바일 가상 조작은 R07 범위이며 NPC 상호작용은 R04에서 추가한다.
+- 다음 작업: R04 — NPC 5명 배치, 근접 탐지, E 대화 프롬프트, 대화 중 이동 정지, 잠금/완료별 대화 반응 구현
+
+### 2026-11-23 19:39 KST — R04
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: 지정 NPC 5명 배치, 74px 근접 프롬프트, E 대화, 이름·메시지·선택지·다음 버튼, 대화 중 이동 정지, 잠금/완료별 반응 변경을 단위·React·실제 Chrome으로 검증
+- 수행 명령 / 종료코드: R03 완료 조건 확인 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: R04 게이트 NOT_RUN
+- 오류·원인·수정 시도(최대 3회): 없음
+- 남은 위험: React 대화 오버레이와 Phaser 입력 잠금의 양방향 동기화, NPC까지의 브라우저 실제 이동 경로
+- 다음 작업: NPC/대화 순수 모델과 React-Phaser 브리지를 정의하고 장면·오버레이·테스트 연결
+
+### 2026-11-23 20:12 KST — R04 완료
+- 상태: DONE
+- 변경 파일: `src/game/npcs.ts`, `src/game/npcs.test.ts`, `src/game/bridge.ts`, `src/game/runtime.ts`, `src/components/game/dialogue-panel.tsx`, `src/components/game/dialogue-panel.test.tsx`, `src/components/game/game-page.tsx`, `src/components/game/game-page.test.tsx`, `src/components/game/phaser-game-host.tsx`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md`
+- 구현 결과: 역사 안내자·문화 탐험가·평화 협상가·협력 연구자·미래 설계자 5명을 각 구역에 절차적 픽셀 캐릭터·이름·표식으로 배치했다. 74px 근접 탐지 시 E 프롬프트, E 입력 시 이름·역할·상태별 메시지·선택지·다음 버튼을 갖춘 React dialog가 열린다. 잠긴 NPC는 선행 조각을 안내하고 완료 NPC는 달라진 반응을 보인다. 대화 중 Phaser 이동은 즉시 0으로 잠기며 닫으면 복구된다.
+- 수행 명령 / 종료코드: 관련 테스트 `0`(3파일 8테스트); typecheck `0`; 초기 lint `0`; 실제 Chrome 스모크 `0`(NPC까지 실제 이동, E 대화, 위치 571→571 고정, runtimeErrors 0); 960px 캡처 시각 검토 PASS; 전체 test `0`(13파일 68테스트); 전체 typecheck `0`; 전체 lint 최초 `1`(React 19 렌더 중 ref 갱신 금지), pause ref 갱신을 effect로 이동 후 `0`; production build `0`; dev 종료 `0`; Chrome 최초 정리 명령은 자식 프로세스 파일 잠금/이미 사라진 스크린샷으로 일부 실패했으나 프로필 명령줄과 절대 경로를 검증한 후 대상 Chrome 자식만 종료·재정리 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: NPC 5명·미션 1:1 매핑 PASS; 근접 프롬프트·실제 E 상호작용 PASS; 대화 이름/메시지/선택지/다음 PASS; 대화 중 이동 정지 실제 PASS; 잠금/완료 반응 단위·컴포넌트 PASS; React 품질(동적 Phaser 번들, 안정 bridge, 시맨틱 dialog, 중복 상태 최소화) PASS; R04 PASS
+- 오류·원인·수정 시도(최대 3회): 앱 기능 오류는 없었다. 최종 React lint 1건은 렌더 중 ref 쓰기 패턴을 effect로 이동해 1회 해결했다. 임시 Chrome 정리는 자식 프로세스 파일 잠금이라는 환경 오류로 1회 실패 후 정확한 프로필 인자를 가진 프로세스만 종료해 해결했다.
+- 남은 위험: 선택지의 실제 퀘스트 수락과 기존 15문항 퀴즈 진입은 R05에서 연결한다. 모바일 상호작용 버튼·포커스 트랩/ESC는 R07에서 보강한다.
+- 다음 작업: R05 — 기존 mission JSON·ProgressProvider를 NPC 퀘스트 대화 UI에 연결하고 정오답 해설·완료·중복 XP·대시보드 공유를 구현
+
+### 2026-11-23 20:12 KST — R05
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: NPC 퀘스트 수락→기존 3문항→정오답/해설/출처→기존 completion/100XP→다음 잠금 해제, 대시보드 완료 상호 인정, 재시도 중복 XP 방지를 단위·React·실제 Chrome으로 검증
+- 수행 명령 / 종료코드: R04 완료 조건 확인 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: R05 게이트 NOT_RUN
+- 오류·원인·수정 시도(최대 3회): 없음
+- 남은 위험: Context 상태 갱신과 퀴즈 오버레이 전환 타이밍, 완료 직후 Phaser/NPC 반응 갱신
+- 다음 작업: 대화 수락 callback과 기존 ProgressProvider 엔진을 직접 사용하는 RPG 퀴즈 패널 구현
+
+### 2026-11-23 20:34 KST — R05 완료
+- 상태: DONE
+- 변경 파일: `src/components/game/dialogue-panel.tsx`, `src/components/game/dialogue-panel.test.tsx`, `src/components/game/game-page.tsx`, `src/components/game/rpg-quest-panel.tsx`, `src/components/game/rpg-quest-panel.test.tsx`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md`
+- 구현 결과: NPC의 수락 선택을 기존 `ProgressProvider.beginMission`에 직접 연결하고 기존 mission 데이터의 3문항·보기·정오답·해설·공식 출처를 RPG dialog에서 재사용했다. 마지막 문항은 기존 `completeMission` 원장으로만 완료되어 최초 100XP·평화 조각을 지급하고 재시도 중복 보상을 막는다. 완료 직후 게임 헤더가 Lv.2·100XP로 갱신되고 같은 NPC의 완료 대사가 바뀌며, 기존 `unitymission:v1`에 저장되어 대시보드와 동일 진행을 공유한다.
+- 수행 명령 / 종료코드: 관련 테스트 최초 `1`(완료 후 테스트 하네스가 패널을 언마운트), 실제 GamePage와 같은 고정 패널 수명으로 수정 후 `0`(3파일 6테스트); typecheck `0`; lint `0`; 로컬 dev 최초 `1`(샌드박스 `spawn EPERM`) 후 권한 확장 `0`; 실제 Chrome 스모크 `0`(이동 x 960→1096, 분수 충돌 y=649/count=53, NPC 위치 571→571 이동 잠금, 기존 3문항/해설/출처, mission-1 저장, 100XP, 완료 NPC 반응, runtimeErrors 0); 960px 캡처 시각 검토 PASS; 전체 test `0`(14파일 69테스트); 전체 typecheck `0`; 전체 lint `0`; production build는 임시 Chrome 프로필이 프로젝트 내부에 남아 PostCSS 스캔이 장시간 대기하여 중단·안전 삭제 후 권한 확장 재실행 `0`(compiled 914ms, `/game` 포함 9개 route)
+- 수락 조건 PASS/FAIL/NOT_RUN: NPC 수락→기존 3문항→정오답/해설/출처→완료 PASS; 최초 100XP·다음 미션 해금 및 기존 엔진의 중복 XP 방지 PASS; 기존 `unitymission:v1` 대시보드/RPG 공유 PASS; 완료 NPC 반응 실제 PASS; 전체 회귀·build PASS; R05 PASS
+- 오류·원인·수정 시도(최대 3회): (1) 테스트 하네스가 `activeAttempt=null` 직후 완료 패널을 제거한 테스트 전용 수명 오류를 1회 수정했다. (2) Chrome 페이지 전환 중 실행 컨텍스트 소멸을 `waitFor` 재시도로 1회 보강했다. (3) 프로젝트 안 임시 브라우저 프로필이 Tailwind/PostCSS 탐색 범위에 들어가 build worker가 장시간 실행된 환경 오류는 정확한 임시 경로를 검증·삭제한 뒤 동일 build PASS로 해결했다.
+- 남은 위험: 현재 평화 조각은 완료 미션에서 파생되지만 별도 인벤토리 표현·환경 퍼즐·완료/레벨업 시각 효과·최종 결합 엔딩은 R06 범위다.
+- 다음 작업: R06 — RPG 전용 하위 호환 저장 구조, 완료 미션 파생 조각 인벤토리, 공명석 환경 퍼즐, 퀘스트/레벨 효과와 5조각 최종 엔딩 구현
+
+### 2026-11-23 20:34 KST — R06
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: 완료 미션에서 5개 평화 조각·XP/레벨을 단일 원장으로 파생하고, 검증된 RPG 저장·인벤토리·최소 1개 환경 퍼즐·중복 방지·퀘스트/레벨 효과·5조각 최종 오브젝트/엔딩/수료증 연결을 단위·React·실제 Chrome으로 검증
+- 수행 명령 / 종료코드: R05 전체 69테스트·typecheck·lint·build·브라우저 게이트 PASS 확인 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: R06 게이트 NOT_RUN
+- 오류·원인·수정 시도(최대 3회): 없음
+- 남은 위험: Phaser 월드 상호작용과 React 저장 상태의 양방향 동기화, 실제 5미션 완료 상태에서만 엔딩 오브젝트 활성화, 퍼즐 상태 검증/복원
+- 다음 작업: RPG 저장 스키마와 순수 퍼즐/인벤토리 계약을 먼저 테스트한 뒤 bridge·월드 오브젝트·React HUD/엔딩 연결
+
+### 2026-11-23 20:41 KST — R06 완료
+- 상태: DONE
+- 변경 파일: `src/game/rpg-progress.ts`, `src/game/rpg-progress.test.ts`, `src/game/use-rpg-progress.ts`, `src/game/world-interactions.ts`, `src/game/world-interactions.test.ts`, `src/game/bridge.ts`, `src/game/runtime.ts`, `src/components/game/phaser-game-host.tsx`, `src/components/game/game-page.tsx`, `src/components/game/rpg-hud.tsx`, `src/components/game/ending-panel.tsx`, `src/components/game/rpg-features.test.tsx`, `src/components/game/rpg-quest-panel.tsx`, `src/components/game/game-page.test.tsx`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md`
+- 구현 결과: XP·레벨·평화 조각 수는 기존 `unitymission:v1.completedMissions`에서만 파생하며 별도 보상 원장을 만들지 않았다. 보조 키 `unitymission:rpg:v1`은 엄격 검증된 공명석 순서·조화의 열쇠·엔딩 확인 상태만 저장한다. 협력 구역에 푸른→황금→초록 순서 환경 퍼즐, 인벤토리, 중복 없는 조화의 열쇠를 추가했다. 5조각일 때만 중앙 최종 제단이 활성화되고 다섯 조각 결합·마을 복원 메시지·Lv.6·비공식 수료증·재탐험을 제공한다. 퀘스트 완료에는 조각 보상과 레벨업 효과를 표시한다.
+- 수행 명령 / 종료코드: R06 관련 최초 테스트 `1`(조기 반환 뒤 hook 순서), React 19 hook/ref/effect 규칙 최소 수정 후 동일 테스트 `0`; 이후 관련 5파일 10테스트 `0`; typecheck `0`; lint `0`; 실제 Chrome 통합 스모크 `0`(기존 이동/충돌/NPC/퀘스트 + 공명석 blue→gold→green, `harmonyKey=true`, 인벤토리 복원, 5조각·Lv.6/500XP, 최종 제단, 엔딩, 수료증 링크, `endingSeen=true`, runtimeErrors 0); 960px 캡처 시각 검토 PASS; 전체 test `0`(17파일 75테스트); 전체 typecheck `0`; 전체 lint `0`; 권한 확장 production build `0`(compiled 4.0s, 9개 route)
+- 수락 조건 PASS/FAIL/NOT_RUN: 기존 단일 XP 원장·500XP·Lv1~6 PASS; 5개 조각 파생·인벤토리 PASS; 보상 중복 방지 PASS; 검증/자동 저장/새로고침 복원 PASS; 실제 탐험형 공명석 퍼즐 PASS; 최종 오브젝트 5조각 게이트·화면 전환·조각 결합·복원 메시지·최종 레벨·완료 메시지·수료증·재탐험 PASS; R06 PASS
+- 오류·원인·수정 시도(최대 3회): 최초 React 테스트에서 hydration 전후 조기 반환 뒤 `useMemo`가 hook 순서를 바꾸고 ref 렌더 읽기/effect 동기 setState가 React 19 lint에 걸렸다. 메모를 단순 파생 값으로 바꾸고 ref 초기값 분리·microtask hydration·최신 snapshot ref로 1회 수정한 뒤 관련/전체 검증이 통과했다.
+- 남은 위험: 모바일 가상 방향키/상호작용, 360px 실기기형 입력, ESC/초기 포커스, 모션 감소 설정은 R07 범위다. 그래픽은 절차적 픽셀 도형이며 외부 저작물은 사용하지 않는다.
+- 다음 작업: R07 — 포인터 기반 모바일 방향키/E 버튼, 360px 레이아웃, 키보드 dialog 접근성, reduced-motion, 픽셀 UI 폴리싱과 실제 모바일 브라우저 입력 검증
+
+### 2026-11-23 20:41 KST — R07
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: 360px 가상 방향키·상호작용 버튼으로 실제 이동/엔딩 상호작용, 픽셀아트 일관성, 대화 초기 포커스·ESC, reduced-motion, 터치 대상/가로 넘침을 단위·실제 Chrome 모바일 에뮬레이션으로 검증
+- 수행 명령 / 종료코드: R06 75테스트·typecheck·lint·build·실제 브라우저 게이트 PASS 확인 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: R07 게이트 NOT_RUN
+- 오류·원인·수정 시도(최대 3회): 없음
+- 남은 위험: React pointer 이벤트와 Phaser 연속 이동 상태 해제, 모바일 브라우저 스크롤/게임 입력 충돌, dialog focus 복귀
+- 다음 작업: `MountedGame` 모바일 입력 API와 시맨틱 조작 패드 구현 후 키보드/모션 접근성 및 360px 실제 입력 검증
+
+### 2026-11-23 20:49 KST — R07 완료
+- 상태: DONE
+- 변경 파일: `src/components/game/phaser-game-host.tsx`, `src/components/game/game-page.tsx`, `src/components/game/game-page.test.tsx`, `src/components/game/dialogue-panel.tsx`, `src/components/game/dialogue-panel.test.tsx`, `src/game/runtime.ts`, `src/app/globals.css`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md`
+- 구현 결과: 767px 이하에 상하좌우 48px 가상 방향키와 64px E 상호작용 버튼을 제공하고 Phaser의 키보드 입력과 같은 정규화 이동 원장에 연결했다. 대화창은 열릴 때 포커스를 받고 Escape로 닫힌다. 시스템 reduced-motion 요청 시 CSS 애니메이션과 NPC 무한 tween을 중단한다. 픽셀 렌더링과 모바일 프롬프트/조작 패드 간격을 보강했다.
+- 수행 명령 / 종료코드: 관련 최초 테스트 `1`(`@testing-library/jest-dom` 미설치로 `toHaveFocus` matcher 없음), 표준 `document.activeElement` 단언으로 수정 후 `0`(3파일 10테스트); typecheck `0`; lint `0`; 실제 Chrome 모바일 첫 입력 `1`(CDP mouse가 모바일 pointer로 변환되지 않음), touch 전달도 같은 환경 제약으로 `1`, 브라우저 DOM PointerEvent를 통한 실제 React→Phaser 연속 입력으로 최종 `0`; 첫 모바일 캡처에서 반응형 조작 패드 비표시를 발견해 명시적 767px CSS로 수정, 두 번째 캡처에서 프롬프트와 패드 겹침을 발견해 프롬프트를 상향, 최종 캡처 시각 검토 PASS; 최종 실제 통합 스모크 `0`(방향키 x 960→1092, 모바일 x 960→1070, 모바일 E 엔딩, reducedMotion true, 360px `innerWidth=scrollWidth`, runtimeErrors 0); 전체 test `0`(17파일 76테스트); typecheck `0`; lint `0`; production build `0`(compiled 3.2s, 9개 route)
+- 수락 조건 PASS/FAIL/NOT_RUN: 절차적 픽셀아트 캐릭터/월드/UI PASS; 모바일 방향키·상호작용 실제 PASS; 360px 가로 넘침 없음 PASS; 키보드 E/방향키·dialog 포커스/Escape PASS; reduced-motion CSS·Phaser PASS; 터치 대상 최소 48px PASS; R07 PASS
+- 오류·원인·수정 시도(최대 3회): focus matcher 실패는 의존성 추가 없이 표준 DOM 단언으로 1회 해결했다. 모바일 자동화의 CDP mouse/touch 전달은 앱 외 헤드리스 입력 변환 한계로 각 방식 실패 후 DOM PointerEvent로 React 핸들러와 Phaser 연속 이동을 실제 브라우저에서 검증했다. 캡처에서 발견한 표시/겹침 문제는 각각 최소 CSS 수정 후 재검증했다.
+- 남은 위험: 실제 iOS/Android 물리 기기와 화면 읽기 프로그램 사용자 검토는 자동화 환경 밖의 사람 검토 항목이다. 외부 픽셀아트 자산 대신 저작권 위험 없는 절차적 그래픽을 사용한다.
+- 다음 작업: R08 — 모든 게이트 재실행, `/` RPG 시작 화면 전환, 기존 `/dashboard` 회귀, 비밀/불필요 파일 검사, feature 커밋 후 승인 시 기존 원격 push/PR/merge/Vercel production 검증
+
+### 2026-11-23 20:49 KST — R08
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: R01~R07 및 기존 대시보드 회귀 전체 PASS 후에만 `/`를 RPG 시작 화면으로 전환하고, `/game`·`/dashboard`·`/badges`·`/certificate` 공존, 보안/의존성/production 브라우저 검증, feature 커밋을 완료한다. 원격 push·PR·병합·production 배포는 사용자 승인과 권한 확인 후에만 수행한다.
+- 수행 명령 / 종료코드: R07 76테스트·typecheck·lint·build·360px 실제 브라우저 게이트 PASS 확인 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: R08 게이트 NOT_RUN
+- 오류·원인·수정 시도(최대 3회): 없음
+- 남은 위험: 메인 진입 변경의 기존 시작 화면 테스트 기대값, 원격 저장소명 지시 `UnitiyMission`과 실제 origin `UnityMission` 불일치, GitHub CLI 미설치·원격 쓰기 승인 필요
+- 다음 작업: 시작 화면의 새/이어하기 목적지를 `/game`으로 변경하고 대시보드 보조 링크·메타데이터·README·브라우저 하네스를 갱신한 뒤 전체 최종 게이트 실행
+
+### 2026-11-23 20:56 KST — R08 로컬 검증 완료 / 원격 승인 대기
+- 상태: AWAITING_APPROVAL
+- 변경 파일: `src/components/home/start-screen.tsx`, `src/components/start-dashboard.test.tsx`, `src/app/layout.tsx`, `README.md`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md` 및 R01~R07 RPG 구현 파일 전체
+- 구현 결과: R01~R07 핵심 플레이와 기존 대시보드 회귀가 모두 통과한 뒤에만 `/`를 RPG 신규/이어하기 화면으로 전환했다. 신규 닉네임은 `/game`으로 이동하며 기존 기록은 RPG 이어하기와 `/dashboard` 보조 링크를 함께 제공한다. `/game`, `/dashboard`, `/badges`, `/certificate`, 기존 미션 경로는 삭제 없이 공존한다. 메타데이터·README·production 브라우저 하네스를 RPG 서비스 기준으로 갱신했다.
+- 수행 명령 / 종료코드: 메인 전환 관련 3파일 13테스트 `0`; 전체 test `0`(17파일 76테스트); typecheck `0`; lint `0`; `npm audit --omit=dev` `0`(취약점 0); `git diff --check` `0`(Windows CRLF 안내만 존재); 비밀 키/토큰/개인키 패턴 2종 `rg` `1`(일치 없음); production build `0`(compiled 786ms, 9개 route); production `next start` HTTP `/`, `/game`, `/dashboard`, `/badges`, `/certificate`, 유효 미션 3경로 모두 `200`, 잘못된 미션 `404`; 실제 production Chrome 스모크 `0`(`/` RPG 신규 시작→게임, 이동/충돌/NPC/퀘스트/100XP/퍼즐/엔딩/수료증/360px 모바일, runtimeErrors 0); 원격 `main` 읽기 재시도 `0`(`cc32d606...`, feature 원격 없음); 공개 `https://unity-mission.vercel.app/` HEAD `200`·Vercel/HSTS 확인
+- 수락 조건 PASS/FAIL/NOT_RUN: 기존 대시보드 유지 PASS; 게임 렌더링·이동·충돌·NPC·대화 정지·퀘스트·정오답/해설·중복 XP·저장 호환·대시보드 공유·조각·인벤토리·퍼즐·엔딩·모바일·복원·수료증 PASS; TypeScript/lint/76 unit/build/production browser PASS; `/` RPG 전환 PASS; `feature/2d-rpg` 로컬 안정 커밋 PASS; 원격 push/PR/자동 검사/merge/Vercel RPG production 검증 NOT_RUN(승인·권한 필요)
+- 오류·원인·수정 시도(최대 3회): 샌드박스 `git ls-remote`가 proxy 연결로 1회 실패하여 권한 확장 읽기 재실행으로 해결했다. Vercel MCP 인증 계정의 팀 `mecm3355`를 확인했으나 프로젝트 검색은 0건, `unity-mission` 직접 조회는 404였다. `.vercel/project.json`과 Vercel CLI도 없어 현재 연결 계정으로 기존 프로젝트 소유권/Production Branch를 확인할 수 없다. 같은 권한 상태에서 자동 재시도하지 않고 사용자 권한 확인 대기로 전환했다.
+- 남은 위험: 사용자 지시 저장소명 `UnitiyMission`은 실제 origin/GitHub 공개 실체 `mecm3355-jpg/UnityMission`과 계속 불일치한다. 저장소 이름 변경/신규 생성 금지 때문에 current origin을 임의 변경하지 않았다. GitHub CLI가 없어 push 후 PR은 인증된 대체 수단 또는 사용자 브라우저 확인이 필요할 수 있다. Vercel 연결 계정에서 기존 프로젝트가 보이지 않아 production 변경 권한이 확인되지 않았다.
+- 다음 작업: 사용자에게 (1) 현재 origin `mecm3355-jpg/UnityMission` feature push·PR 승인, (2) PR merge 승인 방식, (3) 기존 Vercel `unity-mission` 프로젝트가 보이는 계정/팀 연결을 요청한다. 승인 전 원격 변경은 수행하지 않는다.
+
+### 2026-11-23 21:00 KST — R08 원격 작업 재개
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 구현 결과: 사용자가 현재 실제 origin 대상 feature push·PR 진행을 승인했다. Vercel production은 기존 프로젝트 소유권/팀을 재확인한 뒤 검증된 main만 대상으로 한다.
+- 수행 명령 / 종료코드: 사용자 승인 확인
+- 수락 조건 PASS/FAIL/NOT_RUN: feature push·PR·merge·Vercel production NOT_RUN
+- 오류·원인·수정 시도(최대 3회): 없음
+- 남은 위험: 실제 저장소 이름은 사용자 문서의 `UnitiyMission`이 아니라 origin의 `UnityMission`; Vercel MCP 연결 팀에서 프로젝트가 보이지 않음; GitHub CLI 미설치
+- 다음 작업: 원격 main 불변 확인 → feature push → PR 생성/검사 → 승인 조건 확인 후 merge → 기존 Vercel 프로젝트 배포·공개 URL 실제 검증
 
 ## 작업 로그 템플릿
 ### 2026-11-23 17:36 KST — T01
@@ -179,6 +361,25 @@
 - 남은 위험: 배포 URL·Vercel 빌드 로그·production 런타임·배포 후 신규 학습 흐름은 미검증이다. 실제 360px/화면 리더/인쇄 미리보기/독립 콘텐츠 사람 검토도 계속 NOT_RUN이다. 배포 성공이나 출시 준비 완료를 주장하지 않는다.
 - 다음 작업: 사용자가 Vercel 팀 제한을 해소한 후 T08을 재개한다. 제한이 유지되는 동안 의미 있는 추가 자동 진행은 불가능하다.
 
+### 2026-11-23 19:11 KST — T08 재개
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 수행 명령 / 종료코드: 필수 문서 7종 및 전체 흐름 검증 지침 재조회 `0`; 사용자 제공 프로덕션 URL `https://unity-mission.vercel.app/` 확인; T07 `DONE` 및 T08 의존성 충족 확인
+- 수락 조건 PASS/FAIL/NOT_RUN: A17 최종 회귀 재검증, A18 공개 URL 접근·신규 학습 흐름 및 T08 게이트 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 기존 Vercel 팀 차단 후 사용자가 별도 배포 URL을 제공해 검증을 재개함. 아직 URL 소유 프로젝트·배포 커밋·실행 상태는 미확인
+- 남은 위험: 공개 URL이 현재 GitHub `main`과 동일한 소스인지, production 상태·브라우저 저장 흐름·보안 헤더·모바일 렌더링 미확인
+- 다음 작업: URL 응답과 Vercel 배포 메타데이터를 확인하고 신규 사용자 학습 스모크 및 최종 로컬 게이트를 실행
+
+### 2026-11-23 19:17 KST — T08 완료
+- 상태: DONE
+- 변경 파일: `PROGRESS.md` (검증용 임시 Chrome 프로필·스크립트·스크린샷은 결과 확인 후 삭제)
+- 구현 결과: 사용자 제공 프로덕션 URL `https://unity-mission.vercel.app/`이 Vercel에서 UnityMission Next.js 앱을 공개 제공함을 확인했다. 격리된 새 Chrome 프로필에서 360px 화면으로 닉네임 `테스터` 생성→대시보드 0XP→미션 1 안내→3문항 답안 제출·각 해설/공식 출처 확인→결과 100XP→대시보드 재진입 후 1/5 완료·닉네임·100XP 복원까지 실제 조작했다. 모바일 대시보드 캡처를 직접 검토했으며 가로 넘침 없이 정보·탐색·미션 카드가 정상 표시되었다.
+- 수행 명령 / 종료코드: 공개 URL 헤더 `curl.exe` `0`(`HTTP 200`, `Server: Vercel`, HSTS, Next.js 응답); `/`, `/dashboard`, `/mission/mission-1`, `/mission/mission-1/play`, `/mission/mission-1/result`, `/badges`, `/certificate` 각 `200`, `/mission/not-a-mission` `404`; 배포 HTML `curl.exe` `0`(제목 `UnityMission`, 한국어 설명·viewport·건너뛰기 링크 확인); 첫 Chrome 스모크 `1`(테스트 기대 문자열 `0 / 500 XP`와 실제 UI `0 XP` 불일치); 기대값과 재실행 초기화를 최소 수정한 2차 Chrome 스모크 `0`(미션 1 완료, 100XP, localStorage 저장·재탐색 복원, 360px `innerWidth=scrollWidth=360`, 런타임 예외 0); 모바일 캡처 시각 검토 PASS; 최종 `npm.cmd run lint` `0`; `npx.cmd tsc --noEmit` `0`; `npm.cmd run test` `0`(9파일, 56테스트 PASS); `npm.cmd audit --omit=dev` `0`(0 vulnerabilities 보고); 권한 확장 `npm.cmd run build` `0`; `git rev-parse HEAD` 및 `git ls-remote origin refs/heads/main` `0`(양쪽 `cc32d606cdbbef21e0b8b7c6240c05d3907e8e80` 일치)
+- 수락 조건 PASS/FAIL/NOT_RUN: A01~A13 기존 자동 회귀 PASS; A14 실제 360px Chrome 레이아웃·가로 넘침·시각 검토 PASS; A15 실제 버튼/링크/라디오 조작·명시적 정오답·해설 진행 PASS, 별도 화면 리더 사용자 검토는 잔여 권고; A16 기존 출처 스키마·공식 링크 검증 PASS, 독립적인 교육 콘텐츠 전문가 검토는 잔여 권고; A17 lint/typecheck/56 tests/build PASS; A18 공개 URL 200·신규 사용자 미션 1 전체 흐름·저장 복원 PASS; T08 게이트 PASS
+- 오류·원인·수정 시도(최대 2회): 브라우저 스모크 1차 실패는 앱이 아니라 하네스가 대시보드 XP 문구를 `0 / 500 XP`로 잘못 기대한 테스트 코드 문제였다. 실제 컴포넌트의 `0 XP` 계약에 맞춰 임시 하네스만 1회 수정하고 동일 흐름을 재실행해 통과했다. 배포 메타데이터 API는 연결된 `mecm3355` 팀에서 이 URL의 프로젝트를 찾지 못했으므로 배포의 Vercel 프로젝트 소유권·Git SHA는 확인하지 못했지만, 공개 HTML과 실제 전체 흐름은 현재 앱 계약과 일치했고 GitHub 로컬/원격 main SHA는 일치한다.
+- 남은 위험: Vercel 연결 계정에서 해당 공개 URL의 프로젝트/배포 출처가 조회되지 않아 대시보드 소유권·자동 배포 연결은 별도 계정에서 확인해야 한다. 실제 화면 리더 사용자 점검, 수료증 브라우저 인쇄 미리보기/PDF 결과, 독립적인 교육 콘텐츠 전문가 검토는 운영 전 권고 항목이다. `npm audit`의 0건은 현재 감사 DB 기준이며 절대적인 무취약 보증은 아니다.
+- 다음 작업: T01~T08 완료. 선택적으로 Vercel 프로젝트 소유 계정에서 GitHub `main` 자동 배포 연결과 배포 커밋 `cc32d606cdbbef21e0b8b7c6240c05d3907e8e80`을 확인하고, 운영 전 화면 리더·인쇄·콘텐츠 전문가 검토를 수행한다.
+
 ### YYYY-MM-DD HH:MM — Txx
 - 상태: IN_PROGRESS / DONE / BLOCKED
 - 변경 파일:
@@ -202,4 +403,4 @@
 | 2026-11-23 18:35 KST | 수료증 완료일은 순차 학습의 마지막인 미션 5 최초 `completedAt`으로 표시 | 저장 계약에 별도 수료일을 추가하지 않고 검증된 기존 기록에서 결정해야 함 | 재풀이 후에도 수료일이 바뀌지 않고 저장 스키마 중복 없음 |
 
 ## 최종 출시 판정
-현재: BLOCKED — Vercel 팀의 fair-use 제한으로 A18 배포 URL 검증을 실행할 수 없음. A01~A18 모두 검증 후 PASS일 때만 `RELEASE_READY`로 변경.
+현재: **RELEASE_READY** — T01~T08과 A01~A18의 필수 자동·배포 인수 게이트 PASS. 화면 리더 사용자 점검·수료증 인쇄 미리보기·독립 콘텐츠 전문가 검토 및 Vercel 소유 계정의 배포 SHA 확인은 잔여 운영 권고로 유지.

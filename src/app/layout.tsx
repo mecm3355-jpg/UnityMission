@@ -4,8 +4,8 @@ import { ProgressProvider } from "@/context/progress-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "UnityMission",
-  description: "통일·평화교육 미션을 학습하는 웹앱",
+  title: "UnityMission — 평화의 다섯 조각",
+  description: "평화마을을 탐험하며 통일·평화교육 퀘스트를 해결하는 2D 픽셀 RPG",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
