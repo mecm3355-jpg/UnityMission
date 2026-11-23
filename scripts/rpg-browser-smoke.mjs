@@ -128,6 +128,19 @@ async function holdPointerButton(label, durationMs) {
   await new Promise((resolve) => setTimeout(resolve, 150));
 }
 
+async function moveMobileUntilText(text, buttonLabel, startX, minDelta = 70, maxSteps = 16) {
+  for (let step = 0; step < maxSteps; step += 1) {
+    const state = await evaluate(`(() => ({
+      textReady: document.body.innerText.includes(${JSON.stringify(text)}),
+      x: Number(document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX)
+    }))()`);
+    if (state.textReady && state.x > startX + minDelta) return state.x;
+    await holdPointerButton(buttonLabel, 140);
+  }
+  await waitFor(`document.body.innerText.includes(${JSON.stringify(text)})`, `${text} 모바일 이동`);
+  return Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
+}
+
 await send("Page.enable");
 await send("Runtime.enable");
 await send("Emulation.setDeviceMetricsOverride", {
@@ -242,8 +255,7 @@ await evaluate(`(() => {
 await send("Page.navigate", { url: `${baseUrl}/game` });
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.gameReady === "true"`, "엔딩 장면 준비", 20000);
 await waitFor(`document.body.innerText.includes("Lv.6 · 500XP")`, "최종 레벨 공유");
-await holdKey("ArrowRight", 300);
-await waitFor(`document.body.innerText.includes("E 키: 평화의 나무 상호작용")`, "최종 오브젝트 활성화");
+await moveUntilText("E 키: 평화의 나무 상호작용", "ArrowRight", 12);
 await holdKey("KeyE", 80);
 await waitFor(`document.body.innerText.includes("평화마을이 다시 빛납니다")`, "최종 엔딩");
 await waitFor(`document.body.innerText.includes("최종 레벨 Lv.6")`, "엔딩 최종 레벨");
@@ -270,10 +282,8 @@ await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.reducedMotion === "true"`, "모션 감소 설정");
 await waitFor(`document.querySelector('button[aria-label="오른쪽으로 이동"]')`, "모바일 방향키");
 const mobileStartX = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
-await holdPointerButton("오른쪽으로 이동", 500);
-const mobileMovedX = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
+const mobileMovedX = await moveMobileUntilText("E 키: 평화의 나무 상호작용", "오른쪽으로 이동", mobileStartX);
 if (mobileMovedX <= mobileStartX + 70) throw new Error(`모바일 오른쪽 이동이 확인되지 않았습니다: ${mobileStartX} -> ${mobileMovedX}`);
-await waitFor(`document.body.innerText.includes("E 키: 평화의 나무 상호작용")`, "모바일 최종 오브젝트 근접");
 await holdPointerButton("상호작용", 100);
 await waitFor(`document.body.innerText.includes("평화마을이 다시 빛납니다")`, "모바일 상호작용 엔딩");
 await clickButton("다시 탐험하기");
