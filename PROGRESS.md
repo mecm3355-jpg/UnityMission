@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R08_AWAITING_CONNECTION**. feature 브랜치 push는 완료됐으며, PR 생성용 GitHub 연결과 기존 Vercel 프로젝트 권한 확인을 기다립니다.
+> 현재 상태: **R08_DONE**. PR #1 병합·Vercel production 재배포·공개 URL 전체 RPG 플레이 검증까지 PASS했습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -24,7 +24,7 @@
 | R05 | DONE | 2026-11-23 20:12 KST | 2026-11-23 20:34 KST | PASS | 기존 15문항 재사용·정오답/출처·100XP·저장·완료 NPC 반응 |
 | R06 | DONE | 2026-11-23 20:34 KST | 2026-11-23 20:41 KST | PASS | 공유 성장·5조각 인벤토리·공명석 퍼즐·조화의 열쇠·최종 엔딩 |
 | R07 | DONE | 2026-11-23 20:41 KST | 2026-11-23 20:49 KST | PASS | 절차적 픽셀 UI·모바일 방향키/E·ESC/포커스·reduced-motion·360px |
-| R08 | AWAITING_CONNECTION | 2026-11-23 20:49 KST | - | PARTIAL | 로컬 전체 PASS·feature push 완료; PR/merge·Vercel 연결 대기 |
+| R08 | DONE | 2026-11-23 20:49 KST | 2026-11-23 21:23 KST | PASS | PR #1 merge·Vercel production·공개 URL 전체 RPG 플레이 PASS |
 
 ### 2026-11-23 19:22 KST — R01
 - 상태: IN_PROGRESS
@@ -205,6 +205,26 @@
 - 오류·원인·수정 시도(최대 3회): 로컬 `gh`가 없고 공유 브라우저 제어 도구도 제공되지 않아 인증을 우회하지 않고 GitHub 연결을 사용자에게 제안했다. 연결 전에는 PR 쓰기 권한이 없다. Vercel 연결 팀에는 브랜치 배포도 0건으로 기존 프로젝트 Git 연동/권한을 확인할 수 없다.
 - 남은 위험: PR을 만들기 전에는 보호 규칙/자동 검사 상태를 확인할 수 없다. Vercel 프로젝트가 현재 연결 계정에 보이지 않는다.
 - 다음 작업: 사용자가 GitHub 연결을 완료하면 `main` 대상 PR 생성→검사 확인→승인 조건에 따라 merge. 이어 기존 Vercel 프로젝트가 보이는 계정/팀을 연결해 Production Branch `main` 확인→배포→공개 URL 전체 플레이 검증.
+
+### 2026-11-23 21:13 KST — PR 병합 완료 / Vercel production BLOCKED
+- 상태: BLOCKED
+- 변경 파일: GitHub PR #1·원격 `main`, `PROGRESS.md`
+- 구현 결과: PR #1(`feature/2d-rpg`→`main`)은 충돌 없음·Vercel Preview 성공 상태에서 사용자에 의해 병합됐다. 원격 main은 merge commit `b822a47e44c2ab0f6b918bdbaecf71e40065db1c`으로 갱신됐다. production 프로젝트는 `unitiymission/unity-mission`으로 식별됐지만 배포 `dpl_Eo6EwZgFByg39dwzJVk3Wy6dBC5N`이 실패했다.
+- 수행 명령 / 종료코드: GitHub PR 공개 API `0`(closed, merged true, 2026-11-23 21:11 KST); 원격 main/feature 조회 `0`; 병합 commit Vercel 상태 29회 관찰(계속 failure); 공개 `https://unity-mission.vercel.app/game` 29회 `404`; commit status 조회 `0`(`Deployment has failed`); Vercel deployment 상세 조회 `403`(scope `unitiymission` 권한 없음); 팀 접근 승인 ID 방식 `404`, slug 방식 `404`
+- 수락 조건 PASS/FAIL/NOT_RUN: GitHub PR 생성 PASS; Vercel Preview check PASS; PR merge PASS; production deploy FAIL; 실제 production RPG 플레이 NOT_RUN; R08 FAIL/BLOCKED
+- 오류·원인·수정 시도(최대 2회): 같은 Vercel 팀 권한 문제에 대해 API가 제공한 team ID `team_Gn8AGS8AV7sQMdJzL8AUQkFH`와 slug `unitiymission`로 각각 접근 승인 링크 생성을 시도했으나 둘 다 `Team not found`. 현재 연결 계정은 해당 팀 구성원이 아니어서 로그를 읽거나 재배포할 수 없다. 동일 실패 자동 시도를 중단했다.
+- 남은 위험: public production은 이전 대시보드 버전을 계속 제공하며 `/game`은 404다. Preview 성공으로 소스 자체 build는 통과했지만 production 프로젝트 설정/환경/권한 차이의 정확한 실패 원인은 로그 없이 확정할 수 없다.
+- 다음 작업: 사용자가 [실패한 Vercel 배포](https://vercel.com/unitiymission/unity-mission/Eo6EwZgFByg39dwzJVk3Wy6dBC5N)를 열어 Build Logs의 첫 오류를 공유하거나, 현재 Vercel 연결 계정을 `unitiymission` 팀 구성원 계정으로 전환한다. 로그 확보 후 최대 2회 수정·재배포·공개 URL 검증을 재개한다.
+
+### 2026-11-23 21:23 KST — R08 완료
+- 상태: DONE
+- 변경 파일: Vercel production deployment, `PROGRESS.md`
+- 구현 결과: 첫 production 배포는 Next compile·TypeScript·7개 정적 페이지 생성까지 성공한 뒤 output 배포 단계에서 실패했으나, 사용자 재배포 후 Vercel commit status가 success로 전환됐다. 공개 `https://unity-mission.vercel.app/`은 RPG 시작 화면을 제공하고 `/game`도 200이다. 격리된 신규 Chrome 프로필에서 실제 공개 URL 전체 플레이를 완료했다.
+- 수행 명령 / 종료코드: Vercel merge commit status 재확인 `0`(`success`, `Deployment has completed`, 2026-11-23 21:20 KST); 공개 `/` `200`·RPG 문자열 확인; 공개 `/game` `200`; 실제 공개 Chrome 통합 스모크 `0`(신규 닉네임→RPG, 이동 x960→1092, 충돌 y649/count52, NPC 대화/이동 잠금 x579→579, 기존 3문항·100XP·완료 반응, 공명석 blue→gold→green·조화의 열쇠, 5조각·Lv.6 엔딩·수료증, 모바일 x960→1070, 360px 가로 넘침 없음, reduced-motion true, runtimeErrors 0); 모바일 캡처 시각 검토 PASS; 테스트 Chrome/임시 파일 정리 완료
+- 수락 조건 PASS/FAIL/NOT_RUN: 기존 대시보드 유지 PASS; GitHub feature push·PR #1·Vercel Preview·merge PASS; Vercel production PASS; 실제 공개 URL 게임 렌더링/이동/충돌/NPC/대화 정지/퀘스트/정오답·해설/중복 XP/저장 호환/진행 공유/조각/인벤토리/퍼즐/엔딩/모바일/복원/수료증 PASS; R08 PASS
+- 오류·원인·수정 시도(최대 2회): 첫 production 실패 로그는 앱 build 전체 성공 후 `Deploying outputs...`에서 끝났고 npm `cache-dir` 경고는 저장소 설정이 아니며 실패 원인이 아니었다. 코드 변경 없이 사용자 재배포 1회로 성공하여 Vercel output 배포의 일시적 플랫폼/프로젝트 상태 오류로 분류한다.
+- 남은 위험: 실제 iOS/Android 물리 기기 터치 감각, 실제 화면 읽기 프로그램 사용자 검토, 교육 콘텐츠 독립 전문가 검토는 자동화 밖의 권고 항목이다. RPG 완료 기능과 배포를 막는 알려진 오류는 없다.
+- 다음 작업: 없음. 운영 중 변경은 새 작업/PR로 진행한다.
 
 ## 작업 로그 템플릿
 ### 2026-11-23 17:36 KST — T01
