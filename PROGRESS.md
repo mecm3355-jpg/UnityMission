@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **T08_IN_PROGRESS**. T08 배포·인수 준비와 권한 확인을 진행 중입니다.
+> 현재 상태: **T08_BLOCKED**. GitHub 푸시는 완료했으나 Vercel 팀의 fair-use 제한으로 프로젝트 생성·배포가 차단되었습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -12,7 +12,7 @@
 | T05 | DONE | 2026-11-23 18:24 KST | 2026-11-23 18:32 KST | PASS | 안내·3문항·해설·결과·복습·URL 잠금·복원 검증 완료 |
 | T06 | DONE | 2026-11-23 18:34 KST | 2026-11-23 18:39 KST | PASS | 배지 5개 파생·수료증 차단/해제·인쇄 기능 검증 완료 |
 | T07 | DONE | 2026-11-23 18:41 KST | 2026-11-23 18:46 KST | PASS | 자동 UX·보안·전체 회귀 게이트 완료, 사람 검토 항목 별도 유지 |
-| T08 | IN_PROGRESS | 2026-11-23 18:48 KST | - | NOT_RUN | README·GitHub·Vercel 배포 및 인수 진행 중 |
+| T08 | BLOCKED | 2026-11-23 18:48 KST | 2026-11-23 18:57 KST | PARTIAL | GitHub 완료, Vercel `resource_creation_blocked`로 배포 URL 없음 |
 
 ## 작업 로그 템플릿
 ### 2026-11-23 17:36 KST — T01
@@ -168,6 +168,17 @@
 - 남은 위험: Git 저장소 미초기화 가능성, GitHub CLI·Vercel CLI 로그인/팀/프로젝트 대상 미확인, 실제 브라우저 수동 검토 항목, 원격 배포 권한 또는 보호 설정
 - 다음 작업: 로컬 Git/CLI 설치·인증·기존 링크를 읽기 전용으로 확인하고 README 작성·최종 게이트 후 확인된 대상에만 커밋·푸시·Vercel 배포
 
+### 2026-11-23 18:57 KST — T08 차단
+- 상태: BLOCKED
+- 변경 파일: `README.md`, `PROGRESS.md`, 로컬 `.git/**`(Git 메타데이터, 소스 커밋 대상 아님)
+- 구현 결과: README를 실제 MVP 기능·실행·검증·경로·저장/보안·Vercel 배포·사람 검토 잔여 항목으로 갱신했다. 로컬 저장소를 `main`으로 초기화하고 확인된 빈 원격 `https://github.com/mecm3355-jpg/UnityMission.git`에 소스 커밋 `048396cfada9223fa50398e86e65a83e84471fe7`을 푸시했다. 원격 `refs/heads/main`이 같은 SHA를 가리키는 것을 확인했다.
+- 수행 명령 / 종료코드: 최종 `npm.cmd run lint` `0`; `npx.cmd tsc --noEmit` `0`; `npm.cmd run test` `0`(9파일, 56테스트 PASS); `npm.cmd audit --omit=dev` `0`(0 vulnerabilities 보고); 권한 확장 `npm.cmd run build` `0`; `git init -b main` `0`; `git remote add origin ...` 최초 `1`(샌드박스 `.git/config` 쓰기 권한), 권한 확장 재실행 `0`; `git add .` `0`; `git diff --cached --check` `0`; 스테이징 비밀정보 패턴 검색 `1`(일치 없음); `git commit` `0`; `git push -u origin main` `0`; `git ls-remote origin refs/heads/main` `0`(로컬과 동일 SHA); Vercel 연결 팀 `mecm3355` 확인 `0`; 동일 이름 프로젝트 검색 `0`(0개)
+- Vercel 실패·재시도: MCP `create_project` 1차 시도는 HTTP `402 resource_creation_blocked`와 `Your Team exceeded our fair use limits and has been blocked`를 반환했다. 공식 안내에 따른 동일 팀·동일 프로젝트 CLI fallback `vercel@66.6.0 --scope mecm3355 project add unitymission` 2차 시도도 `payment_required`, `retryable:false`, `userActionRequired:true`로 동일 실패했다. 자동 수정·재시도 한도 2회를 채워 추가 생성·다른 팀/프로젝트 우회를 중단했다. 최종 프로젝트 재조회 결과 `unitymission`은 생성되지 않았다.
+- 수락 조건 PASS/FAIL/NOT_RUN: A17 최종 lint/typecheck/56 tests/build PASS; GitHub 푸시 PASS; README PASS; A18 Vercel 배포 URL 미생성으로 FAIL/NOT_RUN; 배포 URL 신규 학습 스모크 NOT_RUN; T08 게이트 FAIL
+- 해결 조건: Vercel 팀 소유자가 대시보드에서 fair-use/결제/플랜 차단 사유를 해소한 뒤 이 작업을 재개해야 한다. 해소 후에는 `mecm3355` 팀의 `unitymission` 프로젝트가 여전히 없는지 확인하고, 같은 GitHub `main` 커밋으로 프로젝트 생성→production 배포→READY 확인→실제 URL 스모크를 수행한다.
+- 남은 위험: 배포 URL·Vercel 빌드 로그·production 런타임·배포 후 신규 학습 흐름은 미검증이다. 실제 360px/화면 리더/인쇄 미리보기/독립 콘텐츠 사람 검토도 계속 NOT_RUN이다. 배포 성공이나 출시 준비 완료를 주장하지 않는다.
+- 다음 작업: 사용자가 Vercel 팀 제한을 해소한 후 T08을 재개한다. 제한이 유지되는 동안 의미 있는 추가 자동 진행은 불가능하다.
+
 ### YYYY-MM-DD HH:MM — Txx
 - 상태: IN_PROGRESS / DONE / BLOCKED
 - 변경 파일:
@@ -191,4 +202,4 @@
 | 2026-11-23 18:35 KST | 수료증 완료일은 순차 학습의 마지막인 미션 5 최초 `completedAt`으로 표시 | 저장 계약에 별도 수료일을 추가하지 않고 검증된 기존 기록에서 결정해야 함 | 재풀이 후에도 수료일이 바뀌지 않고 저장 스키마 중복 없음 |
 
 ## 최종 출시 판정
-현재: NOT_RUN. A01~A18 모두 검증 후 PASS일 때만 `RELEASE_READY`로 변경.
+현재: BLOCKED — Vercel 팀의 fair-use 제한으로 A18 배포 URL 검증을 실행할 수 없음. A01~A18 모두 검증 후 PASS일 때만 `RELEASE_READY`로 변경.
