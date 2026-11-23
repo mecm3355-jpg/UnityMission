@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R08_AWAITING_CONNECTION**. feature 브랜치 push는 완료됐으며, PR 생성용 GitHub 연결과 기존 Vercel 프로젝트 권한 확인을 기다립니다.
+> 현재 상태: **R09_RELEASE_IN_PROGRESS**. 사용자 승인에 따라 검증 완료 아트 개편의 커밋·PR·병합·Vercel production 배포를 진행 중입니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -24,7 +24,9 @@
 | R05 | DONE | 2026-11-23 20:12 KST | 2026-11-23 20:34 KST | PASS | 기존 15문항 재사용·정오답/출처·100XP·저장·완료 NPC 반응 |
 | R06 | DONE | 2026-11-23 20:34 KST | 2026-11-23 20:41 KST | PASS | 공유 성장·5조각 인벤토리·공명석 퍼즐·조화의 열쇠·최종 엔딩 |
 | R07 | DONE | 2026-11-23 20:41 KST | 2026-11-23 20:49 KST | PASS | 절차적 픽셀 UI·모바일 방향키/E·ESC/포커스·reduced-motion·360px |
-| R08 | AWAITING_CONNECTION | 2026-11-23 20:49 KST | - | PARTIAL | 로컬 전체 PASS·feature push 완료; PR/merge·Vercel 연결 대기 |
+| R08 | DONE | 2026-11-23 20:49 KST | 2026-11-23 21:23 KST | PASS | PR #1 merge·Vercel production·공개 URL 전체 RPG 플레이 PASS |
+| R09 | DONE | 2026-11-23 21:27 KST | 2026-11-23 22:04 KST | PASS | 픽셀아트 월드·캐릭터·HUD·대화/퀘스트 UI 개편, 데스크톱/모바일 전체 플레이 검증 |
+| R09-REL | IN_PROGRESS | 2026-11-23 22:08 KST | - | NOT_RUN | 아트 개편 feature push·PR·main 병합·Vercel production 배포·공개 URL 재검증 |
 
 ### 2026-11-23 19:22 KST — R01
 - 상태: IN_PROGRESS
@@ -205,6 +207,68 @@
 - 오류·원인·수정 시도(최대 3회): 로컬 `gh`가 없고 공유 브라우저 제어 도구도 제공되지 않아 인증을 우회하지 않고 GitHub 연결을 사용자에게 제안했다. 연결 전에는 PR 쓰기 권한이 없다. Vercel 연결 팀에는 브랜치 배포도 0건으로 기존 프로젝트 Git 연동/권한을 확인할 수 없다.
 - 남은 위험: PR을 만들기 전에는 보호 규칙/자동 검사 상태를 확인할 수 없다. Vercel 프로젝트가 현재 연결 계정에 보이지 않는다.
 - 다음 작업: 사용자가 GitHub 연결을 완료하면 `main` 대상 PR 생성→검사 확인→승인 조건에 따라 merge. 이어 기존 Vercel 프로젝트가 보이는 계정/팀을 연결해 Production Branch `main` 확인→배포→공개 URL 전체 플레이 검증.
+
+### 2026-11-23 21:13 KST — PR 병합 완료 / Vercel production BLOCKED
+- 상태: BLOCKED
+- 변경 파일: GitHub PR #1·원격 `main`, `PROGRESS.md`
+- 구현 결과: PR #1(`feature/2d-rpg`→`main`)은 충돌 없음·Vercel Preview 성공 상태에서 사용자에 의해 병합됐다. 원격 main은 merge commit `b822a47e44c2ab0f6b918bdbaecf71e40065db1c`으로 갱신됐다. production 프로젝트는 `unitiymission/unity-mission`으로 식별됐지만 배포 `dpl_Eo6EwZgFByg39dwzJVk3Wy6dBC5N`이 실패했다.
+- 수행 명령 / 종료코드: GitHub PR 공개 API `0`(closed, merged true, 2026-11-23 21:11 KST); 원격 main/feature 조회 `0`; 병합 commit Vercel 상태 29회 관찰(계속 failure); 공개 `https://unity-mission.vercel.app/game` 29회 `404`; commit status 조회 `0`(`Deployment has failed`); Vercel deployment 상세 조회 `403`(scope `unitiymission` 권한 없음); 팀 접근 승인 ID 방식 `404`, slug 방식 `404`
+- 수락 조건 PASS/FAIL/NOT_RUN: GitHub PR 생성 PASS; Vercel Preview check PASS; PR merge PASS; production deploy FAIL; 실제 production RPG 플레이 NOT_RUN; R08 FAIL/BLOCKED
+- 오류·원인·수정 시도(최대 2회): 같은 Vercel 팀 권한 문제에 대해 API가 제공한 team ID `team_Gn8AGS8AV7sQMdJzL8AUQkFH`와 slug `unitiymission`로 각각 접근 승인 링크 생성을 시도했으나 둘 다 `Team not found`. 현재 연결 계정은 해당 팀 구성원이 아니어서 로그를 읽거나 재배포할 수 없다. 동일 실패 자동 시도를 중단했다.
+- 남은 위험: public production은 이전 대시보드 버전을 계속 제공하며 `/game`은 404다. Preview 성공으로 소스 자체 build는 통과했지만 production 프로젝트 설정/환경/권한 차이의 정확한 실패 원인은 로그 없이 확정할 수 없다.
+- 다음 작업: 사용자가 [실패한 Vercel 배포](https://vercel.com/unitiymission/unity-mission/Eo6EwZgFByg39dwzJVk3Wy6dBC5N)를 열어 Build Logs의 첫 오류를 공유하거나, 현재 Vercel 연결 계정을 `unitiymission` 팀 구성원 계정으로 전환한다. 로그 확보 후 최대 2회 수정·재배포·공개 URL 검증을 재개한다.
+
+### 2026-11-23 21:23 KST — R08 완료
+- 상태: DONE
+- 변경 파일: Vercel production deployment, `PROGRESS.md`
+- 구현 결과: 첫 production 배포는 Next compile·TypeScript·7개 정적 페이지 생성까지 성공한 뒤 output 배포 단계에서 실패했으나, 사용자 재배포 후 Vercel commit status가 success로 전환됐다. 공개 `https://unity-mission.vercel.app/`은 RPG 시작 화면을 제공하고 `/game`도 200이다. 격리된 신규 Chrome 프로필에서 실제 공개 URL 전체 플레이를 완료했다.
+- 수행 명령 / 종료코드: Vercel merge commit status 재확인 `0`(`success`, `Deployment has completed`, 2026-11-23 21:20 KST); 공개 `/` `200`·RPG 문자열 확인; 공개 `/game` `200`; 실제 공개 Chrome 통합 스모크 `0`(신규 닉네임→RPG, 이동 x960→1092, 충돌 y649/count52, NPC 대화/이동 잠금 x579→579, 기존 3문항·100XP·완료 반응, 공명석 blue→gold→green·조화의 열쇠, 5조각·Lv.6 엔딩·수료증, 모바일 x960→1070, 360px 가로 넘침 없음, reduced-motion true, runtimeErrors 0); 모바일 캡처 시각 검토 PASS; 테스트 Chrome/임시 파일 정리 완료
+- 수락 조건 PASS/FAIL/NOT_RUN: 기존 대시보드 유지 PASS; GitHub feature push·PR #1·Vercel Preview·merge PASS; Vercel production PASS; 실제 공개 URL 게임 렌더링/이동/충돌/NPC/대화 정지/퀘스트/정오답·해설/중복 XP/저장 호환/진행 공유/조각/인벤토리/퍼즐/엔딩/모바일/복원/수료증 PASS; R08 PASS
+- 오류·원인·수정 시도(최대 2회): 첫 production 실패 로그는 앱 build 전체 성공 후 `Deploying outputs...`에서 끝났고 npm `cache-dir` 경고는 저장소 설정이 아니며 실패 원인이 아니었다. 코드 변경 없이 사용자 재배포 1회로 성공하여 Vercel output 배포의 일시적 플랫폼/프로젝트 상태 오류로 분류한다.
+- 남은 위험: 실제 iOS/Android 물리 기기 터치 감각, 실제 화면 읽기 프로그램 사용자 검토, 교육 콘텐츠 독립 전문가 검토는 자동화 밖의 권고 항목이다. RPG 완료 기능과 배포를 막는 알려진 오류는 없다.
+- 다음 작업: 없음. 운영 중 변경은 새 작업/PR로 진행한다.
+
+### 2026-11-23 21:27 KST — R09 게임 아트 폴리싱
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: 배포된 게임 로직·교육 콘텐츠·저장 키를 변경하지 않고, 저작권 안전한 자체 생성 지형 텍스처와 절차적 픽셀 오브젝트로 월드·플레이어·NPC·건물·수목·물·조명·HUD·대화·퀘스트·엔딩을 일관된 실제 게임 화면처럼 개편한다. 데스크톱/360px 시각 검토, 이동·충돌·NPC·퀘스트·퍼즐·엔딩 회귀, lint/typecheck/test/build PASS가 완료 조건이다.
+- 수행 명령 / 종료코드: 필수 문서 7종·imagegen/Sites 지침·imagegen prompting/game asset 템플릿·Sites local preview 지침 조회 `0`; `git fetch origin main` `0`; 배포 main 기준 `feature/game-art-polish` 생성 `0`; 최종 R08 기록 cherry-pick `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: R09 게이트 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 없음
+- 남은 위험: 생성형 지형 텍스처의 반복 경계/가독성, 시각 오브젝트와 기존 물리 충돌 영역의 일치, Phaser 번들/텍스처 메모리, 모바일 HUD 겹침
+- 다음 작업: 자체 픽셀 지형 텍스처 생성·검수→workspace asset 저장→Phaser 월드/캐릭터/오브젝트/HUD 단계적 통합→자동·브라우저 회귀 검증
+
+### 2026-11-23 22:04 KST — R09 완료
+- 상태: DONE
+- 변경 파일: `public/game-assets/peace-meadow-v1.png`, `src/game/runtime.ts`, `src/app/globals.css`, `src/components/game/game-page.tsx`, `src/components/game/phaser-game-host.tsx`, `src/components/game/rpg-hud.tsx`, `src/components/game/dialogue-panel.tsx`, `src/components/game/rpg-quest-panel.tsx`, `src/components/game/ending-panel.tsx`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md`
+- 구현 결과: 자체 생성한 저작권 안전 픽셀 잔디·돌·야생화 텍스처를 Phaser 바닥에 통합하고 기존 충돌 좌표를 보존한 채 구역별 색조·다층 돌길·건물 지붕/창문/문·수목·애니메이션 분수·가로등·벤치·꽃을 절차적으로 다시 그렸다. 플레이어는 4방향 3프레임 픽셀 캐릭터, NPC는 역할별 의상·이름표·퀘스트 마커·근접 링으로 개선했다. 평화의 나무·공명석도 게임 오브젝트로 재구성했다. React HUD·인벤토리·대화 초상화·선택지·퀘스트 진행 표시·완료/엔딩 패널·모바일 D-pad를 동일한 금빛/남색 픽셀 패널 체계로 통일했다. 모바일은 Phaser `ENVELOP`, 데스크톱은 `FIT`을 사용해 360px 세로 화면에서도 월드가 작은 띠가 아닌 전체 게임 화면으로 보이게 했다. `unitymission:v1`/`unitymission:rpg:v1`, 교육 콘텐츠, XP·레벨·보상 로직은 변경하지 않았다.
+- 생성 자산: built-in image generation으로 16-bit top-down seamless meadow ground texture를 생성·시각 검수한 뒤 `public/game-assets/peace-meadow-v1.png`에 복사했다. 프롬프트 핵심은 deep emerald grass, moss, sparse golden wildflowers, subtle cobblestones, square orthographic seamless edges, crisp hard pixel edges, no text/logo/characters/buildings이었다.
+- 수행 명령 / 종료코드: `npx.cmd tsc --noEmit` `0`; 최종 `npm.cmd run lint` `0`; 최종 `npm.cmd run test` `0`(17파일, 76테스트 PASS); 권한 확장 `npm.cmd run build` `0`(7개 정적 페이지 생성); 로컬 production server `0`; 최종 실제 Chrome 전체 RPG 스모크 `0`(960×540 canvas, 이동 x960→1063, 분수 충돌 y645/count34, NPC 대화 중 x560 고정, 미션1 100XP·완료 반응, 공명석 blue→gold→green·조화의 열쇠, 5조각·Lv.6 엔딩·수료증, 모바일 x960→1066, 360px 가로 넘침 없음, reduced-motion true, runtimeErrors 0); 960px 데스크톱·360px 모바일 캡처 시각 검토 PASS; `git diff --check` `0`; 비밀정보 패턴 검색 일치 없음; 공개 자산 목록은 생성 PNG 1개만 확인
+- 수락 조건 PASS/FAIL/NOT_RUN: 기존 대시보드/RPG 데이터·진행 공유 보존 PASS; 게임 렌더링·이동·충돌·NPC·대화 잠금·퀘스트·XP·퍼즐·엔딩·모바일·저장 회귀 PASS; 데스크톱/360px 실제 픽셀 게임 시각 검토 PASS; lint/typecheck/76 tests/build PASS; R09 PASS. 원격 feature 브랜치 푸시·PR·production 재배포는 승인 전이므로 NOT_RUN.
+- 오류·원인·수정 시도(최대 2회): (1) 최초 단위 테스트는 시각 마크업이 기존 텍스트 계약을 분리해 74/76, 1차 계약 복원 후 75/76이었고 2차로 인벤토리 문장을 단일 텍스트 노드로 복원해 76/76 PASS. (2) 첫 build는 샌드박스 worker `spawn EPERM`이었으며 동일 명령을 승인된 권한 확장으로 1회 재실행해 PASS. (3) 브라우저 스모크의 고정 시간 이동이 시각 오브젝트 증가 후 프레임 속도에 따라 NPC/공명석 목표 좌표에 못 미쳤다. 1차로 공명석을 프롬프트 기준 짧은 이동, 2차로 NPC를 좌표 기준 짧은 이동으로 바꿔 이후 연속 전체 스모크 PASS. 앱의 이동 속도·물리 좌표는 변경하지 않았다. (4) 직접 Chrome 데스크톱 캡처 명령이 파일을 만들지 않아 결과로 인정하지 않고, 검증된 CDP 하네스에 캡처 지점을 추가해 같은 전체 플레이 실행에서 데스크톱/모바일 이미지를 모두 확보했다.
+- React/접근성 검토: Phaser는 기존 client effect 동적 import·destroy 생명주기를 유지하고 새 네트워크 요청·중복 상태·CSS-in-JS를 추가하지 않았다. 대화 dialog, fieldset/radio, 버튼·링크, aria label/value, reduced-motion을 유지했으며 기존 자동화가 의존한 텍스트·접근 가능한 이름을 보존했다. 닉네임은 계속 JSX 텍스트로만 렌더링한다.
+- 남은 위험: 생성 PNG는 약 1.6MB이며 저사양 실제 모바일 기기의 GPU/메모리 체감은 자동화 밖이다. 실제 iOS/Android 물리 기기 터치 감각과 화면 읽기 프로그램 사용자 검토는 권고 항목이다. 로컬 `feature/game-art-polish` 변경은 아직 커밋·푸시·PR·Vercel 배포되지 않아 공개 `https://unity-mission.vercel.app/`에는 기존 R08 디자인이 유지된다.
+- 다음 작업: 사용자 승인 후 변경 검토·커밋 → `feature/game-art-polish` 푸시 → `main` 대상 PR → 검사/병합 → 기존 Vercel 프로젝트 재배포 → 공개 URL에서 동일 전체 플레이와 데스크톱/모바일 시각 재검증
+
+### 2026-11-23 22:08 KST — R09 배포
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: 검증된 R09 파일만 로컬 커밋하고 `feature/game-art-polish`를 기존 `UnityMission` 원격에 푸시한다. `main` 대상 PR의 검사·병합 조건을 확인하고 우회 없이 병합한 뒤 기존 Vercel project/production branch `main`을 사용해 배포한다. 최종 공개 URL에서 전체 RPG 플레이와 데스크톱/360px 시각·런타임 오류 0건을 다시 확인한다.
+- 수행 명령 / 종료코드: 필수 문서 6종·Git 상태/remote/history 조회 `0`; Vercel deployments/CLI의 deployment·projects/teams·monitoring 지침 조회 `0`; 사용자 원격 푸시·PR·병합·production 배포 승인 확인
+- 수락 조건 PASS/FAIL/NOT_RUN: feature push·PR·검사·병합·production deploy·공개 전체 플레이 모두 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 없음
+- 남은 위험: GitHub CLI 미설치 가능성, 브랜치 보호/인증, Vercel 연결 계정과 실제 `unitiymission` 팀 소유 project 불일치, Git 자동 배포 지연
+- 다음 작업: 현재 변경의 staged diff/비밀정보를 재확인하고 로컬 커밋·feature push 후 PR 생성
+
+### 2026-11-23 22:17 KST — R09 배포 진행
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md` 및 R09 커밋 대상 10개 코드/자산 파일
+- 구현 결과: R09 검증 파일만 커밋 `ec30068d88239b16cffd5eae8a3b015bd70181cc`(`feat: polish UnityMission pixel RPG visuals`)으로 고정하고 기존 원격 `UnityMission`의 새 `feature/game-art-polish` 브랜치에 푸시했다. 원격 `main`은 `b822a47`로 유지되어 강제 푸시·직접 main 변경이 없다. Vercel Git 통합은 해당 commit에 `success / Deployment has completed`를 게시했으며 보호된 branch Preview alias가 존재한다.
+- 수행 명령 / 종료코드: `git fetch origin main` `0`; base/merge-base 조회 `0`(모두 `b822a47`, 원격 신규 변경 없음); 명시 파일 `git add` `0`; staged `git diff --check` `0`; staged 토큰/개인키 패턴 검색 `1`(일치 없음); `git commit` `0`; `git push -u origin feature/game-art-polish` `0`; GitHub 공개 API open PR 조회 `0`(0개); commit status 조회 `0`(Vercel success, 2026-11-23 22:15 KST); branch Preview HEAD `302`로 Vercel Deployment Protection 확인
+- 수락 조건 PASS/FAIL/NOT_RUN: feature commit/push PASS; Vercel Preview build PASS; PR 생성·검사·병합·production deploy·공개 전체 플레이 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): GitHub CLI가 설치되지 않았고 연결된 도구에는 GitHub 쓰기 권한이 없어 PR 생성은 GitHub 웹의 사용자 인증이 필요하다. 연결 Vercel MCP에는 `mecm3355` 팀만 있고 실제 Preview 소유 `unitiymission` 팀은 없어 보호된 Preview 본문 자동화는 수행하지 않았다. 보호 설정은 변경하지 않았다. PowerShell의 `Format-Hex -Count`와 `Get-Content -AsByteStream`은 구버전 옵션 미지원으로 실패했으나, PNG는 이전 실제 렌더링·브라우저 로딩과 크기/시각 검수로 이미 검증했다.
+- 남은 위험: PR이 아직 없으므로 branch protection/merge 조건과 production 자동 배포는 시작되지 않았다. Preview는 Vercel status 성공이지만 보호 때문에 공개 브라우저 전체 플레이는 production 병합 후 수행한다.
+- 다음 작업: 사용자가 `https://github.com/mecm3355-jpg/UnityMission/compare/main...feature/game-art-polish?expand=1`에서 PR을 생성한 뒤 알려주면 PR 상태 확인→우회 없는 병합→Vercel production→공개 전체 플레이를 즉시 이어간다.
 
 ## 작업 로그 템플릿
 ### 2026-11-23 17:36 KST — T01
@@ -413,4 +477,4 @@
 | 2026-11-23 18:35 KST | 수료증 완료일은 순차 학습의 마지막인 미션 5 최초 `completedAt`으로 표시 | 저장 계약에 별도 수료일을 추가하지 않고 검증된 기존 기록에서 결정해야 함 | 재풀이 후에도 수료일이 바뀌지 않고 저장 스키마 중복 없음 |
 
 ## 최종 출시 판정
-현재: **RELEASE_READY** — T01~T08과 A01~A18의 필수 자동·배포 인수 게이트 PASS. 화면 리더 사용자 점검·수료증 인쇄 미리보기·독립 콘텐츠 전문가 검토 및 Vercel 소유 계정의 배포 SHA 확인은 잔여 운영 권고로 유지.
+현재: **RELEASE_READY_LOCAL** — T01~T08의 배포 버전은 계속 PASS이고, R09 게임 아트 개편은 로컬 lint/typecheck/76 tests/build/전체 브라우저 플레이/데스크톱·모바일 시각 게이트 PASS. R09 원격 푸시·PR·Vercel 재배포는 사용자 승인 전 NOT_RUN이며, 화면 리더·실물 모바일·교육 콘텐츠 전문가 검토는 잔여 운영 권고로 유지.

@@ -36,6 +36,8 @@ class PeaceVillageScene extends Phaser.Scene {
   private interactionLocked = false;
   private worldSnapshot: GameWorldSnapshot = { fragmentCount: 0, puzzleSequence: [], puzzleSolved: false };
   private readonly interactionVisuals = new Map<WorldInteractionId, Phaser.GameObjects.Rectangle>();
+  private readonly npcRings = new Map<NpcId, Phaser.GameObjects.Ellipse>();
+  private readonly npcMarkers = new Map<NpcId, Phaser.GameObjects.Text>();
   private mobileInput: MovementInput = { up: false, down: false, left: false, right: false };
   private readonly reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
@@ -44,6 +46,10 @@ class PeaceVillageScene extends Phaser.Scene {
     private readonly bridge: GameBridge,
   ) {
     super("peace-village");
+  }
+
+  preload() {
+    this.load.image("peace-meadow", "/game-assets/peace-meadow-v1.png");
   }
 
   create() {
@@ -57,20 +63,9 @@ class PeaceVillageScene extends Phaser.Scene {
 
     const obstacleGroup = this.physics.add.staticGroup();
     for (const obstacle of WORLD_OBSTACLES) {
-      const body = this.add.rectangle(obstacle.x, obstacle.y, obstacle.width, obstacle.height, obstacle.color);
-      body.setStrokeStyle(3, 0x0a1225, 0.55);
+      const body = this.add.rectangle(obstacle.x, obstacle.y, obstacle.width, obstacle.height, 0x000000, 0);
       obstacleGroup.add(body);
-
-      if (obstacle.kind === "building") {
-        this.add.rectangle(obstacle.x, obstacle.y - obstacle.height / 2 + 18, obstacle.width + 18, 36, 0x2c1d2f);
-        this.add.rectangle(obstacle.x, obstacle.y + obstacle.height / 2 - 38, 38, 76, 0x2a2033);
-      } else if (obstacle.kind === "tree") {
-        this.add.circle(obstacle.x, obstacle.y - 18, 34, 0x3d9b5f).setStrokeStyle(3, 0x183d2a);
-        this.add.rectangle(obstacle.x, obstacle.y + 13, 12, 30, 0x6b4a32);
-      } else if (obstacle.kind === "fountain") {
-        this.add.ellipse(obstacle.x, obstacle.y, obstacle.width - 22, obstacle.height - 22, 0x7bd6e8, 0.85);
-        this.add.circle(obstacle.x, obstacle.y - 10, 26, 0xc7f4ff, 0.9);
-      }
+      this.drawObstacle(obstacle);
     }
     this.createNpcs();
     this.createWorldInteractions();
@@ -78,8 +73,8 @@ class PeaceVillageScene extends Phaser.Scene {
     this.player = this.physics.add.sprite(PLAYER_START.x, PLAYER_START.y, "player-down-0");
     this.player.setCollideWorldBounds(true);
     const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
-    playerBody.setSize(18, 18).setOffset(3, 10);
-    this.player.setDepth(20);
+    playerBody.setSize(18, 16).setOffset(5, 18);
+    this.player.setDepth(this.player.y + 30);
     this.physics.add.collider(this.player, obstacleGroup, () => {
       this.collisionCount += 1;
     });
@@ -92,6 +87,7 @@ class PeaceVillageScene extends Phaser.Scene {
 
     this.cameras.main.startFollow(this.player, true, 0.12, 0.12);
     this.host.dataset.gameReady = "true";
+    this.host.dataset.visualTheme = "pixel-polished-v1";
     this.host.dataset.reducedMotion = String(this.reduceMotion);
     this.publishTelemetry(true);
   }
@@ -100,7 +96,9 @@ class PeaceVillageScene extends Phaser.Scene {
     const nearbyNpc = findNearbyNpc(this.player.x, this.player.y);
     const nearbyNpcId = nearbyNpc?.id ?? null;
     if (nearbyNpcId !== this.nearbyNpcId) {
+      if (this.nearbyNpcId) this.setNpcHighlight(this.nearbyNpcId, false);
       this.nearbyNpcId = nearbyNpcId;
+      if (nearbyNpcId) this.setNpcHighlight(nearbyNpcId, true);
       this.bridge.onNearbyNpcChange(nearbyNpcId);
     }
     const nearbyWorld = findNearbyWorldInteraction(this.player.x, this.player.y);
@@ -130,6 +128,7 @@ class PeaceVillageScene extends Phaser.Scene {
     });
     this.player.setVelocity(velocity.x, velocity.y);
     this.facing = getFacingDirection(velocity, this.facing);
+    this.player.setDepth(this.player.y + 30);
 
     if (velocity.x !== 0 || velocity.y !== 0) this.player.anims.play(`walk-${this.facing}`, true);
     else {
@@ -164,6 +163,12 @@ class PeaceVillageScene extends Phaser.Scene {
         visual.setAlpha(snapshot.puzzleSequence.includes(interaction.id) ? 1 : 0.55);
       }
     }
+    NPCS.forEach((npc, index) => {
+      const marker = this.npcMarkers.get(npc.id);
+      if (!marker) return;
+      marker.setText(index < snapshot.fragmentCount ? "✓" : "!");
+      marker.setColor(index < snapshot.fragmentCount ? "#A7F3D0" : "#F9D873");
+    });
   }
 
   setMobileInput(input: MovementInput) {
@@ -185,61 +190,161 @@ class PeaceVillageScene extends Phaser.Scene {
   }
 
   private drawWorld() {
-    const graphics = this.add.graphics();
-    graphics.fillStyle(0x274f3b, 1);
+    this.add.tileSprite(0, 0, WORLD_WIDTH, WORLD_HEIGHT, "peace-meadow")
+      .setOrigin(0)
+      .setTileScale(0.42)
+      .setTint(0xa5c99b)
+      .setDepth(-20);
+
+    const graphics = this.add.graphics().setDepth(-10);
+    graphics.fillStyle(0x081d22, 0.24);
     graphics.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     for (const zone of WORLD_ZONES) {
-      graphics.fillStyle(zone.color, 0.42);
+      graphics.fillStyle(zone.color, 0.24);
       graphics.fillRect(zone.x, zone.y, zone.width, zone.height);
-      this.add.text(zone.x + 20, zone.y + 18, zone.name, {
-        color: "#f8fafc",
-        fontFamily: "sans-serif",
-        fontSize: "22px",
-        fontStyle: "bold",
-        stroke: "#0d1730",
-        strokeThickness: 5,
-      }).setDepth(4);
+      graphics.lineStyle(4, 0xf9d873, 0.22);
+      graphics.strokeRect(zone.x + 5, zone.y + 5, zone.width - 10, zone.height - 10);
+      this.drawZoneBanner(zone.x + 24, zone.y + 22, zone.name, zone.color);
     }
 
-    graphics.fillStyle(0xd5b86c, 1);
-    graphics.fillRect(890, 0, 140, WORLD_HEIGHT);
-    graphics.fillRect(0, 640, WORLD_WIDTH, 140);
-    graphics.fillRect(300, 420, 1320, 76);
-    graphics.fillRect(300, 820, 1320, 76);
-    graphics.lineStyle(4, 0xead48f, 0.55);
-    for (let x = 0; x < WORLD_WIDTH; x += 32) graphics.lineBetween(x, 640, x, 780);
-    for (let y = 0; y < WORLD_HEIGHT; y += 32) graphics.lineBetween(890, y, 1030, y);
+    this.drawRoad(graphics, 890, 0, 140, WORLD_HEIGHT, true);
+    this.drawRoad(graphics, 0, 640, WORLD_WIDTH, 140, false);
+    this.drawRoad(graphics, 300, 420, 1320, 76, false);
+    this.drawRoad(graphics, 300, 820, 1320, 76, false);
+    this.drawVillageDetails();
 
-    this.add.text(960, 530, "평화의 나무\n5개의 조각을 모으세요", {
+    this.add.text(1080, 772, "평화의 나무  ·  5개의 조각을 모으세요", {
       align: "center",
-      color: "#f5c968",
-      fontFamily: "sans-serif",
-      fontSize: "18px",
+      color: "#fff2b2",
+      fontFamily: "monospace",
+      fontSize: "15px",
       fontStyle: "bold",
-      stroke: "#0d1730",
-      strokeThickness: 4,
-    }).setOrigin(0.5).setDepth(5);
+      backgroundColor: "#10273d",
+      padding: { x: 10, y: 6 },
+      stroke: "#07101f",
+      strokeThickness: 3,
+    }).setOrigin(0.5).setDepth(780);
+  }
+
+  private drawRoad(graphics: Phaser.GameObjects.Graphics, x: number, y: number, width: number, height: number, vertical: boolean) {
+    graphics.fillStyle(0x503d2b, 0.65);
+    graphics.fillRect(x - 7, y - 7, width + 14, height + 14);
+    graphics.fillStyle(0xc9a75b, 1);
+    graphics.fillRect(x, y, width, height);
+    graphics.fillStyle(0xe5ca7d, 0.75);
+    graphics.fillRect(x + 7, y + 7, width - 14, height - 14);
+    graphics.lineStyle(3, 0x9a743b, 0.45);
+    if (vertical) {
+      for (let offset = y + 20; offset < y + height; offset += 34) graphics.lineBetween(x, offset, x + width, offset);
+    } else {
+      for (let offset = x + 20; offset < x + width; offset += 40) graphics.lineBetween(offset, y, offset, y + height);
+    }
+  }
+
+  private drawZoneBanner(x: number, y: number, name: string, color: number) {
+    this.add.rectangle(x + 68, y + 15, 136, 30, 0x07101f, 0.82).setStrokeStyle(2, 0xf9d873, 0.7).setDepth(3);
+    this.add.rectangle(x + 5, y + 15, 8, 40, color).setStrokeStyle(2, 0xf9d873, 0.8).setDepth(4);
+    this.add.text(x + 18, y + 4, name, {
+      color: "#fff7cf", fontFamily: "monospace", fontSize: "16px", fontStyle: "bold",
+    }).setDepth(4);
+  }
+
+  private drawVillageDetails() {
+    const flowerColors = [0xf9d873, 0xf3a7c5, 0x8edbc4, 0xa8c7ff];
+    for (let index = 0; index < 56; index += 1) {
+      const x = 70 + ((index * 137) % 1770);
+      const y = 90 + ((index * 211) % 1090);
+      if ((x > 850 && x < 1070) || (y > 600 && y < 920)) continue;
+      const color = flowerColors[index % flowerColors.length];
+      this.add.rectangle(x, y, 4, 4, color, 0.9).setDepth(1);
+      this.add.rectangle(x, y + 5, 2, 6, 0x245d3d, 0.9).setDepth(1);
+    }
+    const lamps = [[760, 585], [1160, 585], [760, 795], [1160, 795]];
+    for (const [x, y] of lamps) {
+      this.add.ellipse(x, y + 18, 28, 10, 0x07101f, 0.25).setDepth(y - 1);
+      this.add.rectangle(x, y, 8, 42, 0x2b3148).setStrokeStyle(2, 0x07101f).setDepth(y);
+      const glow = this.add.circle(x, y - 22, 12, 0xf9d873, 0.22).setDepth(y + 1);
+      this.add.rectangle(x, y - 22, 12, 16, 0xffe89b).setStrokeStyle(3, 0x493f35).setDepth(y + 2);
+      if (!this.reduceMotion) this.tweens.add({ targets: glow, alpha: 0.5, scale: 1.25, duration: 1100, yoyo: true, repeat: -1 });
+    }
+    const benches = [[785, 535], [1135, 535], [785, 850], [1135, 850]];
+    for (const [x, y] of benches) {
+      this.add.rectangle(x, y + 7, 56, 12, 0x8e5f36).setStrokeStyle(3, 0x3e2b24).setDepth(y);
+      this.add.rectangle(x - 21, y + 19, 6, 20, 0x3e2b24).setDepth(y);
+      this.add.rectangle(x + 21, y + 19, 6, 20, 0x3e2b24).setDepth(y);
+    }
+  }
+
+  private drawObstacle(obstacle: (typeof WORLD_OBSTACLES)[number]) {
+    const baseDepth = Math.round(obstacle.y + obstacle.height / 2);
+    if (obstacle.kind === "building") {
+      this.add.ellipse(obstacle.x, obstacle.y + obstacle.height / 2 + 12, obstacle.width + 30, 38, 0x07101f, 0.34).setDepth(baseDepth - 8);
+      this.add.rectangle(obstacle.x, obstacle.y + 18, obstacle.width, obstacle.height - 36, obstacle.color)
+        .setStrokeStyle(6, 0x263044).setDepth(baseDepth - 7);
+      this.add.triangle(obstacle.x, obstacle.y - obstacle.height / 2 - 42, -obstacle.width / 2 - 22, 76, obstacle.width / 2 + 22, 76, 0, -16, 0x4b2940)
+        .setStrokeStyle(7, 0x201c30).setDepth(baseDepth - 5);
+      for (let windowX = obstacle.x - obstacle.width / 2 + 55; windowX <= obstacle.x + obstacle.width / 2 - 55; windowX += 82) {
+        this.add.rectangle(windowX, obstacle.y + 7, 32, 42, 0x9fe4ef).setStrokeStyle(6, 0x263044).setDepth(baseDepth - 4);
+        this.add.rectangle(windowX, obstacle.y + 7, 3, 34, 0xeafcff, 0.65).setDepth(baseDepth - 3);
+      }
+      this.add.rectangle(obstacle.x, obstacle.y + obstacle.height / 2 - 42, 46, 84, 0x563d38).setStrokeStyle(6, 0x201c30).setDepth(baseDepth - 2);
+      this.add.circle(obstacle.x + 13, obstacle.y + obstacle.height / 2 - 42, 3, 0xf9d873).setDepth(baseDepth - 1);
+      return;
+    }
+    if (obstacle.kind === "tree") {
+      this.add.ellipse(obstacle.x, obstacle.y + 25, 62, 24, 0x07101f, 0.28).setDepth(baseDepth - 5);
+      this.add.rectangle(obstacle.x, obstacle.y + 6, 14, 46, 0x6f4930).setStrokeStyle(3, 0x342a24).setDepth(baseDepth - 4);
+      this.add.circle(obstacle.x - 20, obstacle.y - 22, 27, 0x1f7047).setStrokeStyle(4, 0x11442f).setDepth(baseDepth + 1);
+      this.add.circle(obstacle.x + 19, obstacle.y - 24, 29, 0x2b8a50).setStrokeStyle(4, 0x11442f).setDepth(baseDepth + 1);
+      this.add.circle(obstacle.x, obstacle.y - 45, 32, 0x3b9d55).setStrokeStyle(4, 0x11442f).setDepth(baseDepth + 2);
+      this.add.rectangle(obstacle.x - 8, obstacle.y - 55, 8, 8, 0x84c96a).setDepth(baseDepth + 3);
+      return;
+    }
+    if (obstacle.kind === "fountain") {
+      this.add.ellipse(obstacle.x, obstacle.y + 9, obstacle.width + 24, obstacle.height + 30, 0x263044).setDepth(baseDepth - 6);
+      this.add.ellipse(obstacle.x, obstacle.y, obstacle.width, obstacle.height, 0xc5b47b).setStrokeStyle(7, 0x594d3f).setDepth(baseDepth - 5);
+      const water = this.add.ellipse(obstacle.x, obstacle.y - 4, obstacle.width - 24, obstacle.height - 28, 0x4fb9d1, 0.95).setDepth(baseDepth - 4);
+      this.add.rectangle(obstacle.x, obstacle.y - 25, 24, 58, 0x917e60).setStrokeStyle(4, 0x51473c).setDepth(baseDepth - 3);
+      const spray = this.add.ellipse(obstacle.x, obstacle.y - 55, 20, 48, 0xb8f2f2, 0.85).setDepth(baseDepth - 2);
+      if (!this.reduceMotion) this.tweens.add({ targets: [water, spray], scaleX: 1.04, alpha: 0.7, duration: 900, yoyo: true, repeat: -1 });
+      return;
+    }
+    this.add.rectangle(obstacle.x, obstacle.y, obstacle.width, obstacle.height, 0x654b32).setStrokeStyle(3, 0x2e2723).setDepth(baseDepth);
+    for (let y = obstacle.y - obstacle.height / 2 + 18; y < obstacle.y + obstacle.height / 2; y += 42) {
+      this.add.rectangle(obstacle.x, y, 34, 8, 0xb98d50).setStrokeStyle(2, 0x4a3828).setDepth(baseDepth + 1);
+    }
   }
 
   private createPlayerTextures() {
     const directions: Direction[] = ["down", "up", "left", "right"];
     for (const direction of directions) {
-      for (let frame = 0; frame < 2; frame += 1) {
+      for (let frame = 0; frame < 3; frame += 1) {
         const graphics = this.add.graphics();
-        graphics.fillStyle(0xf5c968, 1);
-        graphics.fillRect(5, 2, 14, 10);
-        graphics.fillStyle(0x5279ce, 1);
-        graphics.fillRect(4, 12, 16, 10);
+        const step = frame === 1 ? -1 : frame === 2 ? 1 : 0;
+        graphics.fillStyle(0x07101f, 0.3);
+        graphics.fillEllipse(4, 27, 22, 7);
+        graphics.fillStyle(0x553326, 1);
+        graphics.fillRect(6, 2, 16, 5);
+        graphics.fillStyle(0xf2c7a6, 1);
+        graphics.fillRect(7, 6, 14, 10);
+        graphics.fillStyle(0xe7b94f, 1);
+        graphics.fillRect(5, 5, 18, 4);
+        graphics.fillStyle(0x3d68b2, 1);
+        graphics.fillRect(5, 16, 18, 11);
+        graphics.fillStyle(0xf3d06b, 1);
+        graphics.fillRect(5, 16, 18, 3);
+        graphics.fillStyle(0xc8584f, 1);
+        graphics.fillRect(direction === "left" ? 18 : 3, 18, 4, 10);
         graphics.fillStyle(0xf8fafc, 1);
         if (direction === "down") {
-          graphics.fillRect(8, 6, 2, 2);
-          graphics.fillRect(14, 6, 2, 2);
-        } else if (direction === "left") graphics.fillRect(7, 6, 2, 2);
-        else if (direction === "right") graphics.fillRect(15, 6, 2, 2);
-        graphics.fillStyle(0x0d1730, 1);
-        graphics.fillRect(frame === 0 ? 5 : 8, 22, 5, 6);
-        graphics.fillRect(frame === 0 ? 14 : 11, 22, 5, 6);
-        graphics.generateTexture(`player-${direction}-${frame}`, 24, 28);
+          graphics.fillRect(10, 10, 2, 2);
+          graphics.fillRect(17, 10, 2, 2);
+        } else if (direction === "left") graphics.fillRect(8, 10, 2, 2);
+        else if (direction === "right") graphics.fillRect(19, 10, 2, 2);
+        graphics.fillStyle(0x18243c, 1);
+        graphics.fillRect(6 + step, 27, 6, 7);
+        graphics.fillRect(16 - step, 27, 6, 7);
+        graphics.generateTexture(`player-${direction}-${frame}`, 28, 35);
         graphics.destroy();
       }
     }
@@ -247,46 +352,66 @@ class PeaceVillageScene extends Phaser.Scene {
 
   private createNpcs() {
     for (const npc of NPCS) {
-      const shadow = this.add.ellipse(npc.x, npc.y + 18, 34, 12, 0x07101f, 0.35).setDepth(9);
-      const body = this.add.rectangle(npc.x, npc.y, 28, 36, npc.color).setStrokeStyle(3, 0x0d1730).setDepth(10);
-      const head = this.add.circle(npc.x, npc.y - 25, 13, 0xf1c7a5).setStrokeStyle(2, 0x0d1730).setDepth(10);
-      const marker = this.add.text(npc.x, npc.y - 62, "!", {
-        color: "#F5C968",
+      const depth = npc.y + 40;
+      const ring = this.add.ellipse(npc.x, npc.y + 12, 62, 32, 0xf9d873, 0).setStrokeStyle(4, 0xf9d873, 0).setDepth(depth - 4);
+      const shadow = this.add.ellipse(npc.x, npc.y + 20, 42, 14, 0x07101f, 0.38).setDepth(depth - 3);
+      const cape = this.add.rectangle(npc.x - 13, npc.y, 8, 34, 0x213451).setStrokeStyle(2, 0x07101f).setDepth(depth - 2);
+      const body = this.add.rectangle(npc.x, npc.y, 30, 38, npc.color).setStrokeStyle(4, 0x0d1730).setDepth(depth - 1);
+      this.add.rectangle(npc.x, npc.y - 7, 26, 5, 0xf9d873, 0.75).setDepth(depth);
+      const head = this.add.rectangle(npc.x, npc.y - 28, 22, 20, 0xf1c7a5).setStrokeStyle(3, 0x0d1730).setDepth(depth);
+      this.add.rectangle(npc.x, npc.y - 38, 25, 7, 0x45302a).setDepth(depth + 1);
+      const marker = this.add.text(npc.x, npc.y - 72, "!", {
+        color: "#F9D873",
         fontFamily: "monospace",
-        fontSize: "24px",
+        fontSize: "22px",
         fontStyle: "bold",
         stroke: "#0D1730",
-        strokeThickness: 5,
-      }).setOrigin(0.5).setDepth(11);
-      this.add.text(npc.x, npc.y + 30, npc.role, {
-        color: "#F8FAFC",
-        fontFamily: "sans-serif",
-        fontSize: "15px",
+        strokeThickness: 6,
+      }).setOrigin(0.5).setDepth(depth + 2);
+      this.add.text(npc.x, npc.y + 33, npc.role, {
+        color: "#FFF7CF",
+        backgroundColor: "#07101fcc",
+        padding: { x: 7, y: 4 },
+        fontFamily: "monospace",
+        fontSize: "14px",
         fontStyle: "bold",
         stroke: "#0D1730",
-        strokeThickness: 4,
-      }).setOrigin(0.5, 0).setDepth(11);
-      if (!this.reduceMotion) this.tweens.add({ targets: [body, head, marker, shadow], y: "-=3", duration: 900, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+        strokeThickness: 2,
+      }).setOrigin(0.5, 0).setDepth(depth + 2);
+      this.npcRings.set(npc.id, ring);
+      this.npcMarkers.set(npc.id, marker);
+      if (!this.reduceMotion) this.tweens.add({ targets: [body, head, cape, marker, shadow], y: "-=2", duration: 900, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
     }
+  }
+
+  private setNpcHighlight(id: NpcId, active: boolean) {
+    const ring = this.npcRings.get(id);
+    if (!ring) return;
+    ring.setFillStyle(0xf9d873, active ? 0.12 : 0);
+    ring.setStrokeStyle(4, 0xf9d873, active ? 0.9 : 0);
   }
 
   private createWorldInteractions() {
     const colors: Record<string, number> = { blue: 0x55b8e8, gold: 0xf5c968, green: 0x63d391 };
     for (const interaction of WORLD_INTERACTIONS) {
       if (interaction.kind === "puzzle") {
-        const stone = this.add.rectangle(interaction.x, interaction.y, 34, 46, colors[interaction.id], 0.55)
-          .setStrokeStyle(3, 0xf8fafc, 0.8).setDepth(8);
+        this.add.ellipse(interaction.x, interaction.y + 25, 48, 16, 0x07101f, 0.35).setDepth(interaction.y - 2);
+        this.add.rectangle(interaction.x, interaction.y + 17, 38, 20, 0x4d493f).setStrokeStyle(3, 0x262c38).setDepth(interaction.y - 1);
+        const stone = this.add.rectangle(interaction.x, interaction.y - 8, 28, 44, colors[interaction.id], 0.72)
+          .setStrokeStyle(4, 0xe8ffff, 0.85).setDepth(interaction.y);
         this.interactionVisuals.set(interaction.id, stone);
-        this.add.text(interaction.x, interaction.y + 30, interaction.label, {
-          color: "#F8FAFC", fontFamily: "sans-serif", fontSize: "13px", fontStyle: "bold", stroke: "#0D1730", strokeThickness: 4,
-        }).setOrigin(0.5, 0).setDepth(9);
+        this.add.text(interaction.x, interaction.y + 34, interaction.label, {
+          color: "#FFF7CF", backgroundColor: "#07101fcc", padding: { x: 5, y: 3 }, fontFamily: "monospace", fontSize: "12px", fontStyle: "bold",
+        }).setOrigin(0.5, 0).setDepth(interaction.y + 2);
       } else {
+        this.add.circle(interaction.x, interaction.y - 8, 54, 0x214f35, 0.9).setStrokeStyle(5, 0x102f28).setDepth(interaction.y - 4);
+        this.add.circle(interaction.x - 33, interaction.y - 24, 30, 0x2d7142, 0.95).setStrokeStyle(4, 0x102f28).setDepth(interaction.y - 3);
+        this.add.circle(interaction.x + 34, interaction.y - 21, 32, 0x3a8a4d, 0.95).setStrokeStyle(4, 0x102f28).setDepth(interaction.y - 3);
+        this.add.rectangle(interaction.x, interaction.y + 35, 18, 68, 0x76503a).setStrokeStyle(4, 0x382d29).setDepth(interaction.y - 2);
         const altar = this.add.rectangle(interaction.x, interaction.y, 54, 54, 0x667085, 1)
-          .setStrokeStyle(4, 0xf8fafc, 0.85).setAngle(45).setDepth(8);
+          .setStrokeStyle(5, 0xffefb0, 0.9).setAngle(45).setDepth(interaction.y + 1);
         this.interactionVisuals.set(interaction.id, altar);
-        this.add.text(interaction.x, interaction.y + 44, "최종 평화 제단", {
-          color: "#F5C968", fontFamily: "sans-serif", fontSize: "14px", fontStyle: "bold", stroke: "#0D1730", strokeThickness: 4,
-        }).setOrigin(0.5, 0).setDepth(9);
+        if (!this.reduceMotion) this.tweens.add({ targets: altar, angle: 405, duration: 12000, repeat: -1 });
       }
     }
     this.syncWorldState(this.worldSnapshot);
@@ -297,8 +422,8 @@ class PeaceVillageScene extends Phaser.Scene {
     for (const direction of directions) {
       this.anims.create({
         key: `walk-${direction}`,
-        frames: [{ key: `player-${direction}-0` }, { key: `player-${direction}-1` }],
-        frameRate: 7,
+        frames: [{ key: `player-${direction}-0` }, { key: `player-${direction}-1` }, { key: `player-${direction}-0` }, { key: `player-${direction}-2` }],
+        frameRate: 9,
         repeat: -1,
       });
     }
@@ -307,6 +432,7 @@ class PeaceVillageScene extends Phaser.Scene {
 
 export function mountGame(container: HTMLDivElement, bridge: GameBridge): MountedGame {
   const scene = new PeaceVillageScene(container, bridge);
+  const mobileViewport = window.matchMedia("(max-width: 767px)").matches;
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: container,
@@ -317,7 +443,7 @@ export function mountGame(container: HTMLDivElement, bridge: GameBridge): Mounte
     roundPixels: true,
     audio: { noAudio: true },
     physics: { default: "arcade", arcade: { debug: false } },
-    scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+    scale: { mode: mobileViewport ? Phaser.Scale.ENVELOP : Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     scene: [scene],
   });
   return {
