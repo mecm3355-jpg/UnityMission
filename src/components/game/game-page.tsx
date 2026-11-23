@@ -103,15 +103,18 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
   };
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#081126]">
-      <header className="z-10 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#0D1730] px-4 py-3 sm:px-6">
-        <div>
-          <p className="text-xs font-bold tracking-[0.22em] text-[#F5C968]">평화의 다섯 조각</p>
-          <h1 className="mt-1 text-lg font-bold">{progress.nickname}의 평화마을</h1>
+    <main className="game-shell flex min-h-screen flex-col bg-[#081126]" data-visual-theme="pixel-polished-v1">
+      <header className="game-topbar z-10 flex flex-nowrap items-center justify-between gap-2 px-2 py-2 sm:gap-3 sm:px-6 sm:py-3">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <span aria-hidden="true" className="game-crest">◆</span>
+          <div className="min-w-0">
+            <p className="hidden text-[11px] font-black tracking-[0.22em] text-[#F9D873] sm:block">UNITYMISSION · 평화의 다섯 조각</p>
+            <h1 className="truncate text-sm font-black sm:mt-1 sm:text-lg">{progress.nickname}의 평화마을</h1>
+          </div>
         </div>
         <div className="flex items-center gap-3 text-sm font-semibold">
-          <span className="rounded-lg bg-white/10 px-3 py-2">Lv.{level.level} · {level.xp}XP</span>
-          <Link className="rounded-lg border border-white/20 px-3 py-2" href="/dashboard">
+          <span className="game-status-chip whitespace-nowrap text-[11px] text-[#F9D873] sm:text-sm">Lv.{level.level} · {level.xp}XP</span>
+          <Link className="pixel-button hidden px-3 py-2 sm:inline-flex" href="/dashboard">
             대시보드
           </Link>
         </div>
@@ -125,17 +128,17 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
         />
         <RpgHud fragmentCount={fragmentCount} progress={rpgProgress} />
         {nearbyNpc && !dialogueNpc && !questMissionId ? (
-          <p className="pointer-events-none absolute bottom-44 left-1/2 z-20 -translate-x-1/2 rounded-xl border-2 border-[#F5C968] bg-[#0D1730]/95 px-5 py-3 text-center text-sm font-bold shadow-xl sm:bottom-5" role="status">
-            E 키: {nearbyNpc.role}와 대화하기
+          <p className="interaction-prompt pointer-events-none absolute bottom-44 left-1/2 z-20 -translate-x-1/2 px-5 py-3 text-center text-sm font-bold sm:bottom-5" role="status">
+            <kbd>E</kbd> 키: {nearbyNpc.role}와 대화하기
           </p>
         ) : null}
         {nearbyWorld && !nearbyNpc && !dialogueNpc && !questMissionId && !endingOpen ? (
-          <p className="pointer-events-none absolute bottom-44 left-1/2 z-20 -translate-x-1/2 rounded-xl border-2 border-[#F5C968] bg-[#0D1730]/95 px-5 py-3 text-center text-sm font-bold shadow-xl sm:bottom-5" role="status">
-            E 키: {nearbyWorld.label} 상호작용
+          <p className="interaction-prompt pointer-events-none absolute bottom-44 left-1/2 z-20 -translate-x-1/2 px-5 py-3 text-center text-sm font-bold sm:bottom-5" role="status">
+            <kbd>E</kbd> 키: {nearbyWorld.label} 상호작용
           </p>
         ) : null}
         {feedback && !dialogueNpc && !questMissionId && !endingOpen ? (
-          <p className="absolute left-1/2 top-5 z-20 w-[min(90%,36rem)] -translate-x-1/2 rounded-xl border border-[#F5C968]/70 bg-[#0D1730]/95 px-4 py-3 text-center text-sm font-semibold shadow-xl" role="status">
+          <p className="game-toast absolute left-1/2 top-5 z-20 w-[min(90%,36rem)] -translate-x-1/2 px-4 py-3 text-center text-sm font-semibold" role="status">
             {feedback}
           </p>
         ) : null}

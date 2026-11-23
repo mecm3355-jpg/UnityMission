@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
 
-const [port = "9225", baseUrl = "http://127.0.0.1:3100", screenshotPath] = process.argv.slice(2);
+const [port = "9225", baseUrl = "http://127.0.0.1:3100", screenshotPath, desktopScreenshotPath] = process.argv.slice(2);
 const targets = await fetch(`http://127.0.0.1:${port}/json/list`).then((response) => response.json());
 const target = targets.find((item) => item.type === "page");
 
@@ -49,7 +49,10 @@ async function waitFor(expression, label, timeoutMs = 15000) {
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  const diagnostics = await evaluate(`({ url: location.href, text: document.body.innerText.slice(0, 1000) })`);
+  const diagnostics = await evaluate(`(() => {
+    const host = document.querySelector('[data-testid="phaser-game-container"]');
+    return { url: location.href, text: document.body.innerText.slice(0, 1000), game: host ? { ...host.dataset } : null };
+  })()`);
   throw new Error(`${label} 대기 시간 초과: ${JSON.stringify(diagnostics)}`);
 }
 
@@ -75,9 +78,28 @@ async function holdKey(code, durationMs) {
   await new Promise((resolve) => setTimeout(resolve, 150));
 }
 
+async function moveUntilText(text, code, maxSteps = 28) {
+  for (let step = 0; step < maxSteps; step += 1) {
+    if (await evaluate(`document.body.innerText.includes(${JSON.stringify(text)})`)) return;
+    await holdKey(code, 110);
+  }
+  await waitFor(`document.body.innerText.includes(${JSON.stringify(text)})`, `${text} 이동`);
+}
+
+async function moveUntilAtMost(datasetKey, target, code, maxSteps = 30) {
+  for (let step = 0; step < maxSteps; step += 1) {
+    const value = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset[${JSON.stringify(datasetKey)}]`));
+    if (value <= target) return;
+    await holdKey(code, 110);
+  }
+  throw new Error(`${datasetKey} 좌표가 ${target} 이하에 도달하지 못했습니다.`);
+}
+
 async function clickButton(label) {
   const clicked = await evaluate(`(() => {
-    const button = [...document.querySelectorAll("button")].find((item) => item.textContent.trim() === ${JSON.stringify(label)});
+    const button = [...document.querySelectorAll("button")].find((item) =>
+      item.textContent.trim() === ${JSON.stringify(label)} || item.getAttribute("aria-label") === ${JSON.stringify(label)}
+    );
     if (!button) return false;
     button.click();
     return true;
@@ -154,8 +176,8 @@ if (collision.count < 1 || collision.y < 640 || collision.y > 670) {
 
 await send("Page.navigate", { url: `${baseUrl}/game` });
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.gameReady === "true"`, "NPC 검증 장면 준비", 20000);
-await holdKey("ArrowLeft", 1750);
-await holdKey("ArrowUp", 1150);
+await moveUntilAtMost("playerX", 575, "ArrowLeft");
+await moveUntilAtMost("playerY", 500, "ArrowUp");
 await waitFor(`document.body.innerText.includes("E 키: 역사 안내자와 대화하기")`, "NPC 근접 프롬프트");
 const npcX = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
 await holdKey("KeyE", 80);
@@ -192,16 +214,13 @@ await waitFor(`!document.querySelector('[role="dialog"]')`, "완료 대화 닫�
 
 await send("Page.navigate", { url: `${baseUrl}/game` });
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.gameReady === "true"`, "환경 퍼즐 장면 준비", 20000);
-await holdKey("ArrowRight", 2200);
 await holdKey("ArrowDown", 550);
-await waitFor(`document.body.innerText.includes("E 키: 푸른 공명석 상호작용")`, "푸른 공명석 근접");
+await moveUntilText("E 키: 푸른 공명석 상호작용", "ArrowRight");
 await holdKey("KeyE", 80);
 await waitFor(`document.body.innerText.includes("공명석이 빛났습니다")`, "첫 공명석 활성화");
-await holdKey("ArrowRight", 360);
-await waitFor(`document.body.innerText.includes("E 키: 황금 공명석 상호작용")`, "황금 공명석 근접");
+await moveUntilText("E 키: 황금 공명석 상호작용", "ArrowRight", 12);
 await holdKey("KeyE", 80);
-await holdKey("ArrowRight", 360);
-await waitFor(`document.body.innerText.includes("E 키: 초록 공명석 상호작용")`, "초록 공명석 근접");
+await moveUntilText("E 키: 초록 공명석 상호작용", "ArrowRight", 12);
 await holdKey("KeyE", 80);
 await waitFor(`document.body.innerText.includes("환경 퍼즐 완료")`, "공명석 퍼즐 완료");
 const rpgProgress = await evaluate(`JSON.parse(localStorage.getItem("unitymission:rpg:v1"))`);
@@ -233,6 +252,11 @@ const endingProgress = await evaluate(`JSON.parse(localStorage.getItem("unitymis
 if (!endingProgress.endingSeen) throw new Error("엔딩 상태가 저장되지 않았습니다.");
 await clickButton("다시 탐험하기");
 await waitFor(`!document.body.innerText.includes("평화마을이 다시 빛납니다")`, "엔딩 후 재탐험");
+
+if (desktopScreenshotPath) {
+  const desktopScreenshot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
+  await writeFile(desktopScreenshotPath, Buffer.from(desktopScreenshot.data, "base64"));
+}
 
 await send("Emulation.setDeviceMetricsOverride", {
   width: 360,

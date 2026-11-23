@@ -76,7 +76,7 @@ export function PhaserGameHost({ bridge, loadGame = defaultLoader, paused = fals
   const directionButton = (direction: keyof MovementInput, label: string, symbol: string, gridClass: string) => (
     <button
       aria-label={label}
-      className={`h-12 w-12 touch-none select-none rounded-xl border-2 border-[#F5C968] bg-[#0D1730]/95 text-xl font-bold shadow-xl active:bg-[#F5C968] active:text-[#0D1730] ${gridClass}`}
+      className={`mobile-dpad-key h-12 w-12 touch-none select-none text-xl font-black ${gridClass}`}
       onPointerCancel={() => setMobileDirection(direction, false)}
       onPointerDown={(event) => {
         event.preventDefault();
@@ -91,8 +91,8 @@ export function PhaserGameHost({ bridge, loadGame = defaultLoader, paused = fals
   );
 
   return (
-    <section aria-label="평화마을 게임 화면" className="relative min-h-0 flex-1 overflow-hidden bg-[#081126]">
-      <div className="h-full min-h-[420px] w-full" data-testid="phaser-game-container" ref={containerRef} />
+    <section aria-label="평화마을 게임 화면" className="game-stage relative min-h-0 flex-1 overflow-hidden bg-[#081126]">
+      <div className="game-canvas-host h-full min-h-[420px] w-full" data-testid="phaser-game-container" ref={containerRef} />
       <div className="mobile-game-controls pointer-events-none absolute inset-x-3 bottom-3 z-20 items-end justify-between" aria-label="모바일 게임 조작">
         <div className="pointer-events-auto grid grid-cols-3 grid-rows-3 gap-1">
           {directionButton("up", "위로 이동", "▲", "col-start-2 row-start-1")}
@@ -102,11 +102,11 @@ export function PhaserGameHost({ bridge, loadGame = defaultLoader, paused = fals
         </div>
         <button
           aria-label="상호작용"
-          className="pointer-events-auto h-16 w-16 touch-none rounded-full border-4 border-[#F5C968] bg-[#0D1730]/95 text-lg font-black shadow-xl active:bg-[#F5C968] active:text-[#0D1730]"
+          className="mobile-action-key pointer-events-auto h-16 w-16 touch-none text-lg font-black"
           onClick={() => gameRef.current?.interact()}
           type="button"
         >
-          E
+          <span className="block text-xl">E</span><span className="block text-[9px] tracking-wider">ACTION</span>
         </button>
       </div>
       {status === "loading" ? (
