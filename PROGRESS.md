@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R08_IN_PROGRESS**. 사용자 승인에 따라 feature push·PR·원격 검사와 Vercel 권한 확인을 진행 중입니다.
+> 현재 상태: **R08_AWAITING_CONNECTION**. feature 브랜치 push는 완료됐으며, PR 생성용 GitHub 연결과 기존 Vercel 프로젝트 권한 확인을 기다립니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -24,7 +24,7 @@
 | R05 | DONE | 2026-11-23 20:12 KST | 2026-11-23 20:34 KST | PASS | 기존 15문항 재사용·정오답/출처·100XP·저장·완료 NPC 반응 |
 | R06 | DONE | 2026-11-23 20:34 KST | 2026-11-23 20:41 KST | PASS | 공유 성장·5조각 인벤토리·공명석 퍼즐·조화의 열쇠·최종 엔딩 |
 | R07 | DONE | 2026-11-23 20:41 KST | 2026-11-23 20:49 KST | PASS | 절차적 픽셀 UI·모바일 방향키/E·ESC/포커스·reduced-motion·360px |
-| R08 | IN_PROGRESS | 2026-11-23 20:49 KST | - | PARTIAL | 로컬 전체 PASS; 승인 후 원격 push·PR·Vercel 확인 진행 |
+| R08 | AWAITING_CONNECTION | 2026-11-23 20:49 KST | - | PARTIAL | 로컬 전체 PASS·feature push 완료; PR/merge·Vercel 연결 대기 |
 
 ### 2026-11-23 19:22 KST — R01
 - 상태: IN_PROGRESS
@@ -195,6 +195,16 @@
 - 오류·원인·수정 시도(최대 3회): 없음
 - 남은 위험: 실제 저장소 이름은 사용자 문서의 `UnitiyMission`이 아니라 origin의 `UnityMission`; Vercel MCP 연결 팀에서 프로젝트가 보이지 않음; GitHub CLI 미설치
 - 다음 작업: 원격 main 불변 확인 → feature push → PR 생성/검사 → 승인 조건 확인 후 merge → 기존 Vercel 프로젝트 배포·공개 URL 실제 검증
+
+### 2026-11-23 21:02 KST — feature push 완료 / 연결 대기
+- 상태: AWAITING_CONNECTION
+- 변경 파일: Git 원격 `origin/feature/2d-rpg`, `PROGRESS.md`
+- 구현 결과: push 직전 원격 main이 `cc32d606...`으로 불변이고 원격 feature가 없음을 확인한 뒤 로컬 검증 커밋 `23636b2`를 `origin/feature/2d-rpg`에 신규 push했다. main은 변경하지 않았다.
+- 수행 명령 / 종료코드: 원격 main/feature 검증 `0`; `git push --set-upstream origin feature/2d-rpg` `0`; GitHub PR 생성 URL 수신; 공유 브라우저 제어 도구 조회(사용 불가); GitHub 연동 검색 결과 연결 가능한 GitHub 연동은 있으나 현재 미설치/미연결; Vercel `feature/2d-rpg` 배포 목록 조회 `0`(0건)
+- 수락 조건 PASS/FAIL/NOT_RUN: feature push PASS; PR 생성·자동 검사·merge NOT_RUN; Vercel preview/production NOT_RUN
+- 오류·원인·수정 시도(최대 3회): 로컬 `gh`가 없고 공유 브라우저 제어 도구도 제공되지 않아 인증을 우회하지 않고 GitHub 연결을 사용자에게 제안했다. 연결 전에는 PR 쓰기 권한이 없다. Vercel 연결 팀에는 브랜치 배포도 0건으로 기존 프로젝트 Git 연동/권한을 확인할 수 없다.
+- 남은 위험: PR을 만들기 전에는 보호 규칙/자동 검사 상태를 확인할 수 없다. Vercel 프로젝트가 현재 연결 계정에 보이지 않는다.
+- 다음 작업: 사용자가 GitHub 연결을 완료하면 `main` 대상 PR 생성→검사 확인→승인 조건에 따라 merge. 이어 기존 Vercel 프로젝트가 보이는 계정/팀을 연결해 Production Branch `main` 확인→배포→공개 URL 전체 플레이 검증.
 
 ## 작업 로그 템플릿
 ### 2026-11-23 17:36 KST — T01
