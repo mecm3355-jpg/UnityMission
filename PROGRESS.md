@@ -260,6 +260,16 @@
 - 남은 위험: GitHub CLI 미설치 가능성, 브랜치 보호/인증, Vercel 연결 계정과 실제 `unitiymission` 팀 소유 project 불일치, Git 자동 배포 지연
 - 다음 작업: 현재 변경의 staged diff/비밀정보를 재확인하고 로컬 커밋·feature push 후 PR 생성
 
+### 2026-11-23 22:17 KST — R09 배포 진행
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md` 및 R09 커밋 대상 10개 코드/자산 파일
+- 구현 결과: R09 검증 파일만 커밋 `ec30068d88239b16cffd5eae8a3b015bd70181cc`(`feat: polish UnityMission pixel RPG visuals`)으로 고정하고 기존 원격 `UnityMission`의 새 `feature/game-art-polish` 브랜치에 푸시했다. 원격 `main`은 `b822a47`로 유지되어 강제 푸시·직접 main 변경이 없다. Vercel Git 통합은 해당 commit에 `success / Deployment has completed`를 게시했으며 보호된 branch Preview alias가 존재한다.
+- 수행 명령 / 종료코드: `git fetch origin main` `0`; base/merge-base 조회 `0`(모두 `b822a47`, 원격 신규 변경 없음); 명시 파일 `git add` `0`; staged `git diff --check` `0`; staged 토큰/개인키 패턴 검색 `1`(일치 없음); `git commit` `0`; `git push -u origin feature/game-art-polish` `0`; GitHub 공개 API open PR 조회 `0`(0개); commit status 조회 `0`(Vercel success, 2026-11-23 22:15 KST); branch Preview HEAD `302`로 Vercel Deployment Protection 확인
+- 수락 조건 PASS/FAIL/NOT_RUN: feature commit/push PASS; Vercel Preview build PASS; PR 생성·검사·병합·production deploy·공개 전체 플레이 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): GitHub CLI가 설치되지 않았고 연결된 도구에는 GitHub 쓰기 권한이 없어 PR 생성은 GitHub 웹의 사용자 인증이 필요하다. 연결 Vercel MCP에는 `mecm3355` 팀만 있고 실제 Preview 소유 `unitiymission` 팀은 없어 보호된 Preview 본문 자동화는 수행하지 않았다. 보호 설정은 변경하지 않았다. PowerShell의 `Format-Hex -Count`와 `Get-Content -AsByteStream`은 구버전 옵션 미지원으로 실패했으나, PNG는 이전 실제 렌더링·브라우저 로딩과 크기/시각 검수로 이미 검증했다.
+- 남은 위험: PR이 아직 없으므로 branch protection/merge 조건과 production 자동 배포는 시작되지 않았다. Preview는 Vercel status 성공이지만 보호 때문에 공개 브라우저 전체 플레이는 production 병합 후 수행한다.
+- 다음 작업: 사용자가 `https://github.com/mecm3355-jpg/UnityMission/compare/main...feature/game-art-polish?expand=1`에서 PR을 생성한 뒤 알려주면 PR 상태 확인→우회 없는 병합→Vercel production→공개 전체 플레이를 즉시 이어간다.
+
 ## 작업 로그 템플릿
 ### 2026-11-23 17:36 KST — T01
 - 상태: IN_PROGRESS
