@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { APP_ROUTES, missionRoute } from "./routes";
 
-describe("T01 route contract", () => {
-  it("defines all seven P0 screen routes", () => {
+describe("application route contract", () => {
+  it("keeps the seven dashboard routes and adds the RPG route", () => {
     expect(APP_ROUTES).toEqual([
       "/",
+      "/game",
       "/dashboard",
       "/mission/[id]",
       "/mission/[id]/play",

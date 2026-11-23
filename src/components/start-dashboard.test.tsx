@@ -33,7 +33,7 @@ describe("start screen", () => {
 
     const input = await screen.findByLabelText("닉네임");
     await user.type(input, "   ");
-    await user.click(screen.getByRole("button", { name: "학습 시작하기" }));
+    await user.click(screen.getByRole("button", { name: "모험 시작하기" }));
 
     expect(await screen.findByRole("alert")).toHaveProperty(
       "textContent",
@@ -57,7 +57,7 @@ describe("start screen", () => {
     expect(window.localStorage.getItem(PROGRESS_STORAGE_KEY)).toBeNull();
   });
 
-  it("starts a new profile and routes to the dashboard", async () => {
+  it("starts a new profile and routes to the RPG", async () => {
     const user = userEvent.setup();
     render(
       <ProgressProvider>
@@ -67,9 +67,9 @@ describe("start screen", () => {
 
     const input = await screen.findByLabelText("닉네임");
     await user.type(input, "평화별");
-    await user.click(screen.getByRole("button", { name: "학습 시작하기" }));
+    await user.click(screen.getByRole("button", { name: "모험 시작하기" }));
 
-    await waitFor(() => expect(router.push).toHaveBeenCalledWith("/dashboard"));
+    await waitFor(() => expect(router.push).toHaveBeenCalledWith("/game"));
     const stored = JSON.parse(window.localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "{}");
     expect(stored.nickname).toBe("평화별");
   });
@@ -85,11 +85,11 @@ describe("start screen", () => {
     const input = await screen.findByLabelText("닉네임");
     await user.type(input, "<script>alert(1)</script>");
     expect(input).toHaveProperty("value", "<script>aler");
-    await user.click(screen.getByRole("button", { name: "학습 시작하기" }));
+    await user.click(screen.getByRole("button", { name: "모험 시작하기" }));
 
-    expect(await screen.findByText("<script>aler님의 학습")).toBeTruthy();
+    expect(await screen.findByText("<script>aler님의 모험")).toBeTruthy();
     expect(container.querySelector("script")).toBeNull();
-    expect(router.push).toHaveBeenCalledWith("/dashboard");
+    expect(router.push).toHaveBeenCalledWith("/game");
   });
 
   it("reaches the nickname field and submit button in keyboard order", async () => {
@@ -104,7 +104,7 @@ describe("start screen", () => {
     await user.tab();
     expect(document.activeElement).toBe(input);
     await user.tab();
-    expect(document.activeElement).toBe(screen.getByRole("button", { name: "학습 시작하기" }));
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "모험 시작하기" }));
   });
 
   it("renders a restored nickname as text instead of HTML", async () => {
@@ -117,9 +117,10 @@ describe("start screen", () => {
       </ProgressProvider>,
     );
 
-    expect(await screen.findByText("<b>나</b>님의 학습")).toBeTruthy();
+    expect(await screen.findByText("<b>나</b>님의 모험")).toBeTruthy();
     expect(container.querySelector("b")).toBeNull();
-    expect(screen.getByRole("link", { name: "이어서 학습하기" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "평화마을 이어서 탐험하기" })).toHaveProperty("pathname", "/game");
+    expect(screen.getByRole("link", { name: "기존 대시보드 보기" })).toHaveProperty("pathname", "/dashboard");
   });
 });
 

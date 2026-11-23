@@ -20,7 +20,7 @@ export function StartScreen() {
     try {
       const normalizedNickname = normalizeNickname(nickname);
       startNewProgress(normalizedNickname);
-      router.push("/dashboard");
+      router.push("/game");
     } catch {
       setError("닉네임은 공백을 제외하고 2~12자로 입력해 주세요.");
     }
@@ -44,17 +44,17 @@ export function StartScreen() {
       <section aria-labelledby="home-title" className="flex flex-col justify-center">
         <p className="text-sm font-bold tracking-[0.22em] text-[#F5C968]">UNITYMISSION</p>
         <h1 id="home-title" className="mt-4 max-w-3xl text-4xl font-bold leading-tight sm:text-6xl">
-          평화를 배우는
-          <span className="block text-[#F5C968]">다섯 가지 미션</span>
+          평화의 다섯 조각
+          <span className="block text-[#F5C968]">2D 픽셀 RPG</span>
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-          역사, 일상, 갈등 해결, 협력, 미래를 차례대로 살펴보며 나만의 학습 기록을
-          완성해 보세요.
+          평화마을을 탐험하고 다섯 안내자의 퀘스트를 해결해 흩어진 조각을 모으세요.
+          기존 통일교육 15문항과 성장 기록은 게임과 대시보드에서 함께 이어집니다.
         </p>
         <ul className="mt-8 grid gap-3 text-base text-slate-200 sm:grid-cols-3">
-          <li className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">5개 학습 미션</li>
-          <li className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">15개 교육 문항</li>
-          <li className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">브라우저 자동 저장</li>
+          <li className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">탐험 가능한 마을</li>
+          <li className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">5 NPC · 15문항</li>
+          <li className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">퍼즐 · 자동 저장</li>
         </ul>
       </section>
 
@@ -68,7 +68,7 @@ export function StartScreen() {
           <div className="mt-2">
             <p className="text-base text-slate-300">다시 만나 반가워요.</p>
             <h2 id="start-title" className="mt-2 text-3xl font-bold">
-              {progress.nickname}님의 학습
+              {progress.nickname}님의 모험
             </h2>
             <div className="mt-6 grid grid-cols-2 gap-3">
               <div className="rounded-xl bg-[#0D1730] p-4">
@@ -82,29 +82,32 @@ export function StartScreen() {
             </div>
             <Link
               className="mt-6 block rounded-xl bg-[#F5C968] px-5 py-3 text-center text-base font-bold text-[#0D1730] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F5C968]"
-              href="/dashboard"
+              href="/game"
             >
-              이어서 학습하기
+              평화마을 이어서 탐험하기
+            </Link>
+            <Link className="mt-3 block rounded-xl border border-white/20 px-5 py-3 text-center text-base font-semibold" href="/dashboard">
+              기존 대시보드 보기
             </Link>
             <button
               className="mt-3 w-full rounded-xl border border-white/20 px-5 py-3 text-base font-semibold hover:border-[#F5C968] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F5C968]"
               onClick={() => setShowNewForm(true)}
               type="button"
             >
-              새 학습 시작하기
+              새 모험 시작하기
             </button>
           </div>
         ) : (
           <form className="mt-2" onSubmit={handleSubmit}>
             <h2 id="start-title" className="text-2xl font-bold">
-              {progress ? "새 학습 기록 만들기" : "닉네임으로 시작하기"}
+              {progress ? "새 모험 기록 만들기" : "닉네임으로 시작하기"}
             </h2>
             <p className="mt-3 text-base leading-7 text-slate-300">
               회원가입 없이 이 브라우저에만 학습 기록을 저장합니다.
             </p>
             {progress ? (
               <p className="mt-4 rounded-xl border border-rose-300/40 bg-rose-300/10 px-4 py-3 text-base text-rose-100">
-                새로 시작하면 현재 학습 기록을 덮어씁니다.
+                새로 시작하면 현재 모험과 학습 기록을 덮어씁니다.
               </p>
             ) : null}
             <label className="mt-6 block text-base font-semibold" htmlFor="nickname">
@@ -138,7 +141,7 @@ export function StartScreen() {
               className="mt-6 w-full rounded-xl bg-[#F5C968] px-5 py-3 text-base font-bold text-[#0D1730] hover:bg-[#ffdc82] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F5C968]"
               type="submit"
             >
-              {progress ? "기록을 새로 시작하기" : "학습 시작하기"}
+              {progress ? "새 모험 시작하기" : "모험 시작하기"}
             </button>
             {progress ? (
               <button
