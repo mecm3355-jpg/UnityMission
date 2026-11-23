@@ -148,6 +148,7 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
             npc={dialogueNpc}
             onClose={() => setDialogueNpcId(null)}
             onStartQuest={startQuest}
+            playerName={progress.nickname}
           />
         ) : null}
         {questMissionId ? <RpgQuestPanel missionId={questMissionId} onClose={() => setQuestMissionId(null)} /> : null}
