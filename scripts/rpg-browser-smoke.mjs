@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
 
-const [port = "9225", baseUrl = "http://127.0.0.1:3100", screenshotPath, desktopScreenshotPath] = process.argv.slice(2);
+const [port = "9225", baseUrl = "http://127.0.0.1:3100", screenshotPath, desktopScreenshotPath, dialogueScreenshotPath] = process.argv.slice(2);
 const targets = await fetch(`http://127.0.0.1:${port}/json/list`).then((response) => response.json());
 const target = targets.find((item) => item.type === "page");
 
@@ -95,6 +95,15 @@ async function moveUntilAtMost(datasetKey, target, code, maxSteps = 30) {
   throw new Error(`${datasetKey} 좌표가 ${target} 이하에 도달하지 못했습니다.`);
 }
 
+async function moveUntilAtLeast(datasetKey, target, code, maxSteps = 30) {
+  for (let step = 0; step < maxSteps; step += 1) {
+    const value = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset[${JSON.stringify(datasetKey)}]`));
+    if (value >= target) return;
+    await holdKey(code, 110);
+  }
+  throw new Error(`${datasetKey} 좌표가 ${target} 이상에 도달하지 못했습니다.`);
+}
+
 async function clickButton(label) {
   const clicked = await evaluate(`(() => {
     const button = [...document.querySelectorAll("button")].find((item) =>
@@ -105,6 +114,39 @@ async function clickButton(label) {
     return true;
   })()`);
   if (!clicked) throw new Error(`버튼을 찾지 못했습니다: ${label}`);
+}
+
+async function advanceDialogueUntilButton(targetLabel, maxSteps = 10) {
+  for (let step = 0; step < maxSteps; step += 1) {
+    const state = await evaluate(`(() => {
+      const buttons = [...document.querySelectorAll("button")];
+      const target = buttons.find((item) => item.textContent.trim() === ${JSON.stringify(targetLabel)} || item.getAttribute("aria-label") === ${JSON.stringify(targetLabel)});
+      if (target) return { ready: true };
+      const advance = buttons.find((item) => ["대사 모두 보기", "다음"].includes(item.textContent.trim()));
+      if (!advance) return { ready: false, advanced: false };
+      advance.click();
+      return { ready: false, advanced: true };
+    })()`);
+    if (state.ready) return;
+    if (!state.advanced) throw new Error(`대화 진행 버튼을 찾지 못했습니다: ${targetLabel}`);
+    await new Promise((resolve) => setTimeout(resolve, 120));
+  }
+  throw new Error(`대화 목표 버튼에 도달하지 못했습니다: ${targetLabel}`);
+}
+
+async function advanceDialogueUntilText(targetText, maxSteps = 10) {
+  for (let step = 0; step < maxSteps; step += 1) {
+    if (await evaluate(`document.body.innerText.includes(${JSON.stringify(targetText)})`)) return;
+    const advanced = await evaluate(`(() => {
+      const button = [...document.querySelectorAll("button")].find((item) => ["대사 모두 보기", "다음"].includes(item.textContent.trim()));
+      if (!button) return false;
+      button.click();
+      return true;
+    })()`);
+    if (!advanced) throw new Error(`대화 문구 진행 버튼을 찾지 못했습니다: ${targetText}`);
+    await new Promise((resolve) => setTimeout(resolve, 120));
+  }
+  throw new Error(`대화 문구에 도달하지 못했습니다: ${targetText}`);
 }
 
 async function holdPointerButton(label, durationMs) {
@@ -172,7 +214,7 @@ await waitFor(`document.body.innerText.includes("평화마을 게임 화면이 �
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.gameReady === "true"`, "Phaser 장면 준비", 20000);
 
 const startX = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
-await holdKey("ArrowRight", 600);
+await moveUntilAtLeast("playerX", startX + 80, "ArrowRight");
 const movedX = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
 if (movedX <= startX + 70) throw new Error(`오른쪽 이동이 확인되지 않았습니다: ${startX} -> ${movedX}`);
 
@@ -183,7 +225,7 @@ const collision = await evaluate(`(() => {
   const data = document.querySelector('[data-testid="phaser-game-container"]').dataset;
   return { y: Number(data.playerY), count: Number(data.collisionCount), facing: data.facing };
 })()`);
-if (collision.count < 1 || collision.y < 640 || collision.y > 670) {
+if (collision.y < 640 || collision.y > 670 || collision.facing !== "up") {
   throw new Error(`광장 분수 충돌이 확인되지 않았습니다: ${JSON.stringify(collision)}`);
 }
 
@@ -199,7 +241,16 @@ await waitFor(`document.querySelector('[data-testid="phaser-game-container"]').d
 await holdKey("ArrowRight", 500);
 const pausedX = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
 if (Math.abs(pausedX - npcX) > 2) throw new Error(`대화 중 플레이어가 이동했습니다: ${npcX} -> ${pausedX}`);
+await advanceDialogueUntilButton("퀘스트를 도울게요");
+if (dialogueScreenshotPath) {
+  const dialogueScreenshot = await send("Page.captureScreenshot", {
+    format: "png",
+    captureBeyondViewport: false,
+  });
+  await writeFile(dialogueScreenshotPath, Buffer.from(dialogueScreenshot.data, "base64"));
+}
 await clickButton("퀘스트를 도울게요");
+await advanceDialogueUntilButton("퀘스트 시작");
 await clickButton("퀘스트 시작");
 await waitFor(`document.body.innerText.includes("문항 1/3")`, "교육 퀘스트 시작");
 
@@ -221,13 +272,15 @@ await waitFor(`!document.body.innerText.includes("QUEST COMPLETE")`, "게임 복
 await waitFor(`document.body.innerText.includes("Lv.2 · 100XP")`, "공유 XP 헤더 갱신");
 
 await holdKey("KeyE", 80);
-await waitFor(`document.body.innerText.includes("역사 조각이 광장을 밝히고 있어요")`, "완료 NPC 반응");
-await clickButton("다음");
+await advanceDialogueUntilText("역사 조각이 광장을 밝히고 있어요");
+await advanceDialogueUntilButton("대화 마치기");
+await waitFor(`document.body.innerText.includes("함께 만든 변화를 기억하면서")`, "완료 NPC 반응");
+await clickButton("대화 마치기");
 await waitFor(`!document.querySelector('[role="dialog"]')`, "완료 대화 닫기");
 
 await send("Page.navigate", { url: `${baseUrl}/game` });
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.gameReady === "true"`, "환경 퍼즐 장면 준비", 20000);
-await holdKey("ArrowDown", 550);
+await moveUntilAtLeast("playerY", 820, "ArrowDown");
 await moveUntilText("E 키: 푸른 공명석 상호작용", "ArrowRight");
 await holdKey("KeyE", 80);
 await waitFor(`document.body.innerText.includes("공명석이 빛났습니다")`, "첫 공명석 활성화");

@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R09_RELEASED**. 픽셀 RPG 아트 개편이 PR #2로 main에 병합되어 Vercel production에 배포됐고 공개 URL 전체 플레이를 통과했습니다.
+> 현재 상태: **R10_RELEASE_IN_PROGRESS**. 검증된 RPG 대화 컷신을 기존 GitHub/Vercel 배포 흐름으로 릴리스 중입니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -27,6 +27,8 @@
 | R08 | DONE | 2026-11-23 20:49 KST | 2026-11-23 21:23 KST | PASS | PR #1 merge·Vercel production·공개 URL 전체 RPG 플레이 PASS |
 | R09 | DONE | 2026-11-23 21:27 KST | 2026-11-23 22:04 KST | PASS | 픽셀아트 월드·캐릭터·HUD·대화/퀘스트 UI 개편, 데스크톱/모바일 전체 플레이 검증 |
 | R09-REL | DONE | 2026-11-23 22:08 KST | 2026-11-23 22:37 KST | PASS | PR #2 병합·Vercel production·공개 데스크톱/모바일 전체 RPG 플레이 PASS |
+| R10 | DONE | 2026-11-23 22:55 KST | 2026-11-24 00:17 KST | PASS | 플레이어↔NPC 교대 대사·픽셀 초상화·타자 효과·퀘스트 선택 연출, 로컬 전체 검증 완료 |
+| R10-REL | IN_PROGRESS | 2026-11-24 00:27 KST | - | NOT_RUN | 검증 변경 커밋·feature push·PR·main 병합·Vercel production·공개 게임 재검증 |
 
 ### 2026-11-23 19:22 KST — R01
 - 상태: IN_PROGRESS
@@ -279,6 +281,38 @@
 - 오류·원인·수정 시도(최대 2회): 공개 스모크 1·2차는 게임 결함이 아니라 기존 하네스의 엔딩 접근 고정 300ms 이동이 production 프레임 속도에서 각각 x1000/x997까지만 도달해 상호작용 반경보다 8~11px 부족했다. 동일 실패 2회 후 재시도를 중단하고 평화의 나무 데스크톱·모바일 이동을 프롬프트/좌표 기준의 짧은 반복 이동으로 최소 수정했다. 3차 전체 production 스모크는 모든 단계 PASS. 게임 코드·속도·물리·보상은 변경하지 않았다.
 - 남은 위험: 실제 iOS/Android 물리 기기의 GPU/메모리·터치 감각, 실제 화면 읽기 프로그램 사용자 검토, 독립 교육 콘텐츠 전문가 검토는 자동화 밖의 운영 권고다. 연결된 Vercel MCP 계정은 배포 소유 `unitiymission` 팀을 조회하지 못해 runtime log drain/관측 설정은 확인하지 못했지만 GitHub commit status·공개 응답·실제 브라우저 전체 흐름으로 배포 기능을 검증했다.
 - 다음 작업: 후속 하네스 안정화와 이 완료 기록을 작은 별도 PR로 main에 반영하면 저장소도 완전히 clean해진다. 제품 production 기능은 이미 완료 상태다.
+
+### 2026-11-23 22:55 KST — R10 RPG 대화 컷신
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: 기존 NPC 근접 E 상호작용·대화 중 이동 잠금·퀘스트 상태·교육 데이터·저장 구조를 보존하면서 플레이어와 NPC가 2~4단계로 번갈아 말하는 실제 RPG 대화 흐름을 구현한다. 플레이어/NPC 픽셀 초상화, 현재 화자 강조, 타자 효과와 즉시 표시, 다음/선택지/퀘스트 시작, ESC 종료, reduced-motion, 모바일 360px를 포함한다. 관련 컴포넌트 테스트·lint·typecheck·전체 test·build·실제 브라우저 대화/이동 잠금 회귀 PASS가 완료 조건이다.
+- 수행 명령 / 종료코드: 필수 문서 6종·imagegen/Sites·image prompting/game asset 지침 조회 `0`; 배포 main 기준 `feature/rpg-dialogue-cutscene` 생성 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: R10 관련/전체 자동 테스트, build, 실제 브라우저 대화 컷신·이동 잠금·퀘스트 전환 모두 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 없음
+- 남은 위험: 타자 효과 타이머 정리, 테스트의 기존 단일 메시지 계약, 초상화 파일 용량, 작은 화면에서 선택지/대화 높이, 화면 읽기 프로그램의 반복 발화
+- 다음 작업: 기존 NPC/대화 테스트 분석→플레이어 픽셀 초상화 생성·검수→교대 대사 데이터/컴포넌트 구현→자동·브라우저 검증
+
+### 2026-11-24 00:17 KST — R10 완료
+- 상태: DONE
+- 변경 파일: `public/game-assets/player-dialogue-portrait-v1.png`, `src/game/npcs.ts`, `src/game/npcs.test.ts`, `src/components/game/dialogue-panel.tsx`, `src/components/game/dialogue-panel.test.tsx`, `src/components/game/game-page.tsx`, `src/app/globals.css`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md`
+- 구현 결과: 기존 NPC 5명과 미션/저장 원장을 그대로 사용하면서 상태별 3턴 대화(미완료 NPC→플레이어→NPC, 완료/잠금 전용 대사)를 추가했다. 컷신은 플레이어·NPC 초상화, 현재 화자 강조, 말풍선 방향, 타자 효과와 즉시 표시, 1/3 진행 표시, 다음/수락·보류 선택, 수락 확인 후 퀘스트 시작, ESC 종료를 제공한다. 대화 중 Phaser 이동 잠금, 기존 퀘스트/XP/저장/완료 NPC 반응은 유지했다. reduced-motion에서는 대사를 즉시 표시하고, 화면 읽기 프로그램에는 완성된 현재 대사를 상태 메시지로 제공한다. 360px 모바일에서도 초상화·대사·선택지가 화면 안에 들어오도록 반응형 배치를 적용했다.
+- 생성 자산: built-in image generation으로 기존 플레이어 디자인과 맞춘 투명 배경 16-bit 픽셀 초상화를 생성·시각 검수한 뒤 `public/game-assets/player-dialogue-portrait-v1.png`에 저장했다. 프롬프트 핵심은 golden explorer cap, short brown hair, cobalt tunic with gold trim, red scarf, friendly chest-up 3/4 portrait facing left, crisp hard pixels, transparent background, no weapon/text/logo/flags였다.
+- 수행 명령 / 종료코드: 관련 테스트 최초 `1`(Vitest worker 2개 환경 timeout), `--maxWorkers=1` 재실행 `0`(3파일 10테스트); 첫 lint `1`(effect 내부 동기 setState 2건), 파생 상태/interval callback 구조로 수정 후 `0`; `npx.cmd tsc --noEmit` `0`; 전체 `npm.cmd run test -- --maxWorkers=1` `0`(17파일, 77테스트 PASS); production build 최초 `1`(샌드박스 worker `spawn EPERM`), 권한 확장 동일 명령 재실행 `0`(`/game` 포함 9개 route); 최종 `npm.cmd run lint` `0`; 최종 typecheck `0`; 실제 로컬 production Chrome 전체 RPG 스모크 `0`(이동 x960→1070, 충돌 y645/count2, NPC 대화 중 x560 고정, 교대 대사·수락 선택·퀘스트 시작, mission-1 100XP·완료 반응, 공명석 blue→gold→green·조화의 열쇠, 5조각·Lv.6 엔딩·수료증, 모바일 x960→1041, 360px 가로 넘침 없음, reduced-motion true, runtimeErrors 0); 데스크톱 대화 컷신·전체 월드·360px 모바일 캡처 시각 검토 PASS; `git diff --check` `0`; 변경 텍스트 비밀정보 패턴 검색 `1`(일치 없음)
+- 수락 조건 PASS/FAIL/NOT_RUN: NPC 근접 E·대화 중 이동 잠금·기존 퀘스트/교육 데이터/저장 보존 PASS; 플레이어↔NPC 교대 대사·상태별 반응·초상화·현재 화자·타자/즉시 표시·다음/선택/퀘스트 시작·ESC PASS; reduced-motion·화면 읽기 상태·360px 모바일 PASS; lint/typecheck/77 tests/build PASS; 실제 전체 게임 플레이 및 런타임 오류 0건 PASS; R10 로컬 PASS. 원격 feature push·PR·merge·Vercel production 배포는 승인 전이므로 NOT_RUN.
+- 오류·원인·수정 시도(최대 2회): (1) 관련 테스트 병렬 실행은 앱 오류가 아닌 Windows worker timeout으로 일부 파일이 시작 전 실패해 단일 worker로 재실행하고 PASS했다. (2) lint의 effect 동기 상태 갱신 2건은 렌더 파생 reduced-motion 값과 timer callback 기반 타자 상태로 1회 수정해 PASS했다. (3) build는 샌드박스 하위 프로세스 권한 오류를 권한 확장 재실행으로 해결했다. (4) 실제 브라우저 하네스는 고정 시간 키 입력이 Headless Chrome 프레임 부하에 따라 이동량이 달라졌고, 분수 정지 좌표는 정상인데 보조 카운터만 늦는 경우가 있었다. 앱 로직을 바꾸지 않고 목표 좌표까지 짧게 반복 입력하고 실제 정지 위치/방향으로 충돌을 판정하도록 안정화했다. 공명석 접근도 y 좌표 목표 이동으로 바꾼 뒤 전체 시나리오가 PASS했다.
+- React/접근성 검토: 대화 상태는 패널 내부에만 두고 기존 ProgressProvider/Phaser bridge에 중복 원장을 만들지 않았다. interval과 focus effect는 cleanup을 제공하며 이미지 크기를 고정했다. 시맨틱 `role=dialog`, 현재 대사의 screen-reader status, 포커스 진입, ESC 종료, reduced-motion을 유지했다. 닉네임은 JSX 텍스트로만 렌더링한다.
+- 남은 위험: 생성 초상화 PNG는 약 950KB이며 실제 저사양 모바일의 체감 성능과 실제 화면 읽기 프로그램 사용자 평가는 자동화 밖이다. 로컬 `feature/rpg-dialogue-cutscene` 변경은 아직 커밋·푸시·PR·Vercel 배포되지 않아 공개 `https://unity-mission.vercel.app/`에는 직전 R09 버전이 유지된다.
+- 다음 작업: 사용자 승인 후 로컬 변경 검토·커밋 → `feature/rpg-dialogue-cutscene` 푸시 → `main` 대상 PR → 검사/병합 → 기존 Vercel production 배포 → 공개 URL에서 동일 대화 컷신·전체 플레이·모바일 재검증
+
+### 2026-11-24 00:27 KST — R10 배포
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md` 및 R10 검증 완료 파일 8개/생성 자산 1개
+- 목표·완료 조건: 현재 변경과 비밀정보를 재확인하고 `feature/rpg-dialogue-cutscene`에 커밋·푸시한다. `main` 대상 PR의 검사·보호 조건을 우회 없이 충족해 병합하고 기존 Vercel Git production 배포를 확인한다. 공개 `https://unity-mission.vercel.app/`에서 교대 대화·퀘스트·전체 게임·360px 모바일·런타임 오류 0건을 다시 검증한다.
+- 수행 명령 / 종료코드: 필수 문서 7종·Vercel deployments/CI 지침 조회 `0`; 사용자 원격 푸시·PR·병합·production 배포 승인 확인
+- 수락 조건 PASS/FAIL/NOT_RUN: 로컬 staged diff/비밀정보 확인, feature push, PR/checks/merge, production deploy, 공개 전체 플레이 모두 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 없음
+- 남은 위험: GitHub CLI 부재 또는 인증 범위, Vercel Preview 보호, Git 자동 배포 지연, 연결 Vercel 계정과 실제 production 소유 팀 불일치 가능성
+- 다음 작업: 원격 main 동기화 확인→검증 파일만 stage→diff/비밀정보 재검사→커밋·feature push→PR/checks/merge→production 검증
 
 ## 작업 로그 템플릿
 ### 2026-11-23 17:36 KST — T01

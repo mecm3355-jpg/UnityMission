@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NPCS, findNearbyNpc, getNpcMessage, getNpcQuestState } from "./npcs";
+import { NPCS, findNearbyNpc, getNpcDialogueTurns, getNpcMessage, getNpcQuestState } from "./npcs";
 import type { CompletedMissions } from "../types/progress";
 
 const completed = (ids: string[]): CompletedMissions => Object.fromEntries(
@@ -26,5 +26,17 @@ describe("R04 NPC model", () => {
   it("selects an NPC only inside the interaction radius", () => {
     expect(findNearbyNpc(NPCS[0].x + 30, NPCS[0].y)?.id).toBe(NPCS[0].id);
     expect(findNearbyNpc(960, 720)).toBeUndefined();
+  });
+
+  it("builds alternating player and NPC dialogue without duplicating mission questions", () => {
+    const available = getNpcDialogueTurns(NPCS[0], {}, "평화별");
+    expect(available.map((turn) => turn.speaker)).toEqual(["npc", "player", "npc"]);
+    expect(available[0].text).toBe(NPCS[0].greeting);
+    expect(available[1].text).toBe(NPCS[0].playerReply);
+    expect(available[2].text).toBe(NPCS[0].questPrompt);
+
+    const finished = getNpcDialogueTurns(NPCS[0], completed(["mission-1"]), "평화별");
+    expect(finished.map((turn) => turn.speaker)).toEqual(["player", "npc", "player"]);
+    expect(finished[1].text).toBe(NPCS[0].completedMessage);
   });
 });
