@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R14_IN_PROGRESS**. 사용자의 원격 반영 승인을 받아 R11~R13을 기존 GitHub/Vercel production에 릴리스 중입니다.
+> 현재 상태: **R14_DONE_PRODUCTION**. R11~R13을 PR #5로 main에 병합하고 공개 Vercel production 전체 플레이 검증을 완료했습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -34,7 +34,7 @@
 | R11 | DONE | 2026-11-24 02:45 KST | 2026-11-24 16:29 KST | PASS | 지역별 절차적 BGM·6종 효과음·음소거/볼륨·검증된 설정 자동 저장 |
 | R12 | DONE | 2026-11-24 16:29 KST | 2026-11-24 16:33 KST | PASS | 다음 NPC 마커·화면 가장자리 방향 화살표·현재 목표·NPC 3상태 색상 |
 | R13 | DONE | 2026-11-24 16:33 KST | 2026-11-24 16:58 KST | PASS | 6프레임 보행·NPC 대기/감정·대화 마주보기·조각/레벨업 연출·전체 브라우저 회귀 |
-| R14 | IN_PROGRESS | 2026-11-24 17:03 KST | - | NOT_RUN | 변경 검토·feature push·PR·main 병합·Vercel production·공개 전체 플레이 검증 |
+| R14 | DONE | 2026-11-24 17:03 KST | 2026-11-24 17:13 KST | PASS | commit `f12cca1`·PR #5·main `409df9e`·공개 production 전체 플레이·360px PASS |
 
 ### 2026-11-23 19:22 KST — R01
 - 상태: IN_PROGRESS
@@ -398,14 +398,16 @@
 - 다음 작업: 사용자가 승인하면 변경사항을 검토·커밋하고 기존 GitHub 저장소의 feature 브랜치에 push한 뒤 PR/production 배포를 진행한다. 이후 새 기능을 반영해 사용자 매뉴얼과 구현 설명서 PDF를 각각 재출력한다.
 
 ### 2026-11-24 17:03 KST — R14 개선 릴리스
-- 상태: IN_PROGRESS
-- 변경 파일: `PROGRESS.md`
+- 상태: DONE
+- 변경 파일: 앱·테스트·하네스 16개 파일과 `PROGRESS.md`; DOC02의 `docs/**`, `scripts/document-visual-check.mjs`는 릴리스 커밋에서 제외
 - 목표·완료 조건: R11~R13 앱·테스트·하네스 변경만 검토해 기존 feature 브랜치에 커밋·push하고 `main` 대상 PR을 생성한다. 자동 검사와 보호 규칙을 확인한 뒤 병합하고 기존 Vercel 프로젝트의 production `main` 배포가 READY인지 확인한다. 공개 URL에서 사운드 설정·현재 목표·6프레임/NPC 상태와 기존 전체 RPG 흐름을 검증한다.
-- 수행 명령 / 종료코드: 필수 문서 7종 조회 `0`; Vercel `deployments-cicd`·`verification` 지침 전체 조회 `0`; 사용자 원격 반영 승인 확인
-- 수락 조건 PASS/FAIL/NOT_RUN: 비밀정보/변경 범위 검사, commit/push, PR/check/merge, production 배포, 공개 브라우저 전체 플레이 모두 NOT_RUN
-- 오류·원인·수정 시도(최대 2회): 없음
-- 남은 위험: GitHub/Vercel 인증·브랜치 보호·production 자동 배포 지연, 미완료 DOC02 파일의 실수 포함
-- 다음 작업: remote·브랜치·인증·diff를 읽기 전용 확인하고 DOC02 산출물을 제외한 정확한 파일만 stage한다.
+- 구현·릴리스 결과: staged 17개 파일만 기능 커밋 `f12cca1`(`feat: enhance RPG audio guidance and animations`)로 생성해 기존 `feature/rpg-dialogue-cutscene`에 일반 push했다. 사용자가 생성·병합한 PR #5의 head가 `f12cca1`, base가 `main`임을 공개 API로 확인했고 원격 main 병합 커밋은 `409df9efdea87210b38590cf78c482e4c6a99a8a`다. Git 연동 Vercel이 새 main을 자동 production 배포했으며 `https://unity-mission.vercel.app/`에서 개선 기능과 기존 전체 흐름을 확인했다.
+- 수행 명령 / 종료코드: `git fetch origin --prune` `0`; remote/branch/divergence 확인 `0`; 정확한 파일 `git add` 첫 시도 `128`(`.git/index.lock` sandbox 권한), 권한 확장 재실행 `0`; `git diff --cached --check` `0`; staged secret 패턴 검사 `0`(일치 없음); DOC02 stage 제외 검사 `0`; `npm.cmd audit --omit=dev` `0`(0 vulnerabilities); `git commit` `0`(`f12cca1`); `git push origin feature/rpg-dialogue-cutscene` `0`; GitHub 공개 API에서 PR #5 merged/head/base 확인 `0`; PR 병합 후 `git fetch` `0`; `origin/main`이 `409df9e`이며 `f12cca1` 포함 확인 `0`; Vercel 팀/프로젝트 조회 `0`(`mecm3355` 팀에는 UnityMission 프로젝트 0개); 공개 URL `curl -I -L` `0`(`200`, `Server: Vercel`, HSTS); 공개 production Chrome 전체 RPG 스모크 `0`; 임시 Chrome/.tmp 정리 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 변경 범위/비밀정보/production 의존성 감사 PASS; feature push PASS; PR #5 main 병합 PASS; 원격 main SHA 확인 PASS; 공개 Vercel URL 200 PASS; 새 음량/음소거·6프레임·NPC 감정·현재 퀘스트 PASS; 이동 `960→1048`, 분수 충돌, 대화 이동 잠금 `564→564`, 미션 1/100XP/완료 반응, 공명석 blue→gold→green/조화의 열쇠, 5조각/Lv.6/엔딩/수료증, 모바일 이동 `960→1037`, 360px `innerWidth=scrollWidth=360`, reduced-motion PASS; runtimeErrors 0; R14 PASS
+- 오류·원인·수정 시도(최대 2회): Git stage 첫 시도는 코드가 아니라 `.git` sandbox 쓰기 권한으로 실패해 정확한 파일 목록 그대로 권한 확장 재실행하여 통과했다. GitHub CLI가 설치되지 않아 인증된 API로 PR을 직접 생성할 수 없었고 비교 페이지를 열어 사용자가 PR 생성·병합을 완료했다. 최초 head 필터 조회에서 열린 PR이 없어 최근 PR 목록을 한 번 확인해 PR #5가 이미 병합됐음을 확인했다.
+- 배포 후 관측: 공개 브라우저 콘솔/런타임 오류 0건. 연결된 Vercel 계정에는 `mecm3355` 팀만 있고 production 소유 프로젝트가 보이지 않아 배포 ID·정확한 build duration·runtime log drain/모니터링 설정은 조회하지 못했다. 공개 응답과 전체 사용자 흐름은 새 기능 계약과 일치한다.
+- 남은 위험: 실제 스피커 청감, iOS/Android 물리 기기 GPU/터치, 화면 읽기 프로그램 사용자 평가는 자동화 밖이다. Vercel 소유 팀에서 프로젝트 Git 연결·관측 설정을 별도 확인해야 한다. DOC02 문서 분리는 아직 로컬 미완료 상태다.
+- 다음 작업: 새 R11~R14 기능을 반영해 사용자 매뉴얼과 구현 설명서를 각각 독립 PDF로 출력·검증한다.
 
 ## 작업 로그 템플릿
 ### 2026-11-23 17:36 KST — T01
@@ -614,4 +616,4 @@
 | 2026-11-23 18:35 KST | 수료증 완료일은 순차 학습의 마지막인 미션 5 최초 `completedAt`으로 표시 | 저장 계약에 별도 수료일을 추가하지 않고 검증된 기존 기록에서 결정해야 함 | 재풀이 후에도 수료일이 바뀌지 않고 저장 스키마 중복 없음 |
 
 ## 최종 출시 판정
-현재: **LOCAL_VERIFIED_AWAITING_RELEASE / DOC02_DEFERRED** — 기존 production은 T01~T08과 R01~R10 게이트 PASS. 새 R11~R13 사운드·퀘스트 안내·애니메이션 개선은 전체 83테스트, lint, typecheck, production build, 실제 데스크톱/360px 전체 플레이 PASS이며 로컬 feature 브랜치에만 있다. GitHub push·PR·Vercel production 반영은 사용자 승인 전이라 NOT_RUN. 개별 사용자 매뉴얼/구현 설명서 PDF는 새 기능 반영 후 재출력하도록 DEFERRED.
+현재: **RELEASE_READY_PRODUCTION_R14 / DOC02_DEFERRED** — T01~T08, R01~R14의 필수 자동·빌드·PR·Vercel production·공개 데스크톱/360px 전체 플레이 게이트 PASS. production main은 `409df9e`, 공개 URL은 `https://unity-mission.vercel.app/`. 실제 청감·물리 모바일·화면 읽기 프로그램·Vercel 소유 팀의 관측 설정 확인은 잔여 운영 권고다. 개별 사용자 매뉴얼/구현 설명서 PDF는 새 기능 반영 후 재출력하도록 DEFERRED.
