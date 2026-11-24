@@ -23,6 +23,24 @@ afterEach(() => {
 });
 
 describe("start screen", () => {
+  it("provides separate PDF downloads for players and developers", async () => {
+    render(
+      <ProgressProvider>
+        <StartScreen />
+      </ProgressProvider>,
+    );
+
+    const userManual = await screen.findByRole("link", { name: "사용자 매뉴얼 PDF" });
+    const implementationGuide = screen.getByRole("link", { name: "구현 설명서 PDF" });
+
+    expect(userManual.getAttribute("href")).toBe("/downloads/unitymission-user-manual-ko.pdf");
+    expect(userManual.hasAttribute("download")).toBe(true);
+    expect(implementationGuide.getAttribute("href")).toBe(
+      "/downloads/unitymission-implementation-guide-ko.pdf",
+    );
+    expect(implementationGuide.hasAttribute("download")).toBe(true);
+  });
+
   it("rejects a whitespace-only nickname", async () => {
     const user = userEvent.setup();
     render(

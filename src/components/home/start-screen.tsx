@@ -158,6 +158,22 @@ export function StartScreen() {
         <p className="mt-6 border-t border-white/10 pt-5 text-sm leading-6 text-slate-400">
           공용 기기에서는 학습 후 대시보드의 ‘기록 초기화’를 눌러 주세요.
         </p>
+        <nav aria-label="PDF 도움말" className="mt-5 grid gap-2 sm:grid-cols-2">
+          <a
+            className="rounded-lg border border-white/15 px-3 py-2 text-center text-sm font-semibold text-slate-200 hover:border-[#F5C968] hover:text-[#F5C968]"
+            download
+            href="/downloads/unitymission-user-manual-ko.pdf"
+          >
+            사용자 매뉴얼 PDF
+          </a>
+          <a
+            className="rounded-lg border border-white/15 px-3 py-2 text-center text-sm font-semibold text-slate-200 hover:border-[#F5C968] hover:text-[#F5C968]"
+            download
+            href="/downloads/unitymission-implementation-guide-ko.pdf"
+          >
+            구현 설명서 PDF
+          </a>
+        </nav>
       </section>
     </main>
   );

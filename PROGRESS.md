@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R14_DONE_PRODUCTION**. R11~R13을 PR #5로 main에 병합하고 공개 Vercel production 전체 플레이 검증을 완료했습니다.
+> 현재 상태: **DOC03_IN_PROGRESS**. 독립 PDF 두 파일을 웹 다운로드 경로에 연결하고 GitHub·Vercel production 반영을 진행 중입니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -30,7 +30,8 @@
 | R10 | DONE | 2026-11-23 22:55 KST | 2026-11-24 00:17 KST | PASS | 플레이어↔NPC 교대 대사·픽셀 초상화·타자 효과·퀘스트 선택 연출, 로컬 전체 검증 완료 |
 | R10-REL | DONE | 2026-11-24 00:27 KST | 2026-11-24 00:55 KST | PASS | PR #4 병합·Vercel production·공개 교대 대화/전체 RPG·360px 재검증 PASS |
 | DOC01 | DONE | 2026-11-24 01:21 KST | 2026-11-24 02:32 KST | PASS | 실제 production 화면을 포함한 21쪽 사용자 매뉴얼·구현 설명서 PDF 제작·검증 |
-| DOC02 | DEFERRED | 2026-11-24 02:38 KST | - | NOT_RUN | 사용자 우선순위가 게임 개선으로 변경되어 PDF 분리 출력·검증을 후속 작업으로 이관 |
+| DOC02 | DONE | 2026-11-24 02:38 KST | 2026-11-24 17:38 KST | PASS | R14 반영 사용자 매뉴얼 9쪽·구현 설명서 11쪽 개별 PDF 출력·시각/구조 검증 |
+| DOC03 | IN_PROGRESS | 2026-11-24 17:41 KST | - | NOT_RUN | PDF 공개 다운로드 UI·GitHub PR·Vercel production 배포 |
 | R11 | DONE | 2026-11-24 02:45 KST | 2026-11-24 16:29 KST | PASS | 지역별 절차적 BGM·6종 효과음·음소거/볼륨·검증된 설정 자동 저장 |
 | R12 | DONE | 2026-11-24 16:29 KST | 2026-11-24 16:33 KST | PASS | 다음 NPC 마커·화면 가장자리 방향 화살표·현재 목표·NPC 3상태 색상 |
 | R13 | DONE | 2026-11-24 16:33 KST | 2026-11-24 16:58 KST | PASS | 6프레임 보행·NPC 대기/감정·대화 마주보기·조각/레벨업 연출·전체 브라우저 회귀 |
@@ -353,15 +354,29 @@
 - 다음 작업: PDF를 사용자에게 전달한다. 내용 수정 요청이 있으면 HTML 원본을 편집해 동일 검증 절차로 PDF를 다시 생성한다.
 
 ### 2026-11-24 02:38 KST — DOC02 사용자 매뉴얼·구현 설명서 분리
-- 상태: DEFERRED
-- 변경 파일: `PROGRESS.md`
+- 상태: DONE
+- 변경 파일: `docs/unitymission-manual-and-implementation-guide.html`, `docs/UnityMission_사용자_매뉴얼.pdf`, `docs/UnityMission_구현_설명서.pdf`, `scripts/document-visual-check.mjs`, `PROGRESS.md`
 - 목표·완료 조건: 기존 통합 PDF를 보존하면서 사용자 매뉴얼과 구현 설명서를 각각 독립된 PDF 파일로 출력한다. 각 파일은 전용 표지·제목·대상 정보를 갖고 해당 파트만 포함해야 하며, PDF 구조·페이지 수·한국어 제목·이미지·A4 페이지 넘침과 회귀 게이트를 실제로 검증해야 한다.
 - 수행 명령 / 종료코드: 필수 문서 6종 및 현재 문서 구조 조회 1차 `1`(PowerShell 따옴표 파싱 오류, 파일 변경 없음); 단순화한 재조회 `0`; 통합 HTML 21쪽 중 사용자 파트 8쪽, 구현 파트 9쪽, 공통 표지·부록 구조 확인 `0`
-- 수락 조건 PASS/FAIL/NOT_RUN: 분리 출력 모드, 사용자 매뉴얼 PDF, 구현 설명서 PDF, 각 문서 시각·구조 검증 모두 NOT_RUN
+- 구현 결과: 질의 문자열 기반 분리 출력 모드로 공통 HTML 원본에서 전용 표지와 페이지 번호를 가진 사용자 매뉴얼 9쪽, 구현 설명서 11쪽을 각각 생성했다. R11~R14의 음소거·볼륨 자동 저장, 지역별 사운드, 현재 퀘스트·가장자리 화살표·NPC 상태 표식, 6프레임 보행·NPC 감정/마주보기, PR #5·#6와 main `7426f92` 정보를 반영했다.
+- 수행 명령 / 종료코드: `node --check scripts/document-visual-check.mjs` `0`; CDP Chrome 사용자 매뉴얼 출력·A4 688px 시각 검사 `0`; 구현 설명서 출력·A4 688px 시각 검사 `0`; PDF 헤더·페이지 객체 검사 `0`(9쪽/11쪽); 표지·중간·마지막 페이지 6장 육안 검사 PASS; `npx.cmd tsc --noEmit` `0`; `npm.cmd run lint` 최종 `0`; Chrome 및 `.tmp` 정리 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 분리 출력 모드 PASS; 사용자 매뉴얼 PDF 9쪽 PASS; 구현 설명서 PDF 11쪽 PASS; 한국어 제목·전용 파트·이미지 로드 PASS; A4 페이지 넘침 0 PASS; PDF `%PDF-1.4` 구조 PASS; lint/typecheck PASS
 - 오류·원인·수정 시도(최대 2회): 첫 조회 명령의 정규식 안 큰따옴표가 PowerShell 명령 문자열을 종료했다. 검색식을 `Select-String` 기반으로 단순화해 재조회에 성공했다.
-- 남은 위험: 분리 시 숨긴 페이지가 PDF 페이지 수에 포함되거나 기존 하드코딩 페이지 번호가 어긋날 수 있음
-- 중단 사유: 사용자가 프로그램 전체 개선을 우선 요청한 뒤 하루 범위를 사운드·퀘스트 방향 표시·애니메이션 강화로 확정했다. 통합 HTML의 분리 출력 모드는 구현했지만 Chrome 출력 권한 오류가 있었고 두 개별 PDF는 생성·검증 완료로 보고하지 않는다.
-- 다음 작업: R11~R13 완료 후 변경된 게임 내용까지 반영해 두 PDF를 다시 출력·검증한다.
+- 오류·원인·수정 시도(최대 2회): 첫 병렬 Chrome CLI 출력은 사용자 프로필 접근 오류로 실패해 단일 CDP Chrome 순차 출력으로 변경했다. 첫 실제 A4 폭 검사에서 사용자 1쪽과 구현 2쪽의 넘침을 발견해 추가 문장을 기존 설명에 합치고 검증 기록을 압축한 뒤 재검사에서 모두 통과했다. PowerShell의 `npm`/`npx`는 실행 정책으로 실패해 동일 실행 파일의 `.cmd` 진입점으로 재실행했다. 첫 lint 재실행은 임시 Chrome 프로필까지 검사해 실패했으며, 정확한 Chrome PID 트리와 작업공간 `.tmp`를 정리한 뒤 최종 lint가 통과했다.
+- 남은 위험: PDF는 Windows Chrome과 설치된 한국어 글꼴 기준이다. 기존 합본 PDF는 외부 프로그램의 파일 잠금으로 최신 원본을 덮어쓰지 못했지만 요청 범위인 두 독립 PDF에는 영향이 없다. 실제 종이 인쇄와 다른 PDF 뷰어의 세부 글꼴 차이는 별도 확인이 필요하다.
+- 재개 기록: 2026-11-24 17:29 KST, PR #6 병합과 원격 main `7426f92` 확인 후 R11~R14 기능 설명을 반영해 분리 출력·검증을 재개했다.
+- 다음 작업: 두 독립 PDF를 사용자에게 전달한다. 내용 수정 요청이 있으면 공통 HTML 원본을 편집하고 같은 CDP A4 검사로 재출력한다.
+
+### 2026-11-24 17:41 KST — DOC03 문서 GitHub·Vercel 공개
+- 상태: IN_PROGRESS
+- 변경 파일: `src/components/home/start-screen.tsx`, `src/components/start-dashboard.test.tsx`, `public/downloads/unitymission-user-manual-ko.pdf`, `public/downloads/unitymission-implementation-guide-ko.pdf`, `docs/unitymission-manual-and-implementation-guide.html`, `docs/UnityMission_사용자_매뉴얼.pdf`, `docs/UnityMission_구현_설명서.pdf`, `docs/manual-assets/**`, `scripts/document-visual-check.mjs`, `PROGRESS.md`
+- 목표·완료 조건: 검증된 사용자 매뉴얼과 구현 설명서를 ASCII 공개 경로로 제공하고 시작 화면에서 다운로드할 수 있게 한다. 관련 테스트·lint·typecheck·전체 테스트·production build를 통과한 변경만 feature 브랜치에 커밋·푸시하고 main PR 병합 후 Vercel production URL에서 두 PDF와 링크를 실제 검증한다.
+- 구현 결과: 검증된 두 PDF를 ASCII 파일명의 `public/downloads` 경로에 동일 SHA-256으로 복제하고, 시작 화면에 `download` 속성을 가진 사용자 매뉴얼·구현 설명서 링크를 추가했다. 생성 원본 HTML·이미지와 문서 시각 검사 스크립트도 GitHub 보존 대상으로 준비했다.
+- 수행 명령 / 종료코드: Vercel 배포 지침 및 필수 저장소 문서 재조회 `0`; 로컬/원격 기준·미커밋 문서·공개 파일 구조 확인 `0`; 관련 테스트 1차 `1`(현재 Vitest에 jest-dom matcher 미등록), 표준 DOM 속성 API로 수정 후 재실행 `0`(9 tests); `npm.cmd run lint` `0`; `npx.cmd tsc --noEmit` `0`; `npm.cmd run test` `0`(18 files, 84 tests); `npm.cmd audit --omit=dev` `0`(0 vulnerabilities); production build 1차 `1`(`spawn EPERM`), 권한 확장 재실행 `0`; 원본/공개 PDF SHA-256 일치 검사 `0`; production 서버 두 PDF GET·해시 일치 `0`; 원격 fetch·기준 비교 `0`; feature 브랜치를 동일 트리의 `origin/main` `7426f92`로 fast-forward `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 공개 PDF 2개 PASS; 다운로드 UI·접근 가능한 링크 PASS; 관련/전체 자동 회귀·lint·typecheck·build·audit PASS; GitHub main·Vercel production NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 링크 테스트의 `toHaveAttribute`는 현재 Vitest 설정에 없는 matcher여서 1차 실패했고 `getAttribute`·`hasAttribute`로 최소 수정해 통과했다. production build는 기존 샌드박스 worker 권한 문제(`spawn EPERM`)로 1차 실패해 동일 명령을 권한 확장으로 재실행해 통과했다. 로컬 HTTP 첫 검사에서 PowerShell 예약 변수와 클라이언트 hydration 전 HTML 기대 때문에 진단 명령이 실패했으며, 예약 변수를 쓰지 않고 직접 PDF GET·해시 검사로 범위를 분리해 통과했다. 앱 링크 렌더링은 JSDOM 상호작용 테스트로 검증했다.
+- 남은 위험: Vercel 프로젝트 소유 계정은 MCP에서 조회되지 않으므로 Git 연동 production은 공개 URL과 원격 main 기준으로 검증한다. 실제 production 병합·배포는 아직 수행 전이다.
+- 다음 작업: 변경 범위·비밀정보를 검사하고 정확한 파일만 커밋해 feature 브랜치를 push한 뒤 main PR과 Vercel production을 검증한다.
 
 ### 2026-11-24 02:45 KST — R11 사운드 시스템
 - 상태: DONE
@@ -616,4 +631,4 @@
 | 2026-11-23 18:35 KST | 수료증 완료일은 순차 학습의 마지막인 미션 5 최초 `completedAt`으로 표시 | 저장 계약에 별도 수료일을 추가하지 않고 검증된 기존 기록에서 결정해야 함 | 재풀이 후에도 수료일이 바뀌지 않고 저장 스키마 중복 없음 |
 
 ## 최종 출시 판정
-현재: **RELEASE_READY_PRODUCTION_R14 / DOC02_DEFERRED** — T01~T08, R01~R14의 필수 자동·빌드·PR·Vercel production·공개 데스크톱/360px 전체 플레이 게이트 PASS. production main은 `409df9e`, 공개 URL은 `https://unity-mission.vercel.app/`. 실제 청감·물리 모바일·화면 읽기 프로그램·Vercel 소유 팀의 관측 설정 확인은 잔여 운영 권고다. 개별 사용자 매뉴얼/구현 설명서 PDF는 새 기능 반영 후 재출력하도록 DEFERRED.
+현재: **RELEASE_READY_PRODUCTION_R14 / DOC02_DONE** — T01~T08, R01~R14의 필수 자동·빌드·PR·Vercel production·공개 데스크톱/360px 전체 플레이 게이트 PASS. production main은 `7426f92`, 공개 URL은 `https://unity-mission.vercel.app/`. R14를 반영한 사용자 매뉴얼 9쪽과 구현 설명서 11쪽의 개별 PDF 출력·A4 시각·구조 검증도 PASS. 실제 청감·물리 모바일·화면 읽기 프로그램·다른 PDF 뷰어·Vercel 소유 팀 관측 설정 확인은 잔여 운영 권고다.
