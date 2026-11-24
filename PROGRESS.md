@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **DOC03_IN_PROGRESS**. 독립 PDF 두 파일을 웹 다운로드 경로에 연결하고 GitHub·Vercel production 반영을 진행 중입니다.
+> 현재 상태: **RELEASE_READY_PRODUCTION_R14 / DOC03_DONE**. 독립 PDF 두 파일의 GitHub main 반영과 Vercel production 공개 다운로드 검증을 완료했습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -31,7 +31,7 @@
 | R10-REL | DONE | 2026-11-24 00:27 KST | 2026-11-24 00:55 KST | PASS | PR #4 병합·Vercel production·공개 교대 대화/전체 RPG·360px 재검증 PASS |
 | DOC01 | DONE | 2026-11-24 01:21 KST | 2026-11-24 02:32 KST | PASS | 실제 production 화면을 포함한 21쪽 사용자 매뉴얼·구현 설명서 PDF 제작·검증 |
 | DOC02 | DONE | 2026-11-24 02:38 KST | 2026-11-24 17:38 KST | PASS | R14 반영 사용자 매뉴얼 9쪽·구현 설명서 11쪽 개별 PDF 출력·시각/구조 검증 |
-| DOC03 | IN_PROGRESS | 2026-11-24 17:41 KST | - | NOT_RUN | PDF 공개 다운로드 UI·GitHub PR·Vercel production 배포 |
+| DOC03 | DONE | 2026-11-24 17:41 KST | 2026-11-24 17:59 KST | PASS | commit `c1d0596`·PR #7·main `fb145fd`·Vercel PDF 2개/360px 링크 PASS |
 | R11 | DONE | 2026-11-24 02:45 KST | 2026-11-24 16:29 KST | PASS | 지역별 절차적 BGM·6종 효과음·음소거/볼륨·검증된 설정 자동 저장 |
 | R12 | DONE | 2026-11-24 16:29 KST | 2026-11-24 16:33 KST | PASS | 다음 NPC 마커·화면 가장자리 방향 화살표·현재 목표·NPC 3상태 색상 |
 | R13 | DONE | 2026-11-24 16:33 KST | 2026-11-24 16:58 KST | PASS | 6프레임 보행·NPC 대기/감정·대화 마주보기·조각/레벨업 연출·전체 브라우저 회귀 |
@@ -368,15 +368,16 @@
 - 다음 작업: 두 독립 PDF를 사용자에게 전달한다. 내용 수정 요청이 있으면 공통 HTML 원본을 편집하고 같은 CDP A4 검사로 재출력한다.
 
 ### 2026-11-24 17:41 KST — DOC03 문서 GitHub·Vercel 공개
-- 상태: IN_PROGRESS
+- 상태: DONE
 - 변경 파일: `src/components/home/start-screen.tsx`, `src/components/start-dashboard.test.tsx`, `public/downloads/unitymission-user-manual-ko.pdf`, `public/downloads/unitymission-implementation-guide-ko.pdf`, `docs/unitymission-manual-and-implementation-guide.html`, `docs/UnityMission_사용자_매뉴얼.pdf`, `docs/UnityMission_구현_설명서.pdf`, `docs/manual-assets/**`, `scripts/document-visual-check.mjs`, `PROGRESS.md`
 - 목표·완료 조건: 검증된 사용자 매뉴얼과 구현 설명서를 ASCII 공개 경로로 제공하고 시작 화면에서 다운로드할 수 있게 한다. 관련 테스트·lint·typecheck·전체 테스트·production build를 통과한 변경만 feature 브랜치에 커밋·푸시하고 main PR 병합 후 Vercel production URL에서 두 PDF와 링크를 실제 검증한다.
 - 구현 결과: 검증된 두 PDF를 ASCII 파일명의 `public/downloads` 경로에 동일 SHA-256으로 복제하고, 시작 화면에 `download` 속성을 가진 사용자 매뉴얼·구현 설명서 링크를 추가했다. 생성 원본 HTML·이미지와 문서 시각 검사 스크립트도 GitHub 보존 대상으로 준비했다.
 - 수행 명령 / 종료코드: Vercel 배포 지침 및 필수 저장소 문서 재조회 `0`; 로컬/원격 기준·미커밋 문서·공개 파일 구조 확인 `0`; 관련 테스트 1차 `1`(현재 Vitest에 jest-dom matcher 미등록), 표준 DOM 속성 API로 수정 후 재실행 `0`(9 tests); `npm.cmd run lint` `0`; `npx.cmd tsc --noEmit` `0`; `npm.cmd run test` `0`(18 files, 84 tests); `npm.cmd audit --omit=dev` `0`(0 vulnerabilities); production build 1차 `1`(`spawn EPERM`), 권한 확장 재실행 `0`; 원본/공개 PDF SHA-256 일치 검사 `0`; production 서버 두 PDF GET·해시 일치 `0`; 원격 fetch·기준 비교 `0`; feature 브랜치를 동일 트리의 `origin/main` `7426f92`로 fast-forward `0`
-- 수락 조건 PASS/FAIL/NOT_RUN: 공개 PDF 2개 PASS; 다운로드 UI·접근 가능한 링크 PASS; 관련/전체 자동 회귀·lint·typecheck·build·audit PASS; GitHub main·Vercel production NOT_RUN
+- 배포 결과: commit `c1d0596`을 feature 브랜치에 push했고, 사용자가 PR #7을 main에 병합했다. 원격 main은 merge commit `fb145fd`이며 `c1d0596`을 포함한다. Vercel production은 두 PDF를 `200 application/pdf`로 제공했고 다운로드 바이트의 SHA-256이 로컬 원본과 일치했다. 실제 Chrome 360px에서 두 링크의 문구·경로·`download` 속성, PDF fetch, `innerWidth=scrollWidth=360`을 확인했다.
+- 수락 조건 PASS/FAIL/NOT_RUN: 공개 PDF 2개 PASS; 다운로드 UI·접근 가능한 링크 PASS; 관련/전체 자동 회귀·lint·typecheck·build·audit PASS; GitHub PR #7/main 반영 PASS; Vercel production PDF 200·정확한 내용 PASS; 실제 Chrome 360px 링크·다운로드·가로 넘침 없음 PASS; DOC03 PASS
 - 오류·원인·수정 시도(최대 2회): 링크 테스트의 `toHaveAttribute`는 현재 Vitest 설정에 없는 matcher여서 1차 실패했고 `getAttribute`·`hasAttribute`로 최소 수정해 통과했다. production build는 기존 샌드박스 worker 권한 문제(`spawn EPERM`)로 1차 실패해 동일 명령을 권한 확장으로 재실행해 통과했다. 로컬 HTTP 첫 검사에서 PowerShell 예약 변수와 클라이언트 hydration 전 HTML 기대 때문에 진단 명령이 실패했으며, 예약 변수를 쓰지 않고 직접 PDF GET·해시 검사로 범위를 분리해 통과했다. 앱 링크 렌더링은 JSDOM 상호작용 테스트로 검증했다.
-- 남은 위험: Vercel 프로젝트 소유 계정은 MCP에서 조회되지 않으므로 Git 연동 production은 공개 URL과 원격 main 기준으로 검증한다. 실제 production 병합·배포는 아직 수행 전이다.
-- 다음 작업: 변경 범위·비밀정보를 검사하고 정확한 파일만 커밋해 feature 브랜치를 push한 뒤 main PR과 Vercel production을 검증한다.
+- 남은 위험: Vercel 프로젝트 소유 계정이 연결된 MCP 팀에서 조회되지 않아 대시보드 배포 ID·빌드 로그·로그 드레인은 확인하지 못했다. 공개 URL 응답과 실제 브라우저 다운로드는 통과했다. 기존 합본 PDF는 최신 분리 문서와 별개로 로컬에만 남겨 두었다.
+- 다음 작업: 필수 작업 없음. 선택적으로 Vercel 소유 팀에서 Git 연동·관측 설정을 확인하고 다른 PDF 뷰어·실물 인쇄를 사람 검토한다.
 
 ### 2026-11-24 02:45 KST — R11 사운드 시스템
 - 상태: DONE
@@ -631,4 +632,4 @@
 | 2026-11-23 18:35 KST | 수료증 완료일은 순차 학습의 마지막인 미션 5 최초 `completedAt`으로 표시 | 저장 계약에 별도 수료일을 추가하지 않고 검증된 기존 기록에서 결정해야 함 | 재풀이 후에도 수료일이 바뀌지 않고 저장 스키마 중복 없음 |
 
 ## 최종 출시 판정
-현재: **RELEASE_READY_PRODUCTION_R14 / DOC02_DONE** — T01~T08, R01~R14의 필수 자동·빌드·PR·Vercel production·공개 데스크톱/360px 전체 플레이 게이트 PASS. production main은 `7426f92`, 공개 URL은 `https://unity-mission.vercel.app/`. R14를 반영한 사용자 매뉴얼 9쪽과 구현 설명서 11쪽의 개별 PDF 출력·A4 시각·구조 검증도 PASS. 실제 청감·물리 모바일·화면 읽기 프로그램·다른 PDF 뷰어·Vercel 소유 팀 관측 설정 확인은 잔여 운영 권고다.
+현재: **RELEASE_READY_PRODUCTION_R14 / DOC03_DONE** — T01~T08, R01~R14와 DOC01~DOC03의 자동·빌드·PR·Vercel production 게이트 PASS. production main은 `fb145fd`, 공개 URL은 `https://unity-mission.vercel.app/`. 사용자 매뉴얼 9쪽과 구현 설명서 11쪽을 시작 화면과 고정 다운로드 URL에서 제공하며, 실제 Chrome 360px 링크·PDF 200·원본 SHA-256 일치 PASS. 실제 청감·물리 모바일·화면 읽기 프로그램·다른 PDF 뷰어·Vercel 소유 팀 관측 설정 확인은 잔여 운영 권고다.
