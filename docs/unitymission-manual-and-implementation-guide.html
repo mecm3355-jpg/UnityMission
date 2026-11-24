@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UnityMission 사용자 매뉴얼 및 구현 설명서</title>
+  <style>
+    :root {
+      --navy-950: #07101f;
+      --navy-900: #0d1730;
+      --navy-800: #13294a;
+      --blue: #5279ce;
+      --sky: #79bce8;
+      --gold: #f5c968;
+      --gold-light: #fff1b0;
+      --paper: #f7f4ec;
+      --ink: #172033;
+      --muted: #58667b;
+      --line: #d8d3c6;
+      --green: #197650;
+      --red: #a53d45;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { background: #d7dbe2; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      font-size: 9.8pt;
+      line-height: 1.52;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    @page { size: A4; margin: 13mm 14mm 14mm; }
+    @media print {
+      html, body { background: var(--paper); }
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .page { box-shadow: none !important; margin: 0 !important; }
+      a { color: inherit; text-decoration: none; }
+    }
+
+    .page {
+      position: relative;
+      min-height: 268mm;
+      padding: 4mm 3mm 13mm;
+      break-after: page;
+      background: var(--paper);
+    }
+    .page:last-child { break-after: auto; }
+    .page-number {
+      position: absolute;
+      right: 3mm;
+      bottom: 2mm;
+      color: #798394;
+      font-size: 8.5pt;
+    }
+    .doc-mark {
+      position: absolute;
+      left: 3mm;
+      bottom: 2mm;
+      color: #798394;
+      font-size: 8.5pt;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: 27pt; line-height: 1.18; letter-spacing: -0.035em; }
+    h2 { margin-bottom: 5mm; color: var(--navy-900); font-size: 20pt; line-height: 1.25; letter-spacing: -0.03em; }
+    h3 { margin: 4mm 0 1.8mm; color: var(--navy-800); font-size: 13pt; }
+    h4 { margin: 3mm 0 1.5mm; color: var(--navy-800); font-size: 10.5pt; }
+    p { margin-bottom: 2.5mm; }
+    ul, ol { margin: 2mm 0 4mm; padding-left: 6mm; }
+    li { margin: 0.8mm 0; }
+    code, pre { font-family: Consolas, "D2Coding", monospace; }
+    code { padding: 0.15em 0.35em; border-radius: 3px; background: #e8ecf2; color: #163764; }
+    pre {
+      overflow: hidden;
+      margin: 2.5mm 0 4mm;
+      padding: 3.5mm;
+      border-left: 4px solid var(--gold);
+      border-radius: 4px;
+      background: var(--navy-950);
+      color: #edf5ff;
+      font-size: 8.8pt;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+    a { color: #245eb4; }
+
+    .cover {
+      overflow: hidden;
+      padding: 0;
+      background: var(--navy-950);
+      color: white;
+    }
+    .cover::before {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgb(7 16 31 / 15%) 0%, rgb(7 16 31 / 58%) 62%, #07101f 100%),
+        url("manual-assets/04-completed-world.png") center 20% / cover no-repeat;
+      content: "";
+      filter: saturate(0.85);
+    }
+    .cover-grid {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      min-height: 268mm;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16mm 14mm 13mm;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 3mm;
+      color: var(--gold);
+      font-size: 10pt;
+      font-weight: 900;
+      letter-spacing: 0.13em;
+    }
+    .brand-gem {
+      width: 9mm;
+      height: 9mm;
+      border: 2px solid var(--gold);
+      background: var(--blue);
+      box-shadow: inset 0 0 0 2px var(--navy-950);
+      transform: rotate(45deg);
+    }
+    .cover-title {
+      max-width: 155mm;
+      padding: 11mm;
+      border: 2px solid var(--gold);
+      background: rgb(7 16 31 / 88%);
+      box-shadow: 4px 4px 0 rgb(0 0 0 / 35%);
+    }
+    .cover-title h1 { margin-bottom: 4mm; color: white; }
+    .cover-title .subtitle { margin: 0; color: var(--gold-light); font-size: 14pt; font-weight: 800; }
+    .cover-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3mm;
+      color: #d8e6f5;
+      font-size: 9pt;
+    }
+    .cover-meta div {
+      padding: 3mm;
+      border-top: 1px solid rgb(245 201 104 / 50%);
+      background: rgb(7 16 31 / 72%);
+    }
+
+    .part-label {
+      display: inline-block;
+      margin-bottom: 3mm;
+      padding: 1.5mm 3mm;
+      border: 1px solid var(--gold);
+      background: var(--navy-900);
+      color: var(--gold);
+      font-size: 8.5pt;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+    }
+    .lead { color: #34445b; font-size: 11.5pt; line-height: 1.65; }
+    .section-rule { width: 24mm; height: 2px; margin: 0 0 5mm; border: 0; background: var(--gold); }
+
+    .callout {
+      margin: 3mm 0 4mm;
+      padding: 3.5mm 4mm;
+      border: 1px solid #c9c2ad;
+      border-left: 5px solid var(--blue);
+      border-radius: 4px;
+      background: #fffdf6;
+    }
+    .callout strong { color: var(--navy-800); }
+    .callout.tip { border-left-color: var(--green); background: #f2fbf6; }
+    .callout.warn { border-left-color: #d1932c; background: #fff8e9; }
+    .callout.danger { border-left-color: var(--red); background: #fff2f3; }
+
+    .steps { counter-reset: step; display: grid; gap: 2.5mm; margin: 3mm 0 5mm; }
+    .step {
+      position: relative;
+      min-height: 13mm;
+      padding: 3mm 3mm 3mm 15mm;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: white;
+    }
+    .step::before {
+      position: absolute;
+      top: 3mm;
+      left: 3mm;
+      display: grid;
+      width: 8mm;
+      height: 8mm;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--navy-800);
+      color: var(--gold);
+      content: counter(step);
+      counter-increment: step;
+      font-weight: 900;
+    }
+
+    .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3mm; margin: 3mm 0 5mm; }
+    .cards.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card { padding: 4mm; border: 1px solid var(--line); border-radius: 5px; background: white; }
+    .card h3 { margin-top: 0; font-size: 12pt; }
+    .card p:last-child { margin-bottom: 0; }
+    .icon {
+      display: grid;
+      width: 10mm;
+      height: 10mm;
+      margin-bottom: 2mm;
+      place-items: center;
+      border-radius: 3px;
+      background: var(--navy-900);
+      color: var(--gold);
+      font-size: 13pt;
+      font-weight: 900;
+    }
+
+    table { width: 100%; margin: 3mm 0 5mm; border-collapse: collapse; font-size: 9.2pt; }
+    th, td { padding: 2.4mm 2.6mm; border: 1px solid #cbc7bd; text-align: left; vertical-align: top; }
+    th { background: var(--navy-800); color: white; font-weight: 800; }
+    tr:nth-child(even) td { background: #f1eee5; }
+    .compact th, .compact td { padding: 1.8mm 2.2mm; }
+
+    .shot {
+      width: min(100%, 105mm);
+      margin: 3mm auto 4mm;
+      padding: 2.5mm;
+      border: 2px solid var(--navy-800);
+      background: white;
+      box-shadow: 3px 3px 0 #d5cba9;
+    }
+    .shot img { display: block; width: 100%; height: auto; }
+    .shot figcaption { margin-top: 2mm; color: var(--muted); font-size: 8.5pt; }
+    .shot.mobile { width: 45mm; margin: 0 auto; }
+    .mobile-layout { display: grid; grid-template-columns: 1fr 48mm; gap: 5mm; align-items: start; margin: 3mm 0 4mm; }
+    .mobile-layout .cards { grid-template-columns: 1fr; margin: 0; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2mm;
+      margin: 5mm 0;
+      align-items: stretch;
+    }
+    .flow-item {
+      position: relative;
+      display: grid;
+      min-height: 25mm;
+      place-items: center;
+      padding: 3mm;
+      border: 1px solid #afbac9;
+      border-radius: 4px;
+      background: white;
+      color: var(--navy-800);
+      font-size: 9pt;
+      font-weight: 800;
+      text-align: center;
+    }
+    .flow-item:not(:last-child)::after {
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      right: -3.2mm;
+      color: var(--blue);
+      content: "▶";
+      transform: translateY(-50%);
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr 1fr;
+      gap: 3mm;
+      margin: 4mm 0;
+    }
+    .layer { padding: 4mm; border: 2px solid var(--navy-800); border-radius: 5px; background: white; }
+    .layer h3 { margin: 0 0 3mm; color: white; background: var(--navy-800); padding: 2mm; text-align: center; }
+    .layer ul { margin-bottom: 0; padding-left: 5mm; font-size: 9pt; }
+    .bridge {
+      grid-column: 1 / -1;
+      padding: 3mm;
+      border: 1px dashed var(--blue);
+      background: #eef5ff;
+      color: #174d8d;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .tree {
+      margin: 3mm 0;
+      padding: 4mm;
+      border: 1px solid var(--line);
+      background: #fffdf7;
+      font-family: Consolas, "D2Coding", monospace;
+      font-size: 8.5pt;
+      line-height: 1.55;
+      white-space: pre;
+    }
+
+    .checklist { list-style: none; padding-left: 0; }
+    .checklist li { position: relative; padding-left: 7mm; }
+    .checklist li::before { position: absolute; left: 0; color: var(--green); content: "□"; font-size: 13pt; line-height: 1; }
+
+    .toc { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 10mm; }
+    .toc h3 { margin-bottom: 2mm; border-bottom: 2px solid var(--gold); padding-bottom: 1mm; }
+    .toc ol { margin-top: 0; }
+    .toc li { display: flex; justify-content: space-between; gap: 3mm; border-bottom: 1px dotted #aaa; }
+    .toc .n { color: var(--muted); }
+
+    .small { font-size: 8.5pt; }
+    .muted { color: var(--muted); }
+    .center { text-align: center; }
+    .no-break { break-inside: avoid; }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <div class="cover-grid">
+      <div class="brand"><span class="brand-gem"></span> UNITYMISSION · 평화의 다섯 조각</div>
+      <div class="cover-title">
+        <p class="subtitle">처음 사용하는 사람과 처음 코드를 보는 사람을 위한</p>
+        <h1>사용자 매뉴얼<br />및 구현 설명서</h1>
+        <p>2D 픽셀 RPG로 배우는 통일·평화교육</p>
+      </div>
+      <div class="cover-meta">
+        <div><strong>서비스</strong><br />https://unity-mission.vercel.app/</div>
+        <div><strong>문서 버전</strong><br />1.1 · 2026년 11월 24일</div>
+        <div><strong>대상</strong><br />학습자 · 교사 · 초보 개발자</div>
+        <div><strong>기준 릴리스</strong><br />GitHub PR #5·#6 · main 7426f92</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="part-label">문서 안내</span>
+    <h2>이 문서를 이렇게 사용하세요</h2>
+    <hr class="section-rule" />
+    <p class="lead">이 PDF는 게임을 플레이하는 방법과, 게임이 어떻게 만들어졌는지를 한 번에 설명합니다. 코딩 경험이 없어도 읽을 수 있도록 전문 용어 뒤에 쉬운 뜻을 함께 적었습니다.</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="icon">1</div>
+        <h3>게임을 하려는 분</h3>
+        <p><strong>1부 사용자 매뉴얼</strong>만 읽으면 됩니다. 시작, 조작, NPC 대화, 퀘스트, 저장, 엔딩 순서로 설명합니다.</p>
+      </div>
+      <div class="card">
+        <div class="icon">2</div>
+        <h3>수업에 활용하려는 분</h3>
+        <p>1부의 학습 흐름과 개인정보·수료증 안내를 확인하고, 마지막 체크리스트를 활용하세요.</p>
+      </div>
+      <div class="card">
+        <div class="icon">3</div>
+        <h3>코드를 수정하려는 분</h3>
+        <p><strong>2부 구현 설명서</strong>에서 폴더 구조, 저장 방식, React와 Phaser의 역할, 테스트와 배포 절차를 확인하세요.</p>
+      </div>
+      <div class="card">
+        <div class="icon">!</div>
+        <h3>꼭 알아둘 점</h3>
+        <p>학습 기록은 계정이 아니라 현재 브라우저에 저장됩니다. 다른 기기나 다른 브라우저로 자동 이동하지 않습니다.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <strong>교육 안내</strong><br />UnityMission의 수료증은 비공식 학습 참여 확인용입니다. 학교·기관의 공식 이수증이나 공인 평가 결과가 아닙니다. 문항 정답은 공개되어 있으므로 공인 시험 용도로 사용하지 않습니다.
+    </div>
+
+    <h3>빠른 용어 풀이</h3>
+    <table class="compact">
+      <tr><th>용어</th><th>쉬운 뜻</th></tr>
+      <tr><td>RPG</td><td>캐릭터를 움직이며 이야기와 임무를 진행하는 게임</td></tr>
+      <tr><td>NPC</td><td>플레이어가 조작하지 않는 마을 주민 캐릭터</td></tr>
+      <tr><td>퀘스트</td><td>NPC에게 받아 해결하는 학습 임무</td></tr>
+      <tr><td>XP</td><td>미션을 완료하면 얻는 경험치</td></tr>
+      <tr><td>localStorage</td><td>웹사이트가 현재 브라우저 안에 기록을 보관하는 공간</td></tr>
+    </table>
+    <span class="doc-mark">UnityMission 통합 안내서</span><span class="page-number">2</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">목차</span>
+    <h2>찾아보기</h2>
+    <hr class="section-rule" />
+    <div class="toc">
+      <div>
+        <h3>1부 · 사용자 매뉴얼</h3>
+        <ol>
+          <li><span>게임 목표와 학습 흐름</span><span class="n">4</span></li>
+          <li><span>처음 시작하기</span><span class="n">5</span></li>
+          <li><span>캐릭터 조작</span><span class="n">6</span></li>
+          <li><span>마을과 NPC</span><span class="n">7</span></li>
+          <li><span>대화와 퀘스트</span><span class="n">8</span></li>
+          <li><span>문제 풀이와 보상</span><span class="n">9</span></li>
+          <li><span>퍼즐·엔딩·수료증</span><span class="n">10</span></li>
+          <li><span>모바일·저장·문제 해결</span><span class="n">11</span></li>
+        </ol>
+      </div>
+      <div>
+        <h3>2부 · 구현 설명서</h3>
+        <ol start="9">
+          <li><span>개발 환경과 실행</span><span class="n">12</span></li>
+          <li><span>전체 구조 이해하기</span><span class="n">13</span></li>
+          <li><span>라우트와 핵심 파일</span><span class="n">14</span></li>
+          <li><span>상태와 저장 구조</span><span class="n">15</span></li>
+          <li><span>React와 Phaser 연결</span><span class="n">16</span></li>
+          <li><span>대화·퀘스트 구현</span><span class="n">17</span></li>
+          <li><span>테스트와 품질 게이트</span><span class="n">18</span></li>
+          <li><span>GitHub·Vercel 배포</span><span class="n">19</span></li>
+          <li><span>안전하게 수정하는 법</span><span class="n">20</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <h3>한눈에 보는 핵심</h3>
+    <div class="flow">
+      <div class="flow-item">닉네임<br />입력</div>
+      <div class="flow-item">마을<br />탐험</div>
+      <div class="flow-item">NPC<br />대화</div>
+      <div class="flow-item">3문항<br />퀘스트</div>
+      <div class="flow-item">조각·XP<br />획득</div>
+    </div>
+    <div class="callout tip"><strong>추천 읽기 순서</strong> 처음 플레이한다면 4~11쪽을 차례로 읽으세요. 코드를 처음 맡았다면 12쪽의 실행부터 따라 한 뒤 13~17쪽 구조를 읽고, 18쪽 명령을 모두 통과한 다음 수정하세요.</div>
+    <span class="doc-mark">UnityMission 통합 안내서</span><span class="page-number">3</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">1부 · 사용자 매뉴얼</span>
+    <h2>1. 게임 목표와 학습 흐름</h2>
+    <hr class="section-rule" />
+    <p class="lead">평화마을을 탐험하고 다섯 NPC의 교육 퀘스트를 완료해 <strong>평화 조각 5개</strong>를 모으는 것이 목표입니다.</p>
+    <div class="flow">
+      <div class="flow-item">탐험</div><div class="flow-item">대화</div><div class="flow-item">학습</div><div class="flow-item">보상</div><div class="flow-item">엔딩</div>
+    </div>
+
+    <h3>게임에서 배우는 다섯 주제</h3>
+    <table>
+      <tr><th>순서</th><th>미션</th><th>NPC</th><th>배우는 내용</th></tr>
+      <tr><td>1</td><td>역사</td><td>역사 안내자</td><td>분단과 한반도 현대사의 기초 사실</td></tr>
+      <tr><td>2</td><td>문화</td><td>문화 탐험가</td><td>남북의 일상과 언어, 서로 다른 표현</td></tr>
+      <tr><td>3</td><td>평화</td><td>평화 협상가</td><td>갈등을 대화와 경청으로 해결하는 방법</td></tr>
+      <tr><td>4</td><td>협력</td><td>협력 연구자</td><td>공동 문제를 함께 해결하는 원리</td></tr>
+      <tr><td>5</td><td>미래</td><td>미래 설계자</td><td>평화로운 미래를 위한 참여와 선택</td></tr>
+    </table>
+
+    <div class="cards three">
+      <div class="card center"><div class="icon" style="margin-inline:auto">15</div><strong>전체 문항</strong><br /><span class="muted">5미션 × 3문항</span></div>
+      <div class="card center"><div class="icon" style="margin-inline:auto">500</div><strong>최대 XP</strong><br /><span class="muted">미션당 최초 100XP</span></div>
+      <div class="card center"><div class="icon" style="margin-inline:auto">6</div><strong>최종 레벨</strong><br /><span class="muted">Lv.6 Unity Master</span></div>
+    </div>
+    <div class="callout"><strong>순서가 중요한 이유</strong> 미션은 1번부터 차례로 열립니다. 잠긴 NPC를 먼저 만나면 앞선 평화 조각을 찾아오라는 안내가 표시됩니다.</div>
+    <span class="doc-mark">1부 · 사용자 매뉴얼</span><span class="page-number">4</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">1부 · 사용자 매뉴얼</span>
+    <h2>2. 처음 시작하기</h2>
+    <hr class="section-rule" />
+    <div class="steps">
+      <div class="step"><strong>웹사이트 열기</strong><br />Chrome, Edge, Safari 같은 최신 브라우저에서 <code>https://unity-mission.vercel.app/</code>을 엽니다.</div>
+      <div class="step"><strong>닉네임 입력</strong><br />2~12자의 닉네임을 입력합니다. 실명 대신 수업용 별명을 사용해도 됩니다.</div>
+      <div class="step"><strong>게임 시작</strong><br /><em>모험 시작하기</em> 버튼을 누르면 평화마을 중앙 광장으로 이동합니다.</div>
+      <div class="step"><strong>이어하기</strong><br />같은 브라우저에 기록이 있으면 이전 닉네임과 진행 상태가 자동으로 나타납니다.</div>
+    </div>
+
+    <h3>시작 전에 확인할 것</h3>
+    <ul class="checklist">
+      <li>인터넷 연결이 되어 있습니다.</li>
+      <li>브라우저 창을 너무 작게 줄이지 않았습니다.</li>
+      <li>키보드 사용자는 게임 화면을 한 번 클릭했습니다.</li>
+      <li>공용 컴퓨터라면 사용 후 기록 초기화를 할 예정입니다.</li>
+    </ul>
+
+    <div class="callout tip"><strong>설치가 필요한가요?</strong> 아니요. 별도 프로그램이나 회원가입 없이 웹사이트에서 바로 실행됩니다.</div>
+    <div class="callout warn"><strong>다른 기기에서 이어하기</strong> 기록은 계정에 저장되지 않습니다. 학교 컴퓨터에서 한 기록은 집 컴퓨터에 자동으로 나타나지 않습니다.</div>
+
+    <h3>게임 화면의 기본 정보</h3>
+    <table class="compact">
+      <tr><th>표시</th><th>뜻</th></tr>
+      <tr><td>닉네임의 평화마을</td><td>현재 사용자의 게임 공간</td></tr>
+      <tr><td>Lv. · XP</td><td>완료한 미션에서 계산한 레벨과 경험치</td></tr>
+      <tr><td>평화 조각 0/5</td><td>완료한 미션 수와 같은 조각 개수</td></tr>
+      <tr><td>대시보드</td><td>미션 진행률·배지·수료증으로 이동하는 메뉴</td></tr>
+    </table>
+    <span class="doc-mark">1부 · 사용자 매뉴얼</span><span class="page-number">5</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">1부 · 사용자 매뉴얼</span>
+    <h2>3. 캐릭터 조작</h2>
+    <hr class="section-rule" />
+    <h3>컴퓨터에서</h3>
+    <table>
+      <tr><th>기능</th><th>키</th><th>설명</th></tr>
+      <tr><td>이동</td><td><code>W A S D</code> 또는 방향키</td><td>위·왼쪽·아래·오른쪽으로 이동합니다.</td></tr>
+      <tr><td>대화·조사</td><td><code>E</code></td><td>가까운 NPC, 공명석, 평화의 나무와 상호작용합니다.</td></tr>
+      <tr><td>인벤토리</td><td><code>I</code></td><td>평화 조각과 조화의 열쇠를 확인합니다.</td></tr>
+      <tr><td>대화 닫기</td><td><code>Esc</code></td><td>열린 대화창을 닫습니다.</td></tr>
+      <tr><td>소리</td><td><code>🔊</code>·볼륨</td><td>상단 버튼과 슬라이더로 음소거·크기를 조절합니다.</td></tr>
+    </table>
+
+    <h3>휴대전화·태블릿에서</h3>
+    <div class="mobile-layout">
+      <div class="cards">
+        <div class="card"><div class="icon">▲</div><h3>화면 방향키</h3><p>왼쪽 아래의 네 방향 버튼을 누르는 동안 캐릭터가 이동합니다.</p></div>
+        <div class="card"><div class="icon">E</div><h3>ACTION 버튼</h3><p>오른쪽 아래 버튼으로 NPC 대화와 오브젝트 조사를 시작합니다.</p></div>
+      </div>
+      <figure class="shot mobile">
+        <img src="manual-assets/03-mobile-controls.png" alt="모바일 화면의 방향키와 상호작용 버튼" />
+        <figcaption>왼쪽은 이동, 오른쪽 E는 상호작용입니다.</figcaption>
+      </figure>
+    </div>
+
+    <div class="callout tip"><strong>처음 소리가 안 날 때</strong> 브라우저 정책상 첫 키 입력이나 터치 후 음악이 시작됩니다. 음소거와 볼륨 설정은 자동 저장됩니다.</div>
+    <span class="doc-mark">1부 · 사용자 매뉴얼</span><span class="page-number">6</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">1부 · 사용자 매뉴얼</span>
+    <h2>4. 마을과 NPC 찾기</h2>
+    <hr class="section-rule" />
+    <p>중앙 광장에서 길을 따라 다섯 구역으로 이동합니다. 오른쪽 위 <strong>현재 퀘스트</strong>와 화면 가장자리 화살표를 따라가면 다음 NPC를 쉽게 찾을 수 있습니다.</p>
+    <table>
+      <tr><th>구역</th><th>위치 감각</th><th>NPC</th><th>찾는 순서</th></tr>
+      <tr><td>역사 구역</td><td>북서쪽</td><td>역사 안내자</td><td>가장 먼저</td></tr>
+      <tr><td>문화 구역</td><td>북동쪽</td><td>문화 탐험가</td><td>역사 완료 후</td></tr>
+      <tr><td>평화 구역</td><td>남서쪽</td><td>평화 협상가</td><td>문화 완료 후</td></tr>
+      <tr><td>협력 구역</td><td>남동쪽</td><td>협력 연구자</td><td>평화 완료 후</td></tr>
+      <tr><td>미래 구역</td><td>남쪽 중앙</td><td>미래 설계자</td><td>협력 완료 후</td></tr>
+    </table>
+
+    <figure class="shot">
+      <img src="manual-assets/04-completed-world.png" alt="중앙 광장과 여러 구역이 보이는 데스크톱 게임 화면" />
+      <figcaption>완료된 마을 화면 예시: 중앙의 평화의 나무 주변으로 길과 구역이 연결됩니다.</figcaption>
+    </figure>
+
+    <h3>NPC 머리 위 표시 읽기</h3>
+    <div class="cards three">
+      <div class="card"><strong>느낌표·밝은 고리</strong><br /><span class="muted">지금 진행할 NPC</span></div>
+      <div class="card"><strong>회색 점·고리</strong><br /><span class="muted">앞 미션을 먼저 완료</span></div>
+      <div class="card"><strong>체크·초록 고리</strong><br /><span class="muted">이미 완료한 NPC</span></div>
+    </div>
+    <span class="doc-mark">1부 · 사용자 매뉴얼</span><span class="page-number">7</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">1부 · 사용자 매뉴얼</span>
+    <h2>5. NPC 대화와 퀘스트 받기</h2>
+    <hr class="section-rule" />
+    <div class="steps">
+      <div class="step">NPC 가까이 가서 <strong>“E 키: …와 대화하기”</strong> 안내가 나타나는지 확인합니다.</div>
+      <div class="step"><code>E</code> 또는 모바일 <strong>ACTION</strong>을 누릅니다. 이동이 멈추고 플레이어와 NPC가 서로 바라봅니다.</div>
+      <div class="step"><strong>다음</strong>을 눌러 NPC와 플레이어의 교대 대화를 읽습니다. 타자 효과가 느리면 <strong>대사 모두 보기</strong>를 누릅니다.</div>
+      <div class="step"><strong>퀘스트를 도울게요</strong>를 선택하고, 확인 대사 뒤 <strong>퀘스트 시작</strong>을 누릅니다.</div>
+    </div>
+
+    <figure class="shot">
+      <img src="manual-assets/02-npc-dialogue.png" alt="역사 안내자와 플레이어가 대화하는 게임 화면" />
+      <figcaption>대화창 예시: 현재 말하는 인물은 밝게 강조되고, 3/3처럼 대화 순서가 표시됩니다.</figcaption>
+    </figure>
+
+    <div class="callout"><strong>두 선택지의 차이</strong> “퀘스트를 도울게요”는 학습을 시작하고, “조금 더 둘러볼게요”는 대화를 닫습니다. 나중에 다시 찾아오면 언제든 시작할 수 있습니다.</div>
+    <div class="callout tip"><strong>접근성</strong> 움직임 줄이기 설정을 사용하는 기기에서는 긴 타자 효과가 줄어듭니다. 키보드 사용자는 <code>Esc</code>로 대화를 닫을 수 있습니다.</div>
+    <span class="doc-mark">1부 · 사용자 매뉴얼</span><span class="page-number">8</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">1부 · 사용자 매뉴얼</span>
+    <h2>6. 문제 풀이, 해설, 보상</h2>
+    <hr class="section-rule" />
+    <div class="flow">
+      <div class="flow-item">보기<br />선택</div><div class="flow-item">답안<br />제출</div><div class="flow-item">정오답<br />확인</div><div class="flow-item">해설·출처<br />읽기</div><div class="flow-item">다음<br />문항</div>
+    </div>
+
+    <h3>문제 풀이 규칙</h3>
+    <ul>
+      <li>각 미션은 <strong>3문항</strong>이고, 각 문항에는 보기 4개가 있습니다.</li>
+      <li>답을 고른 뒤 제출하면 정답·오답과 해설, 공식 출처가 표시됩니다.</li>
+      <li>해설을 확인한 뒤에만 다음 문항으로 넘어갈 수 있습니다.</li>
+      <li>정답 개수와 관계없이 3문항을 모두 진행하면 미션이 완료됩니다.</li>
+    </ul>
+
+    <h3>XP와 레벨</h3>
+    <table class="compact">
+      <tr><th>완료 미션</th><th>XP</th><th>레벨</th><th>설명</th></tr>
+      <tr><td>0개</td><td>0</td><td>Lv.1</td><td>처음 시작</td></tr>
+      <tr><td>1개</td><td>100</td><td>Lv.2</td><td>첫 평화 조각 획득</td></tr>
+      <tr><td>2개</td><td>200</td><td>Lv.3</td><td>문화 조각까지 획득</td></tr>
+      <tr><td>3개</td><td>300</td><td>Lv.4</td><td>평화 조각까지 획득</td></tr>
+      <tr><td>4개</td><td>400</td><td>Lv.5</td><td>협력 조각까지 획득</td></tr>
+      <tr><td>5개</td><td>500</td><td>Lv.6</td><td>Unity Master</td></tr>
+    </table>
+
+    <div class="callout warn"><strong>중복 보상 방지</strong> 같은 미션을 다시 풀어도 XP는 한 번만 지급됩니다. 최초 완료 때 평화 조각 연출과 레벨업 효과가 나타납니다.</div>
+    <h3>대시보드에서 볼 수 있는 것</h3>
+    <p>미션 잠금·완료 상태, XP와 레벨, 진행률, 배지 5개, 수료증 링크를 확인할 수 있습니다. RPG와 대시보드는 같은 학습 기록을 사용합니다.</p>
+    <span class="doc-mark">1부 · 사용자 매뉴얼</span><span class="page-number">9</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">1부 · 사용자 매뉴얼</span>
+    <h2>7. 공명석 퍼즐, 엔딩, 수료증</h2>
+    <hr class="section-rule" />
+    <h3>공명석 퍼즐</h3>
+    <p>협력 구역에는 세 개의 공명석이 있습니다. 가까이 다가가 안내가 나타나면 상호작용하세요.</p>
+    <div class="flow" style="grid-template-columns: repeat(3, 1fr); max-width: 125mm;">
+      <div class="flow-item">1 · 푸른 공명석</div><div class="flow-item">2 · 황금 공명석</div><div class="flow-item">3 · 초록 공명석</div>
+    </div>
+    <div class="callout tip"><strong>정답 보상</strong> 순서대로 활성화하면 인벤토리에 <em>조화의 열쇠</em>가 저장됩니다. 순서를 틀리면 푸른색부터 다시 시작하면 됩니다.</div>
+
+    <h3>최종 엔딩</h3>
+    <div class="steps">
+      <div class="step">다섯 미션을 완료해 평화 조각 <strong>5/5</strong>를 만듭니다.</div>
+      <div class="step">중앙 광장의 <strong>평화의 나무</strong>로 이동합니다.</div>
+      <div class="step">상호작용하면 조각 결합, 마을 복원, 최종 레벨 화면이 나타납니다.</div>
+      <div class="step"><strong>수료증 보기</strong> 또는 <strong>다시 탐험하기</strong>를 선택합니다.</div>
+    </div>
+
+    <h3>수료증 이용</h3>
+    <ul>
+      <li>미션 5개를 모두 완료해야 수료증 페이지가 열립니다.</li>
+      <li>닉네임, 완료 날짜, 학습 완료 문구가 표시됩니다.</li>
+      <li>브라우저 인쇄 기능에서 프린터 출력 또는 PDF 저장을 선택할 수 있습니다.</li>
+    </ul>
+    <div class="callout warn"><strong>주의</strong> 수료증은 비공식 참여 확인서입니다. 공식 학점·자격·학교 평가를 대신하지 않습니다.</div>
+    <span class="doc-mark">1부 · 사용자 매뉴얼</span><span class="page-number">10</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">1부 · 사용자 매뉴얼</span>
+    <h2>8. 저장, 초기화, 문제 해결</h2>
+    <hr class="section-rule" />
+    <h3>자동 저장</h3>
+    <p>답안, 현재 문항, 완료 미션, XP 계산 근거, 퍼즐, 엔딩 상태는 현재 브라우저에 자동 저장됩니다. 별도 저장 버튼은 없습니다.</p>
+    <table>
+      <tr><th>상황</th><th>결과</th></tr>
+      <tr><td>같은 브라우저에서 새로고침</td><td>저장된 진행을 복원합니다.</td></tr>
+      <tr><td>시크릿 모드 종료</td><td>기록이 사라질 수 있습니다.</td></tr>
+      <tr><td>브라우저 데이터 삭제</td><td>학습 기록도 삭제됩니다.</td></tr>
+      <tr><td>다른 기기·브라우저 사용</td><td>기존 기록이 자동으로 이동하지 않습니다.</td></tr>
+    </table>
+
+    <h3>자주 생기는 문제</h3>
+    <table class="compact">
+      <tr><th>증상</th><th>해결 방법</th></tr>
+      <tr><td>키가 작동하지 않음</td><td>게임 화면을 클릭한 뒤 다시 누릅니다. 대화창이 열려 있다면 먼저 닫습니다.</td></tr>
+      <tr><td>NPC와 대화할 수 없음</td><td>NPC에게 더 가까이 가서 상호작용 안내가 표시되는지 확인합니다.</td></tr>
+      <tr><td>다음 미션이 잠김</td><td>앞 미션의 3문항과 해설을 모두 완료했는지 대시보드에서 확인합니다.</td></tr>
+      <tr><td>XP가 다시 오르지 않음</td><td>정상입니다. 같은 미션의 XP는 최초 완료 때만 지급됩니다.</td></tr>
+      <tr><td>화면이 잘림</td><td>브라우저 확대를 100%로 되돌리고 세로·가로 방향을 바꿔 봅니다.</td></tr>
+      <tr><td>기록을 새로 시작하고 싶음</td><td>대시보드의 기록 초기화를 사용합니다. 되돌릴 수 없으니 주의하세요.</td></tr>
+    </table>
+    <div class="callout danger"><strong>공용 컴퓨터</strong> 사용을 마쳤다면 반드시 기록 초기화를 하거나 브라우저의 사이트 데이터를 삭제하세요. 닉네임과 학습 진행이 다음 사용자에게 보일 수 있습니다.</div>
+    <span class="doc-mark">1부 · 사용자 매뉴얼</span><span class="page-number">11</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">2부 · 구현 설명서</span>
+    <h2>9. 개발 환경과 로컬 실행</h2>
+    <hr class="section-rule" />
+    <p class="lead">이제부터는 코드를 처음 보는 개발자를 위한 설명입니다. 명령은 프로젝트 폴더에서 실행합니다.</p>
+
+    <h3>필요한 프로그램</h3>
+    <ul>
+      <li><strong>Node.js 20 이상</strong>: Next.js와 테스트를 실행합니다.</li>
+      <li><strong>npm</strong>: 필요한 라이브러리를 설치합니다.</li>
+      <li><strong>Git</strong>: 변경 이력과 브랜치를 관리합니다.</li>
+      <li><strong>최신 Chrome/Edge</strong>: 실제 게임 입력과 화면을 확인합니다.</li>
+    </ul>
+
+    <h3>처음 실행하는 순서</h3>
+    <pre>npm install
+npm run dev</pre>
+    <p>브라우저에서 <code>http://localhost:3000</code>을 엽니다. 이 프로젝트는 서버 DB나 API 키가 필요하지 않습니다.</p>
+
+    <h3>프로덕션과 같은 방식으로 확인</h3>
+    <pre>npm run build
+npm run start</pre>
+    <div class="callout"><strong>개발 서버와 프로덕션 빌드의 차이</strong> 개발 서버는 수정 내용을 빠르게 반영합니다. 프로덕션 빌드는 실제 배포에 필요한 TypeScript 검사, 페이지 생성, 번들 생성을 확인합니다.</div>
+
+    <h3>주요 버전</h3>
+    <table class="compact">
+      <tr><th>도구</th><th>역할</th><th>버전</th></tr>
+      <tr><td>Next.js</td><td>페이지·라우팅·프로덕션 빌드</td><td>16.4.6</td></tr>
+      <tr><td>React</td><td>대화·퀴즈·HUD 같은 화면 UI</td><td>19.3.1</td></tr>
+      <tr><td>Phaser</td><td>월드·캐릭터·물리·카메라·입력</td><td>3.90.0</td></tr>
+      <tr><td>TypeScript</td><td>타입 오류 사전 검사</td><td>6.0.3</td></tr>
+      <tr><td>Vitest</td><td>단위·컴포넌트 회귀 테스트</td><td>5.1.1</td></tr>
+    </table>
+    <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">12</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">2부 · 구현 설명서</span>
+    <h2>10. 전체 구조 이해하기</h2>
+    <hr class="section-rule" />
+    <div class="architecture">
+      <div class="layer">
+        <h3>Next.js</h3>
+        <ul><li>URL 라우팅</li><li>페이지 껍데기</li><li>빌드·배포</li><li>정적 자산 제공</li></ul>
+      </div>
+      <div class="layer">
+        <h3>React</h3>
+        <ul><li>진행 상태 원장</li><li>대화·퀴즈</li><li>HUD·인벤토리</li><li>엔딩·수료증</li></ul>
+      </div>
+      <div class="layer">
+        <h3>Phaser</h3>
+        <ul><li>월드 렌더링</li><li>캐릭터 이동</li><li>충돌·카메라</li><li>NPC 근접 판정</li></ul>
+      </div>
+      <div class="bridge">React가 정답·XP·저장을 소유하고, Bridge가 Phaser와 이벤트·읽기 전용 상태를 교환합니다.</div>
+    </div>
+
+    <h3>중요한 설계 원칙</h3>
+    <div class="cards">
+      <div class="card"><h3>원장은 하나만</h3><p>XP와 완료 미션은 React의 기존 진행 엔진에서만 변경합니다. Phaser가 별도 XP를 저장하지 않습니다.</p></div>
+      <div class="card"><h3>콘텐츠 재사용</h3><p>대시보드와 RPG가 같은 5미션·15문항 데이터를 사용합니다. 문제를 두 번 작성하지 않습니다.</p></div>
+      <div class="card"><h3>클라이언트 전용 게임</h3><p>Phaser는 브라우저 API가 필요하므로 클라이언트에서 동적으로 불러옵니다. 페이지 서버 렌더링과 충돌하지 않습니다.</p></div>
+      <div class="card"><h3>저장값은 불신</h3><p>localStorage 값은 사용 전에 스키마, ID, 범위, 날짜, 불변식을 검사합니다.</p></div>
+    </div>
+    <div class="callout tip"><strong>한 문장 요약</strong> React는 “무엇을 완료했는가”를 관리하고, Phaser는 “마을에서 무엇이 보이고 어떻게 움직이는가”를 담당합니다.</div>
+    <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">13</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">2부 · 구현 설명서</span>
+    <h2>11. 라우트와 핵심 파일</h2>
+    <hr class="section-rule" />
+    <h3>URL 라우트</h3>
+    <table class="compact">
+      <tr><th>경로</th><th>역할</th></tr>
+      <tr><td><code>/</code></td><td>닉네임 입력, 신규 시작, 이어하기</td></tr>
+      <tr><td><code>/game</code></td><td>Phaser RPG와 React 오버레이</td></tr>
+      <tr><td><code>/dashboard</code></td><td>기존 미션 진행·XP·배지·수료증 허브</td></tr>
+      <tr><td><code>/mission/[id]</code></td><td>기존 대시보드형 미션 안내·문제·결과</td></tr>
+      <tr><td><code>/badges</code></td><td>배지 5개</td></tr>
+      <tr><td><code>/certificate</code></td><td>비공식 학습 참여 확인서</td></tr>
+    </table>
+
+    <h3>폴더 지도</h3>
+    <div class="tree">src/
+├─ app/                     # Next.js 페이지와 전체 CSS
+├─ components/game/         # React 게임 UI
+│  ├─ game-page.tsx         # 게임 화면 조정자
+│  ├─ phaser-game-host.tsx  # Phaser 생성·정리
+│  ├─ dialogue-panel.tsx    # NPC 교대 대화
+│  ├─ rpg-quest-panel.tsx   # 3문항 학습
+│  └─ ending-panel.tsx      # 최종 엔딩
+├─ game/                    # Phaser와 RPG 규칙
+│  ├─ runtime.ts            # 월드·입력·물리·NPC
+│  ├─ npcs.ts               # NPC 정의·대화 순서
+│  ├─ bridge.ts             # React↔Phaser 연결
+│  ├─ audio.ts              # Web Audio 음악·효과음
+│  ├─ audio-settings.ts     # 볼륨 설정 검증·저장
+│  └─ rpg-progress.ts       # 퍼즐·엔딩 저장 검증
+├─ lib/                     # 교육 엔진·저장·배지
+└─ data/                    # 5미션·15문항 콘텐츠</div>
+
+    <div class="callout"><strong>수정 위치 찾는 법</strong> 화면 모양은 <code>components</code>와 <code>globals.css</code>, 월드 동작은 <code>game/runtime.ts</code>, 교육 보상은 <code>lib/game-engine.ts</code>, 문제 내용은 데이터 파일에서 찾습니다.</div>
+    <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">14</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">2부 · 구현 설명서</span>
+    <h2>12. 상태와 저장 구조</h2>
+    <hr class="section-rule" />
+    <p>교육 기록, RPG 보조 기록, 오디오 설정을 분리합니다. 기존 대시보드 호환성을 유지하면서 게임 기능과 개인 설정을 안전하게 확장할 수 있습니다.</p>
+    <table>
+      <tr><th>저장 키</th><th>담당 데이터</th><th>원칙</th></tr>
+      <tr><td><code>unitymission:v1</code></td><td>닉네임, 완료 미션, 최고 점수, 시도 횟수, 진행 중 답안</td><td>XP·레벨·배지의 유일한 근거</td></tr>
+      <tr><td><code>unitymission:rpg:v1</code></td><td>공명석 순서, 조화의 열쇠, 엔딩 확인</td><td>교육 보상을 저장하지 않음</td></tr>
+      <tr><td><code>unitymission:audio:v1</code></td><td>음소거, 마스터 볼륨</td><td>범위를 검증하고 진행 기록과 분리</td></tr>
+    </table>
+
+    <h3>교육 진행의 계산 방식</h3>
+    <pre>완료 미션 수 = completedMissions의 유효한 항목 수
+XP = 완료 미션 수 × 100
+레벨 = min(6, floor(XP / 100) + 1)
+평화 조각 = 완료 미션 수</pre>
+    <p>XP와 레벨을 별도 숫자로 저장하지 않고 완료 기록에서 다시 계산하므로, 값이 서로 어긋날 가능성을 줄입니다.</p>
+
+    <h3>저장 처리 순서</h3>
+    <div class="flow">
+      <div class="flow-item">문자열<br />읽기</div><div class="flow-item">JSON<br />변환</div><div class="flow-item">스키마<br />검증</div><div class="flow-item">불변식<br />검사</div><div class="flow-item">사용 또는<br />안전 초기화</div>
+    </div>
+    <div class="callout danger"><strong>하면 안 되는 것</strong> localStorage 값을 검증 없이 화면이나 게임 로직에 사용하지 마세요. 닉네임을 <code>innerHTML</code>로 넣거나 저장된 XP를 그대로 신뢰하지 마세요.</div>
+    <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">15</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">2부 · 구현 설명서</span>
+    <h2>13. React와 Phaser 연결</h2>
+    <hr class="section-rule" />
+    <p class="lead">두 기술이 같은 데이터를 따로 저장하지 않도록, React가 상태를 소유하고 Phaser에는 필요한 스냅샷만 전달합니다.</p>
+    <h3>이벤트 흐름 예시: NPC 대화</h3>
+    <div class="flow">
+      <div class="flow-item">Phaser<br />근접 감지</div><div class="flow-item">Bridge<br />NPC ID 전달</div><div class="flow-item">React<br />대화창 표시</div><div class="flow-item">paused<br />true 전달</div><div class="flow-item">Phaser<br />이동 정지</div>
+    </div>
+
+    <h3>게임 생성과 정리</h3>
+    <ol>
+      <li><code>phaser-game-host.tsx</code>가 브라우저에서 Phaser 모듈을 동적으로 불러옵니다.</li>
+      <li>React 컴포넌트가 마운트되면 게임 인스턴스를 한 번 생성합니다.</li>
+      <li>진행 상태가 바뀌면 새 인스턴스를 만들지 않고 스냅샷을 갱신합니다.</li>
+      <li>페이지를 떠날 때 Phaser 인스턴스를 파괴해 캔버스·이벤트 누수를 막습니다.</li>
+    </ol>
+
+    <h3>역할 구분표</h3>
+    <table class="compact">
+      <tr><th>기능</th><th>React</th><th>Phaser</th></tr>
+      <tr><td>미션 완료·100XP</td><td>변경·저장</td><td>읽어서 표현</td></tr>
+      <tr><td>캐릭터 이동·충돌</td><td>모바일 입력 전달</td><td>계산·렌더링</td></tr>
+      <tr><td>NPC 대화 UI</td><td>렌더링·선택 처리</td><td>근접 대상 전달</td></tr>
+      <tr><td>퍼즐</td><td>결과 저장</td><td>오브젝트·근접 상호작용</td></tr>
+      <tr><td>엔딩</td><td>오버레이·수료증 링크</td><td>최종 오브젝트 활성화</td></tr>
+      <tr><td>사운드·안내</td><td>설정·퀘스트 UI·음악 제어</td><td>구역·걸음·목표 좌표 전달</td></tr>
+    </table>
+    <div class="callout tip"><strong>디버깅 요령</strong> 화면 UI 문제는 React부터, 캐릭터 위치·충돌 문제는 Phaser부터 확인하세요. XP가 틀리면 Phaser가 아니라 완료 미션 원장을 확인합니다.</div>
+    <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">16</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">2부 · 구현 설명서</span>
+    <h2>14. 대화와 퀘스트 구현</h2>
+    <hr class="section-rule" />
+    <h3>대화 데이터</h3>
+    <p><code>src/game/npcs.ts</code>에는 NPC 이름, 역할, 위치, 담당 미션, 색상, 첫 인사, 플레이어 답변, 퀘스트 안내, 완료 후 메시지가 있습니다.</p>
+    <p>대화는 상태에 따라 세 턴으로 조합됩니다.</p>
+    <table>
+      <tr><th>상태</th><th>대화 흐름</th><th>마지막 동작</th></tr>
+      <tr><td>시작 가능</td><td>NPC → 플레이어 → NPC</td><td>수락/보류 선택</td></tr>
+      <tr><td>완료</td><td>플레이어 보고 → NPC 축하 → 플레이어 마무리</td><td>대화 닫기</td></tr>
+      <tr><td>잠김</td><td>플레이어 요청 → NPC 잠금 안내 → 플레이어 확인</td><td>대화 닫기</td></tr>
+    </table>
+
+    <h3>타자 효과와 접근성</h3>
+    <ul>
+      <li>화면에는 일정 간격으로 글자를 추가해 게임 대사 느낌을 만듭니다.</li>
+      <li>“대사 모두 보기”를 누르면 현재 문장을 즉시 표시합니다.</li>
+      <li><code>prefers-reduced-motion</code>이면 긴 효과를 생략합니다.</li>
+      <li>화면 읽기 프로그램에는 잘린 문장이 아니라 완성된 현재 대사를 상태 메시지로 제공합니다.</li>
+    </ul>
+
+    <h3>퀘스트 연결</h3>
+    <div class="flow">
+      <div class="flow-item">대화<br />수락</div><div class="flow-item">beginMission</div><div class="flow-item">기존 3문항<br />재사용</div><div class="flow-item">completeMission</div><div class="flow-item">NPC·HUD<br />즉시 갱신</div>
+    </div>
+    <div class="callout"><strong>콘텐츠 중복 금지</strong> RPG용 문제 JSON을 새로 만들지 않습니다. 기존 교육 데이터를 불러와 UI만 게임 방식으로 보여 줍니다.</div>
+    <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">17</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">2부 · 구현 설명서</span>
+    <h2>15. 테스트와 품질 게이트</h2>
+    <hr class="section-rule" />
+    <p>실제 명령의 종료 코드가 0이어야 완료입니다. R14에서는 18개 파일·83개 테스트와 공개 URL 브라우저 스모크가 통과했습니다.</p>
+    <h3>필수 명령</h3>
+    <pre>npm run lint
+npx tsc --noEmit
+npm run test
+npm run build
+npm audit --omit=dev</pre>
+    <table class="compact">
+      <tr><th>명령</th><th>찾는 문제</th></tr>
+      <tr><td><code>lint</code></td><td>React 훅, 접근성, 코드 품질 규칙 위반</td></tr>
+      <tr><td><code>tsc</code></td><td>잘못된 타입, 누락된 속성, null 가능성</td></tr>
+      <tr><td><code>test</code></td><td>XP·저장·잠금·대화·퍼즐·컴포넌트 회귀</td></tr>
+      <tr><td><code>build</code></td><td>실제 배포 번들, 정적 페이지, 서버/클라이언트 경계</td></tr>
+      <tr><td><code>audit</code></td><td>설치된 운영 의존성의 알려진 취약점</td></tr>
+    </table>
+
+    <h3>브라우저 전체 플레이</h3>
+    <p><code>scripts/rpg-browser-smoke.mjs</code>는 실제 Chrome을 제어해 다음을 확인합니다.</p>
+    <ul class="checklist">
+      <li>캐릭터 이동과 분수 충돌</li><li>NPC 근접·대화·이동 잠금</li><li>교대 대화와 퀘스트 시작</li>
+      <li>3문항·해설·100XP·저장</li><li>완료 NPC 반응</li><li>공명석 퍼즐·인벤토리</li>
+      <li>5조각 엔딩·수료증</li><li>360px 모바일 조작·가로 넘침</li><li>사운드·방향 안내·6프레임 애니메이션</li><li>런타임 오류 0건</li>
+    </ul>
+    <div class="callout warn"><strong>테스트 실패 처리</strong> 로그를 읽고 코드·환경·의존성·콘텐츠·권한 중 원인을 분류합니다. 최소 수정 후 같은 테스트를 다시 실행하며, 실행하지 않은 항목을 PASS라고 기록하지 않습니다.</div>
+    <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">18</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">2부 · 구현 설명서</span>
+    <h2>16. GitHub와 Vercel 배포</h2>
+    <hr class="section-rule" />
+    <p>기본 원칙은 <strong>feature 브랜치 → Pull Request → 검사 → main 병합 → Vercel production</strong>입니다.</p>
+    <div class="flow">
+      <div class="flow-item">로컬<br />검증</div><div class="flow-item">feature<br />push</div><div class="flow-item">PR·Preview<br />검사</div><div class="flow-item">main<br />병합</div><div class="flow-item">Production<br />재검증</div>
+    </div>
+
+    <h3>안전한 배포 체크리스트</h3>
+    <ul class="checklist">
+      <li>원격 <code>main</code>을 fetch하고 현재 기준점과 충돌 여부를 확인합니다.</li>
+      <li>비밀정보, 임시 파일, 브라우저 프로필이 포함되지 않았는지 확인합니다.</li>
+      <li>검증한 파일만 명시적으로 stage합니다.</li>
+      <li>feature 브랜치를 push하고 Vercel Preview 성공을 확인합니다.</li>
+      <li>PR에서 변경 파일과 검사 결과를 확인한 뒤 정상 병합합니다.</li>
+      <li>Vercel의 production branch가 <code>main</code>인지 확인합니다.</li>
+      <li>공개 URL에서 전체 플레이와 모바일 화면을 다시 검증합니다.</li>
+    </ul>
+
+    <h3>현재 배포 정보</h3>
+    <table class="compact">
+      <tr><th>항목</th><th>값</th></tr>
+      <tr><td>GitHub</td><td><code>mecm3355-jpg/UnityMission</code></td></tr>
+      <tr><td>Production URL</td><td><code>https://unity-mission.vercel.app/</code></td></tr>
+      <tr><td>Production branch</td><td><code>main</code></td></tr>
+      <tr><td>게임 품질 개선 릴리스</td><td>PR #5·#6 · main <code>7426f92</code></td></tr>
+    </table>
+    <div class="callout danger"><strong>금지</strong> 강제 push, 보호 브랜치 우회, 테스트 실패 상태의 병합, 토큰·환경파일 커밋을 하지 마세요.</div>
+    <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">19</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">2부 · 구현 설명서</span>
+    <h2>17. 초보자를 위한 안전한 수정 절차</h2>
+    <hr class="section-rule" />
+    <h3>작은 변경 하나를 끝내는 순서</h3>
+    <div class="steps">
+      <div class="step"><strong>목표를 한 문장으로 쓰기</strong><br />예: “역사 안내자의 완료 대사를 더 쉽게 바꾼다.”</div>
+      <div class="step"><strong>관련 파일만 찾기</strong><br />대사는 <code>src/game/npcs.ts</code>, 대화 모양은 <code>dialogue-panel.tsx</code>와 CSS입니다.</div>
+      <div class="step"><strong>최소한으로 수정하기</strong><br />저장 구조나 XP 규칙까지 함께 바꾸지 않습니다.</div>
+      <div class="step"><strong>가까운 테스트부터 실행하기</strong><br />NPC 변경이면 <code>npcs.test.ts</code>와 <code>dialogue-panel.test.tsx</code>를 먼저 실행합니다.</div>
+      <div class="step"><strong>전체 게이트 실행하기</strong><br />lint, typecheck, 전체 test, build를 모두 통과시킵니다.</div>
+      <div class="step"><strong>실제 브라우저에서 확인하기</strong><br />대사, 이동 잠금, 모바일 크기, 저장 복원을 직접 확인합니다.</div>
+    </div>
+
+    <h3>변경별 빠른 안내</h3>
+    <table class="compact">
+      <tr><th>바꾸려는 것</th><th>먼저 볼 파일</th><th>특히 확인할 것</th></tr>
+      <tr><td>NPC 대사</td><td><code>game/npcs.ts</code></td><td>잠김·가능·완료 세 상태</td></tr>
+      <tr><td>대화 디자인</td><td><code>dialogue-panel.tsx</code>, CSS</td><td>360px, 포커스, reduced-motion</td></tr>
+      <tr><td>캐릭터·충돌</td><td><code>game/runtime.ts</code>, <code>world.ts</code></td><td>실제 브라우저 입력·충돌</td></tr>
+      <tr><td>XP·잠금</td><td><code>lib/game-engine.ts</code></td><td>중복 XP와 URL 잠금</td></tr>
+      <tr><td>저장 구조</td><td><code>progress-storage.ts</code>, <code>rpg-progress.ts</code></td><td>이전 데이터 호환·손상 복구</td></tr>
+    </table>
+    <div class="callout tip"><strong>가장 중요한 습관</strong> 수정 뒤 저장·복원·모바일·기존 대시보드까지 테스트하세요.</div>
+    <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">20</span>
+  </section>
+
+  <section class="page">
+    <span class="part-label">부록</span>
+    <h2>최종 체크리스트와 도움말</h2>
+    <hr class="section-rule" />
+    <div class="cards">
+      <div class="card">
+        <h3>수업 시작 전</h3>
+        <ul class="checklist"><li>공개 URL 접속</li><li>키보드 또는 터치 확인</li><li>소리 없는 환경에서도 진행 가능</li><li>수료증의 비공식 성격 안내</li></ul>
+      </div>
+      <div class="card">
+        <h3>개발 배포 전</h3>
+        <ul class="checklist"><li>lint/typecheck/test/build PASS</li><li>비밀정보 없음</li><li>PR Preview PASS</li><li>production 전체 플레이 PASS</li></ul>
+      </div>
+    </div>
+
+    <h3>개인정보와 안전</h3>
+    <ul>
+      <li>회원가입, 서버 DB, 분석 SDK를 사용하지 않습니다.</li>
+      <li>닉네임과 진행은 현재 브라우저에만 저장됩니다.</li>
+      <li>닉네임은 HTML 코드로 실행되지 않고 일반 텍스트로 표시됩니다.</li>
+      <li>공용 기기에서는 기록 초기화를 권장합니다.</li>
+    </ul>
+
+    <h3>관련 문서</h3>
+    <table class="compact">
+      <tr><th>문서</th><th>내용</th></tr>
+      <tr><td><code>README.md</code></td><td>실행·기능·경로·배포 요약</td></tr>
+      <tr><td><code>RPG_PRD.md</code></td><td>RPG 설계와 상태·월드·테스트 계약</td></tr>
+      <tr><td><code>TEST_PLAN.md</code></td><td>자동·수동 테스트 기준</td></tr>
+      <tr><td><code>SECURITY.md</code></td><td>데이터·코드·교육 안전 규칙</td></tr>
+      <tr><td><code>PROGRESS.md</code></td><td>실제 명령과 오류·검증·배포 이력</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>서비스 주소</strong><br />https://unity-mission.vercel.app/<br /><br />
+      <strong>문서 기준</strong><br />2026년 11월 24일 production 릴리스 · 사운드·퀘스트 안내·강화 애니메이션 포함
+    </div>
+    <p class="center muted" style="margin-top: 18mm;">— UnityMission 사용자 매뉴얼 및 구현 설명서 끝 —</p>
+    <span class="doc-mark">UnityMission 통합 안내서</span><span class="page-number">21</span>
+  </section>
+
+  <script>
+    (() => {
+      const part = new URLSearchParams(window.location.search).get("part");
+      if (part !== "user" && part !== "implementation") return;
+
+      const settings = part === "user"
+        ? {
+            title: "UnityMission 사용자 매뉴얼",
+            coverTitle: "사용자 매뉴얼",
+            subtitle: "처음 플레이하는 학습자를 위한 쉬운 안내서",
+            description: "2D 픽셀 RPG 시작부터 수료증까지",
+            audience: "학습자 · 교사 · 보호자",
+            label: "UnityMission 사용자 매뉴얼",
+          }
+        : {
+            title: "UnityMission 구현 설명서",
+            coverTitle: "구현 설명서",
+            subtitle: "처음 코드를 보는 개발자를 위한 쉬운 안내서",
+            description: "Next.js · React · Phaser 3 구조와 수정 방법",
+            audience: "초보 개발자 · 유지보수 담당자",
+            label: "UnityMission 구현 설명서",
+          };
+
+      document.title = settings.title;
+      const pages = [...document.querySelectorAll(".page")];
+      for (const [index, page] of pages.entries()) {
+        if (index === 0) continue;
+        const partLabel = page.querySelector(".part-label")?.textContent?.trim() ?? "";
+        const keep = part === "user"
+          ? partLabel.startsWith("1부")
+          : partLabel.startsWith("2부") || partLabel === "부록";
+        page.hidden = !keep;
+      }
+
+      const cover = pages[0];
+      const subtitle = cover.querySelector(".subtitle");
+      const heading = cover.querySelector("h1");
+      const description = cover.querySelector(".cover-title > p:last-child");
+      if (subtitle) subtitle.textContent = settings.subtitle;
+      if (heading) heading.textContent = settings.coverTitle;
+      if (description) description.textContent = settings.description;
+      const audience = [...cover.querySelectorAll(".cover-meta > div")]
+        .find((item) => item.textContent?.includes("대상"));
+      if (audience) audience.innerHTML = `<strong>대상</strong><br />${settings.audience}`;
+
+      const visiblePages = pages.filter((page) => !page.hidden);
+      visiblePages.forEach((page, index) => {
+        const pageNumber = page.querySelector(".page-number");
+        const docMark = page.querySelector(".doc-mark");
+        if (pageNumber) pageNumber.textContent = String(index + 1);
+        if (docMark) docMark.textContent = settings.label;
+      });
+
+      const ending = visiblePages.at(-1)?.querySelector(".center.muted");
+      if (ending) ending.textContent = `— ${settings.title} 끝 —`;
+      document.documentElement.dataset.documentPart = part;
+    })();
+  </script>
+</body>
+</html>
