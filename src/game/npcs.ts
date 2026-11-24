@@ -98,6 +98,10 @@ export function getNpcById(id: string): NpcDefinition | undefined {
   return NPCS.find((npc) => npc.id === id);
 }
 
+export function getNextQuestNpc(completedMissions: CompletedMissions): NpcDefinition | undefined {
+  return NPCS.find((npc) => !completedMissions[npc.missionId]);
+}
+
 export function getNpcQuestState(npc: NpcDefinition, completedMissions: CompletedMissions): NpcQuestState {
   if (completedMissions[npc.missionId]) return "completed";
   return isMissionUnlocked(npc.missionId, completedMissions) ? "available" : "locked";

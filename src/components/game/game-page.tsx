@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getLevelSummary } from "../../lib/game-engine";
 import { useProgress } from "../../context/progress-context";
-import { getNpcById, type NpcId } from "../../game/npcs";
+import { NPCS, getNextQuestNpc, getNpcById, getNpcQuestState, type NpcId, type NpcQuestState } from "../../game/npcs";
 import type { GameBridge } from "../../game/bridge";
 import { getPeaceFragmentCount, type PuzzleStoneId } from "../../game/rpg-progress";
 import { useRpgProgress } from "../../game/use-rpg-progress";
+import { useGameAudio } from "../../game/use-game-audio";
 import { WORLD_INTERACTIONS, type WorldInteractionId } from "../../game/world-interactions";
 import type { MissionId } from "../../types/content";
 import { DialoguePanel } from "./dialogue-panel";
@@ -25,6 +26,7 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
   const [feedback, setFeedback] = useState<string | null>(null);
   const [endingOpen, setEndingOpen] = useState(false);
   const { activateStone, progress: rpgProgress, seeEnding } = useRpgProgress();
+  const { playEffect, setMuted, setRegion, setVolume, settings: audioSettings } = useGameAudio();
   const fragmentCount = getPeaceFragmentCount(progress?.completedMissions ?? {});
   const fragmentCountRef = useRef(fragmentCount);
 
@@ -55,11 +57,16 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
   const bridge = useMemo<GameBridge>(
     () => ({
       onNearbyNpcChange: setNearbyNpcId,
-      onNpcInteract: setDialogueNpcId,
+      onNpcInteract: (npcId) => {
+        playEffect("dialogue");
+        setDialogueNpcId(npcId);
+      },
       onNearbyWorldInteractionChange: setNearbyWorldId,
       onWorldInteract: handleWorldInteract,
+      onPlayerStep: () => playEffect("step"),
+      onZoneChange: setRegion,
     }),
-    [handleWorldInteract],
+    [handleWorldInteract, playEffect, setRegion],
   );
 
   if (!isHydrated) {
@@ -91,10 +98,20 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
   const nearbyNpc = nearbyNpcId ? getNpcById(nearbyNpcId) : undefined;
   const dialogueNpc = dialogueNpcId ? getNpcById(dialogueNpcId) : undefined;
   const nearbyWorld = nearbyWorldId ? WORLD_INTERACTIONS.find((item) => item.id === nearbyWorldId) : undefined;
+  const nextQuestNpc = getNextQuestNpc(progress.completedMissions);
+  const peaceTree = WORLD_INTERACTIONS.find((item) => item.id === "peace-tree");
+  const npcQuestStates = Object.fromEntries(
+    NPCS.map((npc) => [npc.id, getNpcQuestState(npc, progress.completedMissions)]),
+  ) as Record<NpcId, NpcQuestState>;
   const worldSnapshot = {
     fragmentCount,
     puzzleSequence: rpgProgress.puzzleSequence,
     puzzleSolved: rpgProgress.puzzleSolved,
+    nextNpcId: nextQuestNpc?.id ?? null,
+    npcQuestStates,
+    questTarget: nextQuestNpc
+      ? { x: nextQuestNpc.x, y: nextQuestNpc.y, label: nextQuestNpc.role }
+      : peaceTree ? { x: peaceTree.x, y: peaceTree.y, label: peaceTree.label } : null,
   };
   const startQuest = (missionId: MissionId) => {
     if (progress.activeAttempt?.missionId !== missionId) beginMission(missionId);
@@ -113,6 +130,28 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
           </div>
         </div>
         <div className="flex items-center gap-3 text-sm font-semibold">
+          <div className="game-audio-controls hidden items-center gap-2 sm:flex" aria-label="게임 소리 설정">
+            <button
+              aria-label={audioSettings.muted ? "게임 소리 켜기" : "게임 소리 끄기"}
+              aria-pressed={audioSettings.muted}
+              className="pixel-button px-3 py-2"
+              onClick={() => setMuted(!audioSettings.muted)}
+              type="button"
+            >
+              <span aria-hidden="true">{audioSettings.muted ? "🔇" : "🔊"}</span>
+            </button>
+            <label className="sr-only" htmlFor="game-volume">게임 음량</label>
+            <input
+              aria-valuetext={`${audioSettings.volume}%`}
+              className="w-20 accent-[#F5C968]"
+              id="game-volume"
+              max="100"
+              min="0"
+              onChange={(event) => setVolume(Number(event.target.value))}
+              type="range"
+              value={audioSettings.volume}
+            />
+          </div>
           <span className="game-status-chip whitespace-nowrap text-[11px] text-[#F9D873] sm:text-sm">Lv.{level.level} · {level.xp}XP</span>
           <Link className="pixel-button hidden px-3 py-2 sm:inline-flex" href="/dashboard">
             대시보드
@@ -127,6 +166,20 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
           worldSnapshot={worldSnapshot}
         />
         <RpgHud fragmentCount={fragmentCount} progress={rpgProgress} />
+        <aside className="quest-tracker absolute right-3 top-3 z-20 w-[min(48%,18rem)] p-3 sm:right-5 sm:top-5 sm:w-72 sm:p-4" aria-label="현재 퀘스트">
+          <p className="text-[10px] font-black tracking-[0.18em] text-[#F9D873]">CURRENT QUEST</p>
+          <h2 className="mt-1 text-sm font-black sm:text-base">
+            {nextQuestNpc ? `${nextQuestNpc.role}를 찾아가세요` : "평화의 나무로 돌아가세요"}
+          </h2>
+          <p className="mt-1 hidden text-xs leading-5 text-slate-200 sm:block">
+            {nextQuestNpc ? `${nextQuestNpc.name}의 머리 위 느낌표와 화면 가장자리 화살표를 따라가세요.` : "다섯 평화 조각을 중앙 광장에서 결합하세요."}
+          </p>
+          <div className="mt-2 hidden gap-3 text-[10px] font-bold sm:flex" aria-label="NPC 상태 색상 안내">
+            <span className="text-[#F9D873]">● 진행 가능</span>
+            <span className="text-[#86E7AF]">● 완료</span>
+            <span className="text-[#8B95A7]">● 잠금</span>
+          </div>
+        </aside>
         {nearbyNpc && !dialogueNpc && !questMissionId ? (
           <p className="interaction-prompt pointer-events-none absolute bottom-44 left-1/2 z-20 -translate-x-1/2 px-5 py-3 text-center text-sm font-bold sm:bottom-5" role="status">
             <kbd>E</kbd> 키: {nearbyNpc.role}와 대화하기
@@ -151,7 +204,18 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
             playerName={progress.nickname}
           />
         ) : null}
-        {questMissionId ? <RpgQuestPanel missionId={questMissionId} onClose={() => setQuestMissionId(null)} /> : null}
+        {questMissionId ? (
+          <RpgQuestPanel
+            missionId={questMissionId}
+            onAnswerFeedback={(correct) => playEffect(correct ? "correct" : "wrong")}
+            onClose={() => setQuestMissionId(null)}
+            onMissionComplete={(rewarded) => {
+              if (!rewarded) return;
+              playEffect("fragment");
+              window.setTimeout(() => playEffect("level-up"), 260);
+            }}
+          />
+        ) : null}
         {endingOpen ? <EndingPanel level={level.level} nickname={progress.nickname} onClose={() => setEndingOpen(false)} /> : null}
       </div>
     </main>

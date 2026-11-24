@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NPCS, findNearbyNpc, getNpcDialogueTurns, getNpcMessage, getNpcQuestState } from "./npcs";
+import { NPCS, findNearbyNpc, getNextQuestNpc, getNpcDialogueTurns, getNpcMessage, getNpcQuestState } from "./npcs";
 import type { CompletedMissions } from "../types/progress";
 
 const completed = (ids: string[]): CompletedMissions => Object.fromEntries(
@@ -26,6 +26,12 @@ describe("R04 NPC model", () => {
   it("selects an NPC only inside the interaction radius", () => {
     expect(findNearbyNpc(NPCS[0].x + 30, NPCS[0].y)?.id).toBe(NPCS[0].id);
     expect(findNearbyNpc(960, 720)).toBeUndefined();
+  });
+
+  it("derives the next quest guide from the shared completion ledger", () => {
+    expect(getNextQuestNpc({})?.id).toBe("history-guide");
+    expect(getNextQuestNpc(completed(["mission-1", "mission-2"]))?.id).toBe("peace-negotiator");
+    expect(getNextQuestNpc(completed(["mission-1", "mission-2", "mission-3", "mission-4", "mission-5"]))).toBeUndefined();
   });
 
   it("builds alternating player and NPC dialogue without duplicating mission questions", () => {

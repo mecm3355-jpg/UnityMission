@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R10_RELEASE_IN_PROGRESS**. 검증된 RPG 대화 컷신을 기존 GitHub/Vercel 배포 흐름으로 릴리스 중입니다.
+> 현재 상태: **R14_IN_PROGRESS**. 사용자의 원격 반영 승인을 받아 R11~R13을 기존 GitHub/Vercel production에 릴리스 중입니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -28,7 +28,13 @@
 | R09 | DONE | 2026-11-23 21:27 KST | 2026-11-23 22:04 KST | PASS | 픽셀아트 월드·캐릭터·HUD·대화/퀘스트 UI 개편, 데스크톱/모바일 전체 플레이 검증 |
 | R09-REL | DONE | 2026-11-23 22:08 KST | 2026-11-23 22:37 KST | PASS | PR #2 병합·Vercel production·공개 데스크톱/모바일 전체 RPG 플레이 PASS |
 | R10 | DONE | 2026-11-23 22:55 KST | 2026-11-24 00:17 KST | PASS | 플레이어↔NPC 교대 대사·픽셀 초상화·타자 효과·퀘스트 선택 연출, 로컬 전체 검증 완료 |
-| R10-REL | IN_PROGRESS | 2026-11-24 00:27 KST | - | NOT_RUN | 검증 변경 커밋·feature push·PR·main 병합·Vercel production·공개 게임 재검증 |
+| R10-REL | DONE | 2026-11-24 00:27 KST | 2026-11-24 00:55 KST | PASS | PR #4 병합·Vercel production·공개 교대 대화/전체 RPG·360px 재검증 PASS |
+| DOC01 | DONE | 2026-11-24 01:21 KST | 2026-11-24 02:32 KST | PASS | 실제 production 화면을 포함한 21쪽 사용자 매뉴얼·구현 설명서 PDF 제작·검증 |
+| DOC02 | DEFERRED | 2026-11-24 02:38 KST | - | NOT_RUN | 사용자 우선순위가 게임 개선으로 변경되어 PDF 분리 출력·검증을 후속 작업으로 이관 |
+| R11 | DONE | 2026-11-24 02:45 KST | 2026-11-24 16:29 KST | PASS | 지역별 절차적 BGM·6종 효과음·음소거/볼륨·검증된 설정 자동 저장 |
+| R12 | DONE | 2026-11-24 16:29 KST | 2026-11-24 16:33 KST | PASS | 다음 NPC 마커·화면 가장자리 방향 화살표·현재 목표·NPC 3상태 색상 |
+| R13 | DONE | 2026-11-24 16:33 KST | 2026-11-24 16:58 KST | PASS | 6프레임 보행·NPC 대기/감정·대화 마주보기·조각/레벨업 연출·전체 브라우저 회귀 |
+| R14 | IN_PROGRESS | 2026-11-24 17:03 KST | - | NOT_RUN | 변경 검토·feature push·PR·main 병합·Vercel production·공개 전체 플레이 검증 |
 
 ### 2026-11-23 19:22 KST — R01
 - 상태: IN_PROGRESS
@@ -324,6 +330,83 @@
 - 남은 위험: PR이 아직 없어 branch protection과 main 병합/production 배포가 시작되지 않았다. Preview build는 성공했지만 보호된 Preview의 실제 브라우저 본문 검증은 production 병합 후 수행한다.
 - 다음 작업: 사용자가 GitHub 웹에서 PR 생성 후 알려주면 PR 상태/check 확인→승인 범위 내 정상 병합→Vercel production 완료 대기→공개 전체 플레이 재검증
 
+### 2026-11-24 00:55 KST — R10 배포 완료
+- 상태: DONE
+- 변경 파일: PR #4의 R10 코드/테스트/자산/문서 9개 파일; 후속 로컬 `PROGRESS.md` 완료 기록
+- 구현 결과: GitHub PR #4 `Feature/rpg dialogue cutscene`이 feature head `6ad1528`에서 main으로 정상 병합됐다. 원격 main은 merge commit `5f568a2678d808fec1875a89e5576bfceaae5f6f`이며 Vercel production commit status는 `success / Deployment has completed`다. 공개 `https://unity-mission.vercel.app/`에서 플레이어와 NPC의 3턴 교대 대화, 초상화·화자 강조·선택지와 기존 전체 RPG가 함께 동작한다.
+- 수행 명령 / 종료코드: GitHub PR #4 공개 API 조회 `0`(closed, merged, 2026-11-24 00:41 KST, merge `5f568a2`); `git fetch origin main` `0`; merge commit Vercel status 조회 `0`(success, 2026-11-24 00:42 KST); 공개 production 실제 Chrome 전체 스모크 `0`(960×540 canvas, 이동 x960→1059, 분수 충돌 y645/count8, NPC 대화 중 x535 고정, 교대 대화·수락 선택·퀘스트 시작, mission-1 100XP·완료 반응, 공명석 blue→gold→green·조화의 열쇠, 5조각·Lv.6 엔딩·수료증, 모바일 x960→1041, 360px 가로 넘침 없음, reduced-motion true, runtimeErrors 0); production 대화 컷신·데스크톱 월드·모바일 캡처 시각 검토 PASS; 검증 Chrome 종료·임시 파일 정리 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: feature push PASS; PR #4 merge PASS; Vercel production PASS; 공개 플레이어↔NPC 교대 대화·현재 화자·초상화·선택지 PASS; 이동·충돌·대화 이동 잠금·퀘스트·XP·완료 NPC 반응·퍼즐·인벤토리·엔딩·수료증·모바일·저장 회귀 PASS; 360px 레이아웃 PASS; 런타임 오류 0건; R10-REL PASS
+- 오류·원인·수정 시도(최대 2회): open PR 조회가 빈 배열을 반환했으나 전체 상태 조회에서 사용자가 PR 생성 직후 이미 병합한 PR #4를 확인했다. 배포/게임 오류는 없었고 공개 전체 플레이는 첫 실행에 PASS했다. 검증용 Chrome 종료의 WMI 조회가 장시간 대기해 중단했으며 정확한 디버그 포트의 CDP `Browser.close`로 대체 후 임시 디렉터리 삭제를 완료했다.
+- 배포 후 관측: 실제 브라우저 runtimeErrors 0건, 공개 전체 흐름 PASS. 연결된 Vercel 계정에서 production 소유 `unitiymission` 팀의 runtime log drain/모니터링 설정은 조회할 수 없어 해당 관측 설정은 미확인이다.
+- 남은 위험: 실제 iOS/Android 물리 기기의 GPU/터치 감각과 실제 화면 읽기 프로그램 사용자 평가는 자동화 밖이다. 완료 기록은 현재 로컬 feature 브랜치에만 추가되어 main에 반영하려면 후속 문서 PR이 필요하지만 production 제품 기능과 R10 구현에는 영향이 없다.
+- 다음 작업: 제품 기능 작업 없음. 선택적으로 후속 `PROGRESS.md` 완료 기록을 작은 문서 PR로 main에 반영한다.
+
+### 2026-11-24 01:21 KST — DOC01 사용자 매뉴얼·구현 설명서 PDF
+- 상태: DONE
+- 변경 파일: `docs/unitymission-manual-and-implementation-guide.html`, `docs/UnityMission_사용자_매뉴얼_및_구현_설명서.pdf`, `docs/manual-assets/02-npc-dialogue.png`, `docs/manual-assets/03-mobile-controls.png`, `docs/manual-assets/04-completed-world.png`, `scripts/document-visual-check.mjs`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md`
+- 목표·완료 조건: 실제 production 화면을 포함한 초보자용 한국어 통합 PDF를 제작한다. 사용자 파트에는 시작·조작·NPC 대화·퀘스트·저장·퍼즐·엔딩·문제 해결을, 구현 파트에는 기술 구조·핵심 파일·상태 공유·Phaser/React 연결·테스트·배포·안전한 변경 절차를 설명한다. PDF 생성 성공, 페이지/한글 텍스트/링크·이미지 확인, 시각 검토 PASS가 완료 조건이다.
+- 구현 결과: A4 인쇄용 HTML 한 파일에서 사용자 매뉴얼과 구현 설명서를 분리해 설명하고, 실제 공개 게임에서 캡처한 NPC 대화·모바일 조작·완료 월드 화면을 배치했다. Chrome 인쇄 엔진으로 21쪽 PDF를 생성했으며 최종 파일 크기는 2,221,276바이트다. 사용자 파트는 시작·키보드/모바일 조작·NPC 퀘스트·문제 풀이·XP/배지·퍼즐·엔딩·수료증·저장/초기화·문제 해결을, 구현 파트는 Next.js/React/Phaser 구조·라우트·공유 저장소·React↔Phaser 브리지·대화/퀘스트·테스트·GitHub/Vercel·안전한 수정 절차를 초보자 용어로 설명한다.
+- 수행 명령 / 종료코드: 필수 문서 및 현재 R10 production 상태 확인 `0`; production RPG 브라우저 스모크 및 3개 화면 캡처 최종 `0`(이동·충돌·대화 이동 잠금·미션 1/100XP·완료 NPC 반응·퍼즐·5조각·Lv.6 엔딩·수료증·360px 모바일·저장·런타임 오류 0); `node scripts/document-visual-check.mjs 9232 file:///.../docs/unitymission-manual-and-implementation-guide.html .tmp/document-preview-review` `0`(21개 페이지, 한국어 제목/두 파트/3개 이미지, 모든 페이지 `height=scrollHeight=1013`); Chrome `--print-to-pdf` `0`; PDF 헤더 `%PDF-` 및 `/Type /Page` 21개 확인 `0`; `npm.cmd run lint` `0`; `npx.cmd tsc --noEmit` `0`; `npm.cmd run test -- --maxWorkers=1` `0`(17파일, 77테스트 PASS); 첫 `npm.cmd run build` `1`(`spawn EPERM`, 환경 권한); 권한 확장 동일 빌드 `0`(9개 라우트 생성); `git diff --check` `0`(CRLF 변환 경고만, 공백 오류 없음)
+- 수락 조건 PASS/FAIL/NOT_RUN: production 화면 캡처 PASS; 사용자/구현 설명 내용 PASS; PDF 생성 PASS; `%PDF-` 구조와 21쪽 페이지 수 PASS; 한국어 제목·두 파트·이미지 로드 PASS; 21개 A4 페이지 넘침 없음 PASS; 대표 표지·모바일·NPC 대화·아키텍처·안전한 수정 페이지 시각 검토 PASS; lint/typecheck/77 tests/build PASS; DOC01 PASS
+- 오류·원인·수정 시도(최대 2회): 완료 NPC 재대화 캡처가 Chrome 포커스 영향으로 E 키를 받지 못해 두 번 실패했다. 1차로 완료 NPC 프롬프트 대기를 추가했고, 2차로 접근 가능한 `상호작용` 버튼 클릭을 사용해 전체 production 스모크를 통과했다. 최초 A4 시각 검사에서 화면 이미지가 페이지 높이를 넘는 문제를 발견해 본문 간격과 이미지 폭, 모바일 2열 배치를 조정한 뒤 21쪽 전체 높이 검사를 통과했다. 첫 production build의 `spawn EPERM`은 코드가 아닌 샌드박스 하위 프로세스 권한 문제로 분류했고 권한 확장 재실행에서 통과했다.
+- 남은 위험: PDF는 Windows Chrome과 설치된 한국어 글꼴 기준으로 생성되었다. 다른 PDF 뷰어의 세부 글꼴 렌더링과 실제 종이 프린터 출력은 별도 확인이 필요하다. 문서와 스모크 안정화 변경은 현재 로컬 브랜치에만 있으며 원격 푸시·배포는 요청 범위가 아니므로 수행하지 않았다.
+- 다음 작업: PDF를 사용자에게 전달한다. 내용 수정 요청이 있으면 HTML 원본을 편집해 동일 검증 절차로 PDF를 다시 생성한다.
+
+### 2026-11-24 02:38 KST — DOC02 사용자 매뉴얼·구현 설명서 분리
+- 상태: DEFERRED
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: 기존 통합 PDF를 보존하면서 사용자 매뉴얼과 구현 설명서를 각각 독립된 PDF 파일로 출력한다. 각 파일은 전용 표지·제목·대상 정보를 갖고 해당 파트만 포함해야 하며, PDF 구조·페이지 수·한국어 제목·이미지·A4 페이지 넘침과 회귀 게이트를 실제로 검증해야 한다.
+- 수행 명령 / 종료코드: 필수 문서 6종 및 현재 문서 구조 조회 1차 `1`(PowerShell 따옴표 파싱 오류, 파일 변경 없음); 단순화한 재조회 `0`; 통합 HTML 21쪽 중 사용자 파트 8쪽, 구현 파트 9쪽, 공통 표지·부록 구조 확인 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 분리 출력 모드, 사용자 매뉴얼 PDF, 구현 설명서 PDF, 각 문서 시각·구조 검증 모두 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 첫 조회 명령의 정규식 안 큰따옴표가 PowerShell 명령 문자열을 종료했다. 검색식을 `Select-String` 기반으로 단순화해 재조회에 성공했다.
+- 남은 위험: 분리 시 숨긴 페이지가 PDF 페이지 수에 포함되거나 기존 하드코딩 페이지 번호가 어긋날 수 있음
+- 중단 사유: 사용자가 프로그램 전체 개선을 우선 요청한 뒤 하루 범위를 사운드·퀘스트 방향 표시·애니메이션 강화로 확정했다. 통합 HTML의 분리 출력 모드는 구현했지만 Chrome 출력 권한 오류가 있었고 두 개별 PDF는 생성·검증 완료로 보고하지 않는다.
+- 다음 작업: R11~R13 완료 후 변경된 게임 내용까지 반영해 두 PDF를 다시 출력·검증한다.
+
+### 2026-11-24 02:45 KST — R11 사운드 시스템
+- 상태: DONE
+- 변경 파일: `src/game/audio-settings.ts`, `src/game/audio-settings.test.ts`, `src/game/audio.ts`, `src/game/use-game-audio.ts`, `src/game/bridge.ts`, `src/game/runtime.ts`, `src/components/game/game-page.tsx`, `src/components/game/game-page.test.tsx`, `src/components/game/rpg-quest-panel.tsx`, `PROGRESS.md`
+- 목표·완료 조건: 지역별 절차적 배경음악, 걷기·대화·정오답·레벨업·평화 조각 효과음, 음소거·볼륨 조절과 검증된 localStorage 자동 저장을 구현한다. 최초 사용자 입력 전 자동재생 금지, reduced-motion과 별개인 독립 음향 설정, 기존 RPG 진행 저장·XP 원장 불변을 유지한다.
+- 구현 결과: Web Audio API로 6개 구역과 길의 음계를 다르게 구성한 절차적 배경음악, 걸음·대화·정답·오답·레벨업·평화 조각 효과음을 구현했다. 최초 포인터/키 입력 후에만 AudioContext를 시작하며, 음소거 버튼과 0~100 음량 슬라이더를 제공한다. `unitymission:audio:v1`은 정확한 키·정수 범위를 검증하고 기존 학습 진행 원장과 분리 저장한다.
+- 수행 명령 / 종료코드: 관련 1차 테스트 `0`(4파일, 11테스트); `npx.cmd tsc --noEmit` `0`; 1차 `npm.cmd run lint` `1`(effect 동기 setState); 마이크로태스크 복원으로 수정 후 `npm.cmd run lint` `0`, `npx.cmd tsc --noEmit` `0`, 관련 재테스트 `0`(3파일, 7테스트); 음량/음소거 UI·저장 분리 추가 테스트 `0`(2파일, 7테스트)
+- 수락 조건 PASS/FAIL/NOT_RUN: 설정 스키마 검증·손상 데이터 초기화 PASS; 음량·음소거 저장 및 `unitymission:v1` 비변경 PASS; Phaser 지역 변경·320ms 걸음 이벤트 연결 PASS; 대화·정오답·조각·레벨업 이벤트 연결 PASS; 자동재생 정책 대응 PASS; lint/typecheck/관련 테스트 PASS; 실제 사람의 청음 평가는 최종 브라우저 게이트에서 확인 필요
+- 오류·원인·수정 시도(최대 2회): 1차 lint가 `useEffect` 내부 동기 `setSettings`를 연속 렌더링 위험으로 차단했다. 기존 RPG 복원 방식처럼 활성 플래그를 둔 `queueMicrotask` 갱신으로 1회 수정해 통과했다.
+- 남은 위험: 실제 스피커 음색·모바일 브라우저 볼륨은 자동 테스트로 청감 평가할 수 없으며 최종 플레이에서 조절해야 한다.
+- 다음 작업: R12 다음 NPC·화면 가장자리 방향 화살표·현재 목표 추적창·NPC 상태 색상을 구현한다.
+
+### 2026-11-24 16:29 KST — R12 퀘스트 방향 표시
+- 상태: DONE
+- 변경 파일: `src/game/npcs.ts`, `src/game/npcs.test.ts`, `src/game/bridge.ts`, `src/game/world.ts`, `src/game/world.test.ts`, `src/game/runtime.ts`, `src/components/game/game-page.tsx`, `src/components/game/game-page.test.tsx`, `src/app/globals.css`, `PROGRESS.md`
+- 목표·완료 조건: 공유 완료 미션에서 다음 NPC를 유도하고, 화면 안에서는 NPC 머리 위 느낌표, 화면 밖에서는 가장자리 방향 화살표, React HUD에는 현재 목표를 표시한다. 완료·진행 가능·잠금 NPC의 마커/링 색상을 구분하고 5개 완료 후에는 평화의 나무를 목표로 전환한다.
+- 구현 결과: 완료 미션에서 첫 미완료 NPC를 다음 목표로 파생하고, 모든 미션 완료 후 목표를 중앙 광장의 평화의 나무로 전환했다. React HUD의 현재 목표와 Phaser의 NPC `!`/`✓`/`·`, 금색/초록/회색 링, 화면 밖 가장자리 화살표가 동일 `GameWorldSnapshot`을 사용한다. 화면 안 목표에는 머리 위 마커만 보이고 화면 밖 목표에는 방향 각도가 적용된 화살표를 표시한다.
+- 수행 명령 / 종료코드: 1차 관련 테스트 `0`(3파일, 13테스트); `npx.cmd tsc --noEmit` `0`; `npm.cmd run lint` `0`; 화살표 순수 좌표 함수 추가 후 재테스트 `0`(3파일, 14테스트); `npx.cmd tsc --noEmit` `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 첫·중간·전체 완료 다음 목표 파생 PASS; 현재 퀘스트 HUD PASS; 진행 가능/완료/잠금 마커·링 구분 PASS; 동쪽·북쪽 화면 밖 화살표 위치/각도와 화면 안 숨김 PASS; TypeScript/lint/관련 회귀 PASS; 실제 모바일 시각 겹침은 최종 브라우저 게이트에서 재검증
+- 오류·원인·수정 시도(최대 2회): 화살표 좌표 테스트를 추가하는 첫 패치가 기존 테스트 import 형식 불일치로 적용되지 않았다. 실제 파일 구조를 조회해 한 번 수정한 뒤 적용·테스트에 성공했다.
+- 남은 위험: 화면 모서리 방향 화살표는 직사각형 가장자리 클램프 방식이므로 정밀한 레이캐스트형 나침반은 아니지만 목표 방향과 접근성 라벨은 유지한다.
+- 다음 작업: R13 보행 프레임·NPC 감정/대기·마주보기·조각/레벨업 연출을 구현한다.
+
+### 2026-11-24 16:33 KST — R13 애니메이션 강화
+- 상태: DONE
+- 변경 파일: `src/game/runtime.ts`, `src/components/game/rpg-quest-panel.tsx`, `src/components/game/rpg-quest-panel.test.tsx`, `src/app/globals.css`, `scripts/rpg-browser-smoke.mjs`, `PROGRESS.md`
+- 목표·완료 조건: 플레이어 4방향 보행을 6프레임으로 늘리고 팔·발·몸의 움직임을 구분한다. NPC는 상태별 감정 아이콘과 눈동자/대기 동작을 갖고 대화 시작 시 플레이어와 서로 바라본다. 최초 퀘스트 완료 화면에 평화 조각과 레벨업 애니메이션을 강화하되 reduced-motion 설정을 존중한다.
+- 구현 결과: 플레이어 텍스처를 방향별 3장에서 6장으로 확대하고 몸의 상하 움직임, 팔 교차, 보폭을 분리해 11fps로 재생한다. NPC에는 눈동자와 `♪`/`★`/`…` 감정 상태, 완만한 대기 이동을 추가했고 대화 시작 시 플레이어가 NPC 방향으로 회전하며 NPC 눈동자가 플레이어를 향한다. 최초 퀘스트 완료에는 다섯 개 조각 폭발과 레벨업 플래시를 추가했고 전역 reduced-motion 규칙과 Phaser 분기로 반복 효과를 억제한다.
+- 수행 명령 / 종료코드: R13 관련 테스트 `0`(4파일, 15테스트); `npx.cmd tsc --noEmit` `0`; `npm.cmd run lint` `0`; 전체 `npm.cmd run test -- --maxWorkers=1` `0`(18파일, 83테스트); 첫 `npm.cmd run build` `1`(`spawn EPERM` 환경 권한); 권한 확장 동일 build `0`(9개 라우트 생성); 개발 서버 `1`(`spawn EPERM`) 후 권한 확장 개발 서버는 첫 `/` 컴파일 교착으로 중단; 이미 생성된 production build의 `next start` `0`; 실제 Chrome 전체 RPG 스모크 `0`; 최종 관련 재테스트 `0`(5파일, 18테스트); 최종 `npx.cmd tsc --noEmit` `0`; 임시 Chrome 프로필 삭제 후 최종 `npm.cmd run lint` `0`; `node --check scripts/rpg-browser-smoke.mjs` `0`; `git diff --check` `0`(줄바꿈 변환 경고만)
+- 수락 조건 PASS/FAIL/NOT_RUN: 방향별 6프레임/11fps PASS; NPC 감정 상태와 대기 동작 PASS; 대화 마주보기와 이동 잠금 PASS; 조각/레벨업 보상 UI PASS; reduced-motion PASS; 전체 83테스트/lint/typecheck/production build PASS; 실제 Chrome 이동 `960→1044`, 분수 충돌, NPC 대화 중 위치 `549→549`, 미션 1/100XP/완료 반응, 공명석 순서/열쇠, 5조각/Lv.6/엔딩/수료증, 360px `innerWidth=scrollWidth=360`, 모바일 이동 `960→1063`, 런타임 오류 0건 PASS; 캡처 시각 검토 PASS
+- 오류·원인·수정 시도(최대 2회): 개발 서버의 Turbopack 첫 페이지 컴파일이 장시간 정지해 이미 통과한 production build와 `next start`로 브라우저 검증을 전환했다. 브라우저 PASS 후 테스트 telemetry만 추가한 재빌드가 두 번 같은 컴파일 단계에서 교착되어 Chrome 종료와 정확한 `.next` 재생성을 각각 시도했으나 해소되지 않았다. 사용자 기능과 무관한 telemetry를 되돌려 앱 소스를 이미 production build PASS한 상태와 일치시켰고, 부분 `.next`와 `.tmp`만 삭제했다. 추가 자동 수정은 규칙상 중단했다.
+- React 품질 검토: `react-best-practices`에 따라 Web Audio는 동적 게임 경로에만 있고 외부 라이브러리를 추가하지 않았다. 설정은 버전 localStorage로 최소화·검증하며, 일시적인 걸음/지역 이벤트는 React state가 아닌 controller/ref로 처리했다. 접근 가능한 버튼·range·aria 상태를 사용하고 effect 동기 setState를 제거했다.
+- 남은 위험: 자동화는 AudioContext 생성·설정·이벤트 연결을 검증하지만 실제 스피커의 음색/음량은 사람 청음 조정이 필요하다. 절차적 배경음은 MVP용 짧은 패턴이라 장시간 플레이에서 반복감이 있을 수 있다. 최신 개선은 로컬 브랜치에만 있고 원격 GitHub/Vercel에는 아직 반영하지 않았다. DOC02 개별 PDF 분리는 변경된 기능 문서화를 위해 DEFERRED 상태다.
+- 다음 작업: 사용자가 승인하면 변경사항을 검토·커밋하고 기존 GitHub 저장소의 feature 브랜치에 push한 뒤 PR/production 배포를 진행한다. 이후 새 기능을 반영해 사용자 매뉴얼과 구현 설명서 PDF를 각각 재출력한다.
+
+### 2026-11-24 17:03 KST — R14 개선 릴리스
+- 상태: IN_PROGRESS
+- 변경 파일: `PROGRESS.md`
+- 목표·완료 조건: R11~R13 앱·테스트·하네스 변경만 검토해 기존 feature 브랜치에 커밋·push하고 `main` 대상 PR을 생성한다. 자동 검사와 보호 규칙을 확인한 뒤 병합하고 기존 Vercel 프로젝트의 production `main` 배포가 READY인지 확인한다. 공개 URL에서 사운드 설정·현재 목표·6프레임/NPC 상태와 기존 전체 RPG 흐름을 검증한다.
+- 수행 명령 / 종료코드: 필수 문서 7종 조회 `0`; Vercel `deployments-cicd`·`verification` 지침 전체 조회 `0`; 사용자 원격 반영 승인 확인
+- 수락 조건 PASS/FAIL/NOT_RUN: 비밀정보/변경 범위 검사, commit/push, PR/check/merge, production 배포, 공개 브라우저 전체 플레이 모두 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 없음
+- 남은 위험: GitHub/Vercel 인증·브랜치 보호·production 자동 배포 지연, 미완료 DOC02 파일의 실수 포함
+- 다음 작업: remote·브랜치·인증·diff를 읽기 전용 확인하고 DOC02 산출물을 제외한 정확한 파일만 stage한다.
+
 ## 작업 로그 템플릿
 ### 2026-11-23 17:36 KST — T01
 - 상태: IN_PROGRESS
@@ -531,4 +614,4 @@
 | 2026-11-23 18:35 KST | 수료증 완료일은 순차 학습의 마지막인 미션 5 최초 `completedAt`으로 표시 | 저장 계약에 별도 수료일을 추가하지 않고 검증된 기존 기록에서 결정해야 함 | 재풀이 후에도 수료일이 바뀌지 않고 저장 스키마 중복 없음 |
 
 ## 최종 출시 판정
-현재: **RELEASE_READY_PRODUCTION** — T01~T08과 R01~R09의 필수 자동·빌드·PR·Vercel production·공개 데스크톱/360px 전체 플레이 게이트 PASS. 화면 리더·실물 모바일·교육 콘텐츠 전문가 검토와 Vercel 소유 팀의 관측 설정 확인은 잔여 운영 권고로 유지.
+현재: **LOCAL_VERIFIED_AWAITING_RELEASE / DOC02_DEFERRED** — 기존 production은 T01~T08과 R01~R10 게이트 PASS. 새 R11~R13 사운드·퀘스트 안내·애니메이션 개선은 전체 83테스트, lint, typecheck, production build, 실제 데스크톱/360px 전체 플레이 PASS이며 로컬 feature 브랜치에만 있다. GitHub push·PR·Vercel production 반영은 사용자 승인 전이라 NOT_RUN. 개별 사용자 매뉴얼/구현 설명서 PDF는 새 기능 반영 후 재출력하도록 DEFERRED.

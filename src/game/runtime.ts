@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 import type { MountedGame } from "../components/game/phaser-game-host";
 import type { GameBridge, GameWorldSnapshot } from "./bridge";
-import { NPCS, findNearbyNpc, type NpcId } from "./npcs";
+import { NPCS, findNearbyNpc, type NpcId, type NpcQuestState } from "./npcs";
 import {
   PLAYER_START,
   WORLD_HEIGHT,
@@ -10,6 +10,7 @@ import {
   WORLD_ZONES,
   getFacingDirection,
   getMovementVelocity,
+  getOffscreenIndicatorPlacement,
   getZoneAt,
   type Direction,
   type MovementInput,
@@ -30,6 +31,8 @@ class PeaceVillageScene extends Phaser.Scene {
   private facing: Direction = "down";
   private collisionCount = 0;
   private lastTelemetry = "";
+  private lastStepAt = 0;
+  private lastZone: string | null = null;
   private interactKey!: Phaser.Input.Keyboard.Key;
   private nearbyNpcId: NpcId | null = null;
   private nearbyWorldId: WorldInteractionId | null = null;
@@ -38,6 +41,11 @@ class PeaceVillageScene extends Phaser.Scene {
   private readonly interactionVisuals = new Map<WorldInteractionId, Phaser.GameObjects.Rectangle>();
   private readonly npcRings = new Map<NpcId, Phaser.GameObjects.Ellipse>();
   private readonly npcMarkers = new Map<NpcId, Phaser.GameObjects.Text>();
+  private readonly npcQuestStates = new Map<NpcId, NpcQuestState>();
+  private readonly npcEyes = new Map<NpcId, readonly [Phaser.GameObjects.Rectangle, Phaser.GameObjects.Rectangle]>();
+  private readonly npcEmotions = new Map<NpcId, Phaser.GameObjects.Text>();
+  private questArrow!: Phaser.GameObjects.Text;
+  private questTarget: GameWorldSnapshot["questTarget"] = null;
   private mobileInput: MovementInput = { up: false, down: false, left: false, right: false };
   private readonly reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 
@@ -68,6 +76,14 @@ class PeaceVillageScene extends Phaser.Scene {
       this.drawObstacle(obstacle);
     }
     this.createNpcs();
+    this.questArrow = this.add.text(0, 0, "➤", {
+      color: "#F9D873",
+      fontFamily: "monospace",
+      fontSize: "34px",
+      fontStyle: "bold",
+      stroke: "#07101F",
+      strokeThickness: 7,
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(10000).setVisible(false);
     this.createWorldInteractions();
 
     this.player = this.physics.add.sprite(PLAYER_START.x, PLAYER_START.y, "player-down-0");
@@ -89,6 +105,7 @@ class PeaceVillageScene extends Phaser.Scene {
     this.host.dataset.gameReady = "true";
     this.host.dataset.visualTheme = "pixel-polished-v1";
     this.host.dataset.reducedMotion = String(this.reduceMotion);
+    this.host.dataset.playerAnimationFrames = "6";
     this.publishTelemetry(true);
   }
 
@@ -117,6 +134,7 @@ class PeaceVillageScene extends Phaser.Scene {
       this.player.anims.stop();
       this.player.setTexture(`player-${this.facing}-0`);
       this.publishTelemetry();
+      this.updateQuestDirection();
       return;
     }
 
@@ -135,7 +153,12 @@ class PeaceVillageScene extends Phaser.Scene {
       this.player.anims.stop();
       this.player.setTexture(`player-${this.facing}-0`);
     }
+    if ((velocity.x !== 0 || velocity.y !== 0) && this.time.now - this.lastStepAt >= 320) {
+      this.lastStepAt = this.time.now;
+      this.bridge.onPlayerStep?.();
+    }
     this.publishTelemetry();
+    this.updateQuestDirection();
   }
 
   setPaused(paused: boolean) {
@@ -146,12 +169,23 @@ class PeaceVillageScene extends Phaser.Scene {
 
   interact() {
     if (this.interactionLocked) return;
-    if (this.nearbyNpcId) this.bridge.onNpcInteract(this.nearbyNpcId);
+    if (this.nearbyNpcId) {
+      const npc = NPCS.find((item) => item.id === this.nearbyNpcId);
+      if (npc) {
+        this.facing = getFacingDirection({ x: npc.x - this.player.x, y: npc.y - this.player.y }, this.facing);
+        this.player.anims.stop();
+        this.player.setTexture(`player-${this.facing}-0`);
+        this.setNpcGaze(this.nearbyNpcId, this.player.x, this.player.y);
+        this.host.dataset.dialogueFacing = `${this.facing}:${this.nearbyNpcId}`;
+      }
+      this.bridge.onNpcInteract(this.nearbyNpcId);
+    }
     else if (this.nearbyWorldId) this.bridge.onWorldInteract(this.nearbyWorldId);
   }
 
   syncWorldState(snapshot: GameWorldSnapshot) {
     this.worldSnapshot = snapshot;
+    this.questTarget = snapshot.questTarget ?? null;
     this.host.dataset.fragmentCount = String(snapshot.fragmentCount);
     this.host.dataset.puzzleSolved = String(snapshot.puzzleSolved);
     for (const interaction of WORLD_INTERACTIONS) {
@@ -166,9 +200,21 @@ class PeaceVillageScene extends Phaser.Scene {
     NPCS.forEach((npc, index) => {
       const marker = this.npcMarkers.get(npc.id);
       if (!marker) return;
-      marker.setText(index < snapshot.fragmentCount ? "✓" : "!");
-      marker.setColor(index < snapshot.fragmentCount ? "#A7F3D0" : "#F9D873");
+      const fallbackState: NpcQuestState = index < snapshot.fragmentCount
+        ? "completed"
+        : index === snapshot.fragmentCount ? "available" : "locked";
+      const state = snapshot.npcQuestStates?.[npc.id] ?? fallbackState;
+      this.npcQuestStates.set(npc.id, state);
+      marker.setText(state === "completed" ? "✓" : state === "available" ? "!" : "·");
+      marker.setColor(state === "completed" ? "#86E7AF" : state === "available" ? "#F9D873" : "#8B95A7");
+      marker.setAlpha(snapshot.nextNpcId === npc.id ? 1 : state === "locked" ? 0.55 : 0.85);
+      const emotion = this.npcEmotions.get(npc.id);
+      emotion?.setText(state === "completed" ? "★" : state === "available" ? "♪" : "…");
+      emotion?.setColor(state === "completed" ? "#86E7AF" : state === "available" ? "#F9D873" : "#8B95A7");
+      this.setNpcHighlight(npc.id, npc.id === this.nearbyNpcId);
     });
+    this.host.dataset.npcEmotionStates = NPCS.map((npc) => `${npc.id}:${this.npcQuestStates.get(npc.id)}`).join(",");
+    this.updateQuestDirection();
   }
 
   setMobileInput(input: MovementInput) {
@@ -179,6 +225,10 @@ class PeaceVillageScene extends Phaser.Scene {
     const x = Math.round(this.player.x);
     const y = Math.round(this.player.y);
     const zone = getZoneAt(x, y)?.id ?? "path";
+    if (zone !== this.lastZone) {
+      this.lastZone = zone;
+      this.bridge.onZoneChange?.(zone);
+    }
     const telemetry = `${x}:${y}:${this.facing}:${zone}:${this.collisionCount}`;
     if (!force && telemetry === this.lastTelemetry) return;
     this.lastTelemetry = telemetry;
@@ -317,34 +367,38 @@ class PeaceVillageScene extends Phaser.Scene {
 
   private createPlayerTextures() {
     const directions: Direction[] = ["down", "up", "left", "right"];
+    const strides = [0, -2, -1, 0, 1, 2] as const;
     for (const direction of directions) {
-      for (let frame = 0; frame < 3; frame += 1) {
+      for (let frame = 0; frame < strides.length; frame += 1) {
         const graphics = this.add.graphics();
-        const step = frame === 1 ? -1 : frame === 2 ? 1 : 0;
+        const step = strides[frame];
+        const bob = frame === 1 || frame === 4 ? -1 : 0;
         graphics.fillStyle(0x07101f, 0.3);
-        graphics.fillEllipse(4, 27, 22, 7);
+        graphics.fillEllipse(4, 28, 22, 7);
         graphics.fillStyle(0x553326, 1);
-        graphics.fillRect(6, 2, 16, 5);
+        graphics.fillRect(6, 2 + bob, 16, 5);
         graphics.fillStyle(0xf2c7a6, 1);
-        graphics.fillRect(7, 6, 14, 10);
+        graphics.fillRect(7, 6 + bob, 14, 10);
         graphics.fillStyle(0xe7b94f, 1);
-        graphics.fillRect(5, 5, 18, 4);
+        graphics.fillRect(5, 5 + bob, 18, 4);
         graphics.fillStyle(0x3d68b2, 1);
-        graphics.fillRect(5, 16, 18, 11);
+        graphics.fillRect(5, 16 + bob, 18, 11);
         graphics.fillStyle(0xf3d06b, 1);
-        graphics.fillRect(5, 16, 18, 3);
+        graphics.fillRect(5, 16 + bob, 18, 3);
         graphics.fillStyle(0xc8584f, 1);
-        graphics.fillRect(direction === "left" ? 18 : 3, 18, 4, 10);
+        graphics.fillRect(direction === "left" ? 18 : 3, 18 + bob + Math.sign(step), 4, 9);
+        graphics.fillStyle(0xf2c7a6, 1);
+        graphics.fillRect(direction === "right" ? 18 : 3, 18 + bob - Math.sign(step), 4, 7);
         graphics.fillStyle(0xf8fafc, 1);
         if (direction === "down") {
-          graphics.fillRect(10, 10, 2, 2);
-          graphics.fillRect(17, 10, 2, 2);
-        } else if (direction === "left") graphics.fillRect(8, 10, 2, 2);
-        else if (direction === "right") graphics.fillRect(19, 10, 2, 2);
+          graphics.fillRect(10, 10 + bob, 2, 2);
+          graphics.fillRect(17, 10 + bob, 2, 2);
+        } else if (direction === "left") graphics.fillRect(8, 10 + bob, 2, 2);
+        else if (direction === "right") graphics.fillRect(19, 10 + bob, 2, 2);
         graphics.fillStyle(0x18243c, 1);
-        graphics.fillRect(6 + step, 27, 6, 7);
-        graphics.fillRect(16 - step, 27, 6, 7);
-        graphics.generateTexture(`player-${direction}-${frame}`, 28, 35);
+        graphics.fillRect(6 + step, 27 + bob, 6, 8);
+        graphics.fillRect(16 - step, 27 + bob, 6, 8);
+        graphics.generateTexture(`player-${direction}-${frame}`, 28, 36);
         graphics.destroy();
       }
     }
@@ -359,7 +413,17 @@ class PeaceVillageScene extends Phaser.Scene {
       const body = this.add.rectangle(npc.x, npc.y, 30, 38, npc.color).setStrokeStyle(4, 0x0d1730).setDepth(depth - 1);
       this.add.rectangle(npc.x, npc.y - 7, 26, 5, 0xf9d873, 0.75).setDepth(depth);
       const head = this.add.rectangle(npc.x, npc.y - 28, 22, 20, 0xf1c7a5).setStrokeStyle(3, 0x0d1730).setDepth(depth);
+      const leftEye = this.add.rectangle(npc.x - 4, npc.y - 29, 2, 3, 0x172033).setDepth(depth + 1);
+      const rightEye = this.add.rectangle(npc.x + 4, npc.y - 29, 2, 3, 0x172033).setDepth(depth + 1);
       this.add.rectangle(npc.x, npc.y - 38, 25, 7, 0x45302a).setDepth(depth + 1);
+      const emotion = this.add.text(npc.x + 27, npc.y - 49, "♪", {
+        color: "#F9D873",
+        fontFamily: "monospace",
+        fontSize: "16px",
+        fontStyle: "bold",
+        stroke: "#07101F",
+        strokeThickness: 4,
+      }).setOrigin(0.5).setDepth(depth + 2);
       const marker = this.add.text(npc.x, npc.y - 72, "!", {
         color: "#F9D873",
         fontFamily: "monospace",
@@ -380,15 +444,47 @@ class PeaceVillageScene extends Phaser.Scene {
       }).setOrigin(0.5, 0).setDepth(depth + 2);
       this.npcRings.set(npc.id, ring);
       this.npcMarkers.set(npc.id, marker);
-      if (!this.reduceMotion) this.tweens.add({ targets: [body, head, cape, marker, shadow], y: "-=2", duration: 900, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+      this.npcEyes.set(npc.id, [leftEye, rightEye]);
+      this.npcEmotions.set(npc.id, emotion);
+      if (!this.reduceMotion) {
+        this.tweens.add({ targets: [body, head, cape, leftEye, rightEye, marker, emotion, shadow], y: "-=2", duration: 900, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+        this.tweens.add({ targets: emotion, scale: 1.18, duration: 650, yoyo: true, repeat: -1, ease: "Sine.easeInOut" });
+      }
     }
+  }
+
+  private setNpcGaze(id: NpcId, playerX: number, playerY: number) {
+    const npc = NPCS.find((item) => item.id === id);
+    const eyes = this.npcEyes.get(id);
+    if (!npc || !eyes) return;
+    const xOffset = Phaser.Math.Clamp((playerX - npc.x) / 40, -2, 2);
+    const yOffset = Phaser.Math.Clamp((playerY - npc.y) / 70, -1, 1);
+    eyes[0].setPosition(npc.x - 4 + xOffset, npc.y - 29 + yOffset);
+    eyes[1].setPosition(npc.x + 4 + xOffset, npc.y - 29 + yOffset);
   }
 
   private setNpcHighlight(id: NpcId, active: boolean) {
     const ring = this.npcRings.get(id);
     if (!ring) return;
-    ring.setFillStyle(0xf9d873, active ? 0.12 : 0);
-    ring.setStrokeStyle(4, 0xf9d873, active ? 0.9 : 0);
+    const state = this.npcQuestStates.get(id) ?? "locked";
+    const color = state === "completed" ? 0x63d391 : state === "available" ? 0xf9d873 : 0x728096;
+    ring.setFillStyle(color, active ? 0.16 : state === "available" ? 0.05 : 0);
+    ring.setStrokeStyle(4, color, active ? 1 : state === "available" ? 0.5 : 0.22);
+  }
+
+  private updateQuestDirection() {
+    if (!this.questArrow || !this.questTarget || !this.cameras.main) return;
+    const camera = this.cameras.main;
+    const placement = getOffscreenIndicatorPlacement(
+      this.questTarget,
+      { x: camera.worldView.x, y: camera.worldView.y, width: camera.width, height: camera.height },
+    );
+    if (!placement) {
+      this.questArrow.setVisible(false);
+      return;
+    }
+    this.questArrow.setPosition(placement.x, placement.y).setAngle(placement.angle).setVisible(true);
+    this.questArrow.setData("targetLabel", this.questTarget.label);
   }
 
   private createWorldInteractions() {
@@ -422,8 +518,8 @@ class PeaceVillageScene extends Phaser.Scene {
     for (const direction of directions) {
       this.anims.create({
         key: `walk-${direction}`,
-        frames: [{ key: `player-${direction}-0` }, { key: `player-${direction}-1` }, { key: `player-${direction}-0` }, { key: `player-${direction}-2` }],
-        frameRate: 9,
+        frames: Array.from({ length: 6 }, (_, frame) => ({ key: `player-${direction}-${frame}` })),
+        frameRate: 11,
         repeat: -1,
       });
     }

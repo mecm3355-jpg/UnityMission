@@ -8,6 +8,7 @@ import { ProgressProvider } from "../../context/progress-context";
 import { GamePage } from "./game-page";
 import { PhaserGameHost, type GameModule } from "./phaser-game-host";
 import type { GameBridge } from "../../game/bridge";
+import { GAME_AUDIO_STORAGE_KEY } from "../../game/audio-settings";
 
 const bridge: GameBridge = {
   onNearbyNpcChange: vi.fn(),
@@ -81,7 +82,32 @@ describe("R02 Phaser game host", () => {
     expect(await screen.findByRole("heading", { name: "평화별의 평화마을" })).toBeTruthy();
     expect(screen.getByText("Lv.1 · 0XP")).toBeTruthy();
     expect(screen.getByRole("link", { name: "대시보드" })).toHaveProperty("pathname", "/dashboard");
+    expect(screen.getByRole("heading", { name: "역사 안내자를 찾아가세요" })).toBeTruthy();
 
     await waitFor(() => expect(screen.getByLabelText("평화마을 게임 화면")).toBeTruthy());
+  });
+
+  it("persists accessible mute and volume controls without changing progress", async () => {
+    const progress = createInitialProgress("소리별", "2026-11-23T09:00:00.000Z");
+    window.localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress));
+    const loadGame = async (): Promise<GameModule> => ({
+      mountGame: () => ({ destroy: vi.fn(), setPaused: vi.fn(), interact: vi.fn(), setMobileInput: vi.fn(), syncWorldState: vi.fn() }),
+    });
+    render(
+      <ProgressProvider>
+        <GamePage gameLoader={loadGame} />
+      </ProgressProvider>,
+    );
+
+    await screen.findByRole("heading", { name: "소리별의 평화마을" });
+    fireEvent.change(screen.getByRole("slider", { name: "게임 음량" }), { target: { value: "32" } });
+    fireEvent.click(screen.getByRole("button", { name: "게임 소리 끄기" }));
+
+    expect(JSON.parse(window.localStorage.getItem(GAME_AUDIO_STORAGE_KEY) ?? "null")).toEqual({
+      schemaVersion: 1,
+      muted: true,
+      volume: 32,
+    });
+    expect(JSON.parse(window.localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "null")).toEqual(progress);
   });
 });
