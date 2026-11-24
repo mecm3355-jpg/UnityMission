@@ -83,6 +83,25 @@ export function getZoneAt(x: number, y: number): WorldZone | undefined {
   );
 }
 
+export function getOffscreenIndicatorPlacement(
+  target: { x: number; y: number },
+  camera: { x: number; y: number; width: number; height: number },
+  margin = 58,
+): { x: number; y: number; angle: number } | null {
+  const screenX = target.x - camera.x;
+  const screenY = target.y - camera.y;
+  const onScreen = screenX >= margin && screenX <= camera.width - margin
+    && screenY >= margin && screenY <= camera.height - margin;
+  if (onScreen) return null;
+  const centerX = camera.width / 2;
+  const centerY = camera.height / 2;
+  return {
+    x: Math.max(margin, Math.min(camera.width - margin, screenX)),
+    y: Math.max(margin, Math.min(camera.height - margin, screenY)),
+    angle: Math.atan2(screenY - centerY, screenX - centerX) * (180 / Math.PI),
+  };
+}
+
 export function pointInsideObstacle(x: number, y: number, padding = 0): boolean {
   return WORLD_OBSTACLES.some(
     (obstacle) =>

@@ -53,6 +53,8 @@ describe("R05 RPG quest panel", () => {
 
     expect(await screen.findByRole("heading", { name: /완료$/ })).toBeTruthy();
     expect(screen.getByText("+100 XP · 평화 조각 획득")).toBeTruthy();
+    expect(screen.getByRole("img", { name: "평화 조각 획득 애니메이션" })).toBeTruthy();
+    expect(screen.getByText("LEVEL UP · Lv.2")).toBeTruthy();
     const stored = JSON.parse(window.localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "{}");
     expect(stored.completedMissions["mission-1"]).toBeTruthy();
     expect(getLevelSummary(stored)).toMatchObject({ xp: 100, level: 2 });

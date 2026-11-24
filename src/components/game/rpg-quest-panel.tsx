@@ -9,9 +9,11 @@ import type { MissionId } from "../../types/content";
 type RpgQuestPanelProps = {
   missionId: MissionId;
   onClose: () => void;
+  onAnswerFeedback?: (correct: boolean) => void;
+  onMissionComplete?: (rewarded: boolean) => void;
 };
 
-export function RpgQuestPanel({ missionId, onClose }: RpgQuestPanelProps) {
+export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionComplete }: RpgQuestPanelProps) {
   const { advanceQuestion, completeMission, progress, revealAnswer, selectAnswer } = useProgress();
   const [completion, setCompletion] = useState<CompletionResult | null>(null);
   const mission = getMissionById(missionId);
@@ -27,7 +29,14 @@ export function RpgQuestPanel({ missionId, onClose }: RpgQuestPanelProps) {
           <h2 className="mt-3 text-3xl font-bold" id="quest-complete-title">{mission.title} 완료</h2>
           <p className="mt-4 text-lg text-slate-200">정답 {completion.correctCount}/3</p>
           <p className="mt-2 text-xl font-bold text-[#F5C968]">{completion.xpAwarded > 0 ? "+100 XP · 평화 조각 획득" : "복습 완료 · 추가 XP 없음"}</p>
-          <p className="mt-3 animate-pulse text-lg font-bold text-sky-200">{completion.xpAwarded > 0 ? `LEVEL UP · Lv.${level.level}` : `현재 Lv.${level.level}`}</p>
+          {completion.xpAwarded > 0 ? (
+            <div aria-label="평화 조각 획득 애니메이션" className="quest-reward-burst mt-5" role="img">
+              <span>◆</span><span>✦</span><span>◆</span><span>✦</span><span>◆</span>
+            </div>
+          ) : null}
+          <p className={`mt-3 text-lg font-bold text-sky-200 ${completion.xpAwarded > 0 ? "level-up-flash" : ""}`}>
+            {completion.xpAwarded > 0 ? `LEVEL UP · Lv.${level.level}` : `현재 Lv.${level.level}`}
+          </p>
           <button className="pixel-button is-primary mt-7 px-6 py-3 font-black" onClick={onClose} type="button">
             마을로 돌아가기
           </button>
@@ -55,8 +64,17 @@ export function RpgQuestPanel({ missionId, onClose }: RpgQuestPanelProps) {
   const lastQuestion = index === mission.questions.length - 1;
 
   function handleContinue() {
-    if (lastQuestion) setCompletion(completeMission());
+    if (lastQuestion) {
+      const result = completeMission();
+      setCompletion(result);
+      onMissionComplete?.(result.xpAwarded > 0);
+    }
     else advanceQuestion();
+  }
+
+  function handleRevealAnswer() {
+    revealAnswer();
+    onAnswerFeedback?.(correct);
   }
 
   return (
@@ -93,7 +111,7 @@ export function RpgQuestPanel({ missionId, onClose }: RpgQuestPanelProps) {
         </fieldset>
 
         {!revealed ? (
-          <button className="pixel-button is-primary mt-6 px-6 py-3 font-black disabled:cursor-not-allowed disabled:opacity-40" disabled={answer === null} onClick={revealAnswer} type="button">
+          <button className="pixel-button is-primary mt-6 px-6 py-3 font-black disabled:cursor-not-allowed disabled:opacity-40" disabled={answer === null} onClick={handleRevealAnswer} type="button">
             답안 제출
           </button>
         ) : (

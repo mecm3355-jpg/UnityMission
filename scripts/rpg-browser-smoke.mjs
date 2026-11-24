@@ -212,6 +212,24 @@ await waitFor(`location.pathname === "/game"`, "메인에서 RPG 진입");
 await waitFor(`document.querySelector("canvas")`, "Phaser 캔버스 생성", 20000);
 await waitFor(`document.body.innerText.includes("평화마을 게임 화면이 준비되었습니다")`, "게임 준비 상태", 20000);
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.gameReady === "true"`, "Phaser 장면 준비", 20000);
+await waitFor(`document.body.innerText.includes("역사 안내자를 찾아가세요")`, "현재 퀘스트 추적창");
+await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.playerAnimationFrames === "6"`, "6프레임 플레이어 애니메이션");
+await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.npcEmotionStates?.includes("history-guide:available")`, "NPC 감정 상태");
+const enhancementState = await evaluate(`(() => {
+  const host = document.querySelector('[data-testid="phaser-game-container"]');
+  const slider = document.querySelector('#game-volume');
+  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set;
+  setter.call(slider, "36");
+  slider.dispatchEvent(new Event("input", { bubbles: true }));
+  slider.dispatchEvent(new Event("change", { bubbles: true }));
+  return {
+    frames: host.dataset.playerAnimationFrames,
+    emotions: host.dataset.npcEmotionStates,
+    hasMute: Boolean(document.querySelector('button[aria-label="게임 소리 끄기"]')),
+    hasVolume: Boolean(slider),
+  };
+})()`);
+await waitFor(`JSON.parse(localStorage.getItem("unitymission:audio:v1"))?.volume === 36`, "오디오 설정 자동 저장");
 
 const startX = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
 await moveUntilAtLeast("playerX", startX + 80, "ArrowRight");
@@ -237,6 +255,7 @@ await waitFor(`document.body.innerText.includes("E 키: 역사 안내자와 대�
 const npcX = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
 await holdKey("KeyE", 80);
 await waitFor(`document.querySelector('[role="dialog"]') && document.body.innerText.includes("기록이")`, "NPC 대화창");
+await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.dialogueFacing?.endsWith(":history-guide")`, "플레이어와 NPC 마주보기");
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]').dataset.paused === "true"`, "대화 중 이동 잠금");
 await holdKey("ArrowRight", 500);
 const pausedX = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
@@ -263,6 +282,7 @@ for (let questionIndex = 0; questionIndex < 3; questionIndex += 1) {
 
 await waitFor(`document.body.innerText.includes("QUEST COMPLETE")`, "퀘스트 완료 연출");
 await waitFor(`document.body.innerText.includes("+100 XP")`, "최초 완료 보상");
+await waitFor(`document.querySelector('[aria-label="평화 조각 획득 애니메이션"]')`, "평화 조각 획득 애니메이션");
 const questProgress = await evaluate(`JSON.parse(localStorage.getItem("unitymission:v1"))`);
 if (!questProgress.completedMissions["mission-1"] || questProgress.activeAttempt !== null) {
   throw new Error(`공유 진행 저장이 올바르지 않습니다: ${JSON.stringify(questProgress)}`);
@@ -271,7 +291,9 @@ await clickButton("마을로 돌아가기");
 await waitFor(`!document.body.innerText.includes("QUEST COMPLETE")`, "게임 복귀");
 await waitFor(`document.body.innerText.includes("Lv.2 · 100XP")`, "공유 XP 헤더 갱신");
 
-await holdKey("KeyE", 80);
+await waitFor(`document.body.innerText.includes("E 키: 역사 안내자와 대화하기")`, "완료 NPC 재대화 프롬프트");
+await clickButton("상호작용");
+await waitFor(`document.querySelector('[role="dialog"]')`, "완료 NPC 대화창");
 await advanceDialogueUntilText("역사 조각이 광장을 밝히고 있어요");
 await advanceDialogueUntilButton("대화 마치기");
 await waitFor(`document.body.innerText.includes("함께 만든 변화를 기억하면서")`, "완료 NPC 반응");
@@ -361,6 +383,7 @@ result.quest = { missionId: "mission-1", xp: 100, completed: true, restoredNpcRe
 result.puzzle = { order: rpgProgress.puzzleSequence, solved: rpgProgress.puzzleSolved, harmonyKey: rpgProgress.harmonyKey };
 result.ending = { fragments: 5, level: 6, certificateLink: true, endingSeen: endingProgress.endingSeen };
 result.mobile = { startX: mobileStartX, movedX: mobileMovedX, interaction: true, reducedMotion: true, ...mobileLayout };
+result.enhancements = enhancementState;
 
 if (result.canvasWidth !== 960 || result.canvasHeight !== 540) {
   throw new Error(`예상하지 못한 Phaser 캔버스 크기: ${JSON.stringify(result)}`);

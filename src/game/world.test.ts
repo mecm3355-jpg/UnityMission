@@ -7,6 +7,7 @@ import {
   WORLD_ZONES,
   getFacingDirection,
   getMovementVelocity,
+  getOffscreenIndicatorPlacement,
   getZoneAt,
   pointInsideObstacle,
 } from "./world";
@@ -40,5 +41,12 @@ describe("R03 peace village world", () => {
     expect(WORLD_OBSTACLES.length).toBeGreaterThanOrEqual(15);
     expect(pointInsideObstacle(960, 590)).toBe(true);
     expect(pointInsideObstacle(960, 720)).toBe(false);
+  });
+
+  it("places quest arrows on the camera edge and hides them for visible targets", () => {
+    const camera = { x: 500, y: 400, width: 960, height: 540 };
+    expect(getOffscreenIndicatorPlacement({ x: 980, y: 670 }, camera)).toBeNull();
+    expect(getOffscreenIndicatorPlacement({ x: 1700, y: 670 }, camera)).toEqual({ x: 902, y: 270, angle: 0 });
+    expect(getOffscreenIndicatorPlacement({ x: 980, y: 100 }, camera)).toEqual({ x: 480, y: 58, angle: -90 });
   });
 });
