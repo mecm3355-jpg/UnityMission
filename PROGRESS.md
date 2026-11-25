@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R21-REL_DONE / PRODUCTION_PASS**. 답안 미선택 안내·선택지 포커스 개선을 PR #15로 main에 병합하고 Vercel production 전체 플레이까지 통과했습니다.
+> 현재 상태: **R22-REL_IN_PROGRESS**. 검증된 평화의 나무 엔딩 팡파르 변경을 선별 커밋하고 GitHub PR·Vercel production에 반영 중입니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -46,6 +46,28 @@
 | R20-REL | DONE | 2026-11-25 18:11 KST | 2026-11-25 18:15 KST | PASS | commit `c00a697`·PR #13·main `8283aa9`·Vercel production 전체 검증 |
 | R21 | DONE | 2026-11-25 18:36 KST | 2026-11-25 18:40 KST | PASS | 답안 미선택 제출 안내·선택지 포커스·선택 시 오류 자동 해제 |
 | R21-REL | DONE | 2026-11-25 18:42 KST | 2026-11-25 18:45 KST | PASS | commit `44aeb7f`·PR #15·main `44558c8`·Vercel production 전체 검증 |
+| R22 | DONE | 2026-11-25 19:12 KST | 2026-11-25 19:18 KST | PASS | 팡파르를 평화의 나무 클릭·엔딩 시작 시점으로 이동하고 실제 Chrome 재생 음계 검증 |
+| R22-REL | IN_PROGRESS | 2026-11-25 19:20 KST | - | NOT_RUN | R22 선별 커밋·PR·main 병합·Vercel production 검증 |
+
+### 2026-11-25 19:20 KST — R22-REL
+- 상태: IN_PROGRESS
+- 목표·완료 조건: 검증된 R22 코드·테스트·문서·분리 PDF만 커밋하고 사용자 소유 합본 PDF는 제외한다. 기존 GitHub 저장소의 feature 브랜치에 push해 main 대상 PR 검사 후 정상 병합하고, 기존 Vercel 프로젝트의 production 배포와 공개 URL에서 나무 클릭 팡파르·전체 RPG·PDF를 검증한다.
+- 변경 파일: `PROGRESS.md`
+- 실행 명령 / 종료코드: Vercel `deployments-cicd` 지침·필수 문서 조회 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화·선별 커밋·비밀정보 검사·feature push·PR 검사·main 병합·Vercel production·공개 전체 플레이 모두 NOT_RUN
+- 잔여 위험: 원격 main 변경이나 Vercel 프로젝트 소유 계정 차이가 확인되면 덮어쓰지 않고 중단해야 한다.
+- 다음 작업: Git remote/main 분기·GitHub 인증·Vercel 대상 프로젝트를 확인하고 정확한 R22 파일만 stage한다.
+
+### 2026-11-25 19:12 KST — R22
+- 상태: DONE
+- 목표·완료 조건: 다섯 번째 미션 완료 직후에는 기존 평화 조각·레벨업 효과음만 재생한다. 평화 조각 5개 상태에서 중앙 광장의 평화의 나무와 상호작용해 엔딩을 열 때만 완료 팡파르를 재생한다. 조각 부족 상태에서는 팡파르가 없어야 한다.
+- 변경 파일: `src/components/game/game-page.tsx`, `src/components/game/game-page-fanfare.test.tsx`, `scripts/rpg-browser-smoke.mjs`, `PRD.md`, `ACCEPTANCE.md`, `TEST_PLAN.md`, `RPG_PRD.md`, `README.md`, 사용자 매뉴얼 HTML·분리 PDF 4개, `PROGRESS.md`
+- 구현 결과: 마지막 미션 최초 통과 콜백에서 `finale` 예약 호출을 제거해 조각 획득음과 레벨업음만 남겼다. 5조각 상태에서 평화의 나무 상호작용 콜백이 엔딩을 열기 직전에 `finale`를 재생하도록 이동했다. 조각이 부족하면 기존 안내만 표시하고 소리는 재생하지 않는다. 다시 탐험한 뒤 나무를 재클릭해 엔딩을 다시 열 때에는 팡파르도 다시 재생되는 엔딩 이벤트로 확정했다. 요구사항·테스트 계약·두 분리 PDF도 같은 의미로 갱신했다.
+- 실행 명령 / 종료코드: 필수 문서 7종 조회·배포 main 코드의 이벤트 호출 경로 진단·관련 문구 검색·Git 상태 확인 `0`; 최신 `origin/main` 기준 `fix/tree-triggered-fanfare` 브랜치 생성 `0`; 관련 테스트 `0`(3파일, 7테스트); `node --check scripts/rpg-browser-smoke.mjs` `0`; 사용자 매뉴얼 PDF 시각 검사 `0`(9쪽); 구현 설명서 PDF 시각 검사 `0`(11쪽); 원본/배포용 PDF SHA-256 각각 일치; 전체 `npm.cmd run test` `0`(20파일, 93테스트); `npm.cmd run lint` `0`; `npx.cmd tsc --noEmit` `0`; `npm.cmd audit --omit=dev` `0`(0 vulnerabilities); `npm.cmd run test:e2e:rpg` `0`(production build·실제 Chrome 평화의 나무 클릭 직후 C5→E5→G5→C6→E6 음계·엔딩·이동·충돌·NPC·미통과·재도전·100XP·360px·모바일, 런타임 오류 0); `git diff --check` `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 마지막 미션 완료 콜백의 팡파르 제거 PASS; 5조각 나무 상호작용 팡파르 PASS; 조각 부족 무음 PASS; 엔딩 열림 PASS; 전체 93테스트·lint·typecheck·build·audit PASS; 실제 Chrome 팡파르 음계·전체 RPG·360px PASS; 사용자 PDF 9쪽·구현 PDF 11쪽 PASS; 원격 push·PR·main 병합·Vercel 배포 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 제품 코드·테스트·빌드·PDF·브라우저 검증 실패는 없었다. 브라우저 하네스 수정의 첫 패치는 실제 문자열의 콜론 형식이 예상 문맥과 달라 적용되지 않았고 파일 변경 없이 정확한 문맥으로 1회 수정해 적용했다.
+- 잔여 위험: 자동화는 Web Audio의 팡파르 재생 요청과 5개 주파수를 검증하지만 실제 스피커 청감은 사람 검토가 필요하다. 로컬 변경은 아직 GitHub와 공개 production에 반영되지 않았다. 사용자 소유 합본 PDF는 비추적 상태로 보존했다.
+- 다음 작업: 사용자 승인 후 R22 변경만 선별 커밋하고 feature push → PR → main 병합 → 기존 Vercel production 배포 → 공개 URL에서 마지막 미션 직후 무팡파르와 나무 클릭 팡파르를 최종 확인한다.
 
 ### 2026-11-25 18:42 KST — R21-REL
 - 상태: DONE
