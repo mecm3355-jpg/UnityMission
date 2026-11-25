@@ -8,6 +8,7 @@ import { getMissionById } from "../../content/missions";
 import { ProgressProvider, useProgress } from "../../context/progress-context";
 import { createInitialProgress, getLevelSummary } from "../../lib/game-engine";
 import { PROGRESS_STORAGE_KEY } from "../../lib/progress-storage";
+import { FAILED_ATTEMPT_REWARD_MESSAGE } from "../../lib/reward-copy";
 import { RpgQuestPanel } from "./rpg-quest-panel";
 
 function QuestHarness() {
@@ -67,5 +68,29 @@ describe("R05 RPG quest panel", () => {
     expect(stored.completedMissions["mission-1"]).toBeTruthy();
     expect(getLevelSummary(stored)).toMatchObject({ xp: 100, level: 2 });
     expect(stored.activeAttempt).toBeNull();
+  });
+
+  it("explains that a failed attempt earns 0XP without removing previously earned XP", async () => {
+    const user = userEvent.setup();
+    const initial = createInitialProgress("재도전별", "2026-11-23T09:00:00.000Z");
+    window.localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(initial));
+    render(<ProgressProvider><QuestHarness /></ProgressProvider>);
+
+    await user.click(await screen.findByRole("button", { name: "테스트 퀘스트 시작" }));
+    const mission = getMissionById("mission-1");
+    if (!mission) throw new Error("Test mission not found");
+    for (let index = 0; index < 3; index += 1) {
+      const choices = await screen.findAllByRole("radio");
+      await user.click(choices[(mission.questions[index].correctIndex + 1) % 4]);
+      await user.click(screen.getByRole("button", { name: "답안 제출" }));
+      await screen.findByRole("heading", { name: "힌트를 확인하고 다시 선택해 보세요" });
+      await user.click(screen.getByRole("button", { name: "다시 제출" }));
+      await screen.findByText("오답입니다.");
+      await user.click(screen.getByRole("button", { name: index === 2 ? "퀘스트 완료" : "다음 문항" }));
+    }
+
+    expect(await screen.findByRole("heading", { name: "통과 기준에 조금 못 미쳤어요" })).toBeTruthy();
+    expect(screen.getByText(`${FAILED_ATTEMPT_REWARD_MESSAGE} 힌트와 해설을 떠올리며 바로 다시 도전해 보세요.`)).toBeTruthy();
+    expect(getLevelSummary(JSON.parse(window.localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "{}"))).toMatchObject({ xp: 0, level: 1 });
   });
 });

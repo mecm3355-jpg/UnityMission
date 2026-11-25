@@ -8,6 +8,7 @@ import {
   MISSION_PASS_CORRECT_COUNT,
   type CompletionResult,
 } from "../../lib/game-engine";
+import { FAILED_ATTEMPT_REWARD_MESSAGE } from "../../lib/reward-copy";
 import type { MissionId } from "../../types/content";
 
 type RpgQuestPanelProps = {
@@ -52,7 +53,7 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
               {completion.xpAwarded > 0 ? `LEVEL UP · Lv.${level.level}` : `현재 Lv.${level.level}`}
             </p>
           ) : (
-            <p className="mt-4 leading-7 text-slate-200">힌트와 해설을 떠올리며 바로 다시 도전해 보세요. 실패한 시도에는 XP가 지급되지 않습니다.</p>
+            <p className="mt-4 leading-7 text-slate-200">{FAILED_ATTEMPT_REWARD_MESSAGE} 힌트와 해설을 떠올리며 바로 다시 도전해 보세요.</p>
           )}
           <button
             className="pixel-button is-primary mt-7 px-6 py-3 font-black"

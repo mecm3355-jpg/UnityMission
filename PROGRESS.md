@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R18_DONE / PRODUCTION_PASS**. R15~R17 개선을 PR #9로 main에 병합하고 Vercel production 전체 플레이까지 통과했습니다.
+> 현재 상태: **R19_DONE_LOCAL / REMOTE_NOT_RUN**. 실패 시 XP 안내를 명확히 했고 로컬 전체 게이트를 통과했습니다. 공개 production은 아직 R18 버전입니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -40,6 +40,28 @@
 | R16 | DONE | 2026-11-25 14:53 KST | 2026-11-25 15:00 KST | PASS | 엔딩 기록·RPG 전용 저장소 완전 제거 및 최종 전수 검증 |
 | R17 | DONE | 2026-11-25 15:04 KST | 2026-11-25 15:14 KST | PASS | 최종 점검 후속 하드닝: 모바일 소리 설정·보안 헤더·출처 링크·E2E 실행 계약 |
 | R18 | DONE | 2026-11-25 16:16 KST | 2026-11-25 17:01 KST | PASS | PR #9·main `90bca5a`·Vercel production·공개 URL 전체 RPG 검증 |
+| R19 | DONE | 2026-11-25 17:16 KST | 2026-11-25 17:21 KST | PASS | 실패 시 XP 안내·계약·사용자 매뉴얼 명확화 및 실제 Chrome 회귀 통과 |
+| R19-REL | IN_PROGRESS | 2026-11-25 17:24 KST | - | NOT_RUN | R19 선별 커밋·PR·main 병합·기존 Vercel production 반영 |
+
+### 2026-11-25 17:24 KST — R19-REL
+- 상태: IN_PROGRESS
+- 목표·완료 조건: 검증 완료된 R19 파일만 커밋하고 사용자 소유 합본 PDF를 제외한다. 원격 main과 충돌 여부 및 비밀정보를 확인한 뒤 feature 브랜치 push, main 대상 PR 검사·병합, 기존 Vercel production 자동 배포와 공개 URL 문구·전체 플레이를 검증한다.
+- 변경 파일: `PROGRESS.md`
+- 실행 명령 / 종료코드: 필수 문서 7종 조회 `0`; 현재 브랜치·remote·작업 트리 확인 `0`; Vercel `deployments-cicd` 스킬 조회 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화·선별 커밋·push·PR·병합·production 배포·공개 URL 검증 모두 NOT_RUN
+- 잔여 위험: 공개 production은 현재 R18 버전이며, Vercel 프로젝트 소유 팀과 연결 도구 계정이 달라 상세 대시보드 조회가 제한될 수 있다.
+- 다음 작업: 원격 main을 fetch하고 분기·보호 상태·비밀정보·stage 대상을 검증한 뒤 커밋과 PR 절차를 진행한다.
+
+### 2026-11-25 17:16 KST — R19
+- 상태: DONE
+- 목표·완료 조건: 미션 실패 안내가 XP 차감으로 오해되지 않도록 “이번 도전 보상 0XP”, “이전 XP 유지”, “2개 이상·최초 통과 100XP”를 명시한다. RPG와 대시보드 결과 화면, 테스트, 사용자 문서의 의미가 일치해야 한다.
+- 변경 파일: `src/lib/reward-copy.ts`, `src/components/mission/mission-result.tsx`, `src/components/game/rpg-quest-panel.tsx`, 관련 테스트 2개, `scripts/rpg-browser-smoke.mjs`, `PRD.md`, `ACCEPTANCE.md`, `TEST_PLAN.md`, `RPG_PRD.md`, `README.md`, 사용자 매뉴얼 HTML·PDF·다운로드 PDF, `PROGRESS.md`
+- 구현 결과: 공통 실패 보상 문구를 한 곳에서 관리하도록 만들고 대시보드와 RPG 양쪽에 “이번 도전 보상은 0XP”, “이전에 획득한 XP는 유지”, “2문항 이상 최초 통과 시 100XP”를 동일하게 표시했다. 결과 카드도 `이번 도전 보상`과 `0 XP`로 바꿨다. 기획·수락·테스트 계약과 사용자 매뉴얼을 같은 의미로 정리했으며, 폐기된 퍼즐·엔딩 저장 안내도 매뉴얼에서 제거했다.
+- 실행 명령 / 종료코드: 필수 문서 7종 조회·문구 검색·브랜치 `fix/clarify-xp-copy` 생성 `0`; 관련 `npm.cmd run test -- ...` `0`(2파일, 11테스트); 사용자 매뉴얼 시각/PDF 검사 `0`(9쪽, 넘침·이미지 오류 0); 원본·다운로드 PDF SHA-256 일치(`C5BA7C84F66ADA99A9AAAE0DEACFBDF9B5DDA13887A6FB97E3F6FCCB61182CD9`); 전체 `npm.cmd run test` `0`(18파일, 87테스트); `npm.cmd run lint` `0`; `npx.cmd tsc --noEmit` `0`; `npm.cmd audit --omit=dev` `0`(0 vulnerabilities); `npm.cmd run test:e2e:rpg` `0`(production build·실제 Chrome 이동/충돌/NPC/미통과 0XP·기존 XP 문구/재도전/100XP/엔딩/360px/모바일, 런타임 오류 0); `git diff --check` `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 대시보드 실패 안내 PASS; RPG 실패 안내 PASS; 기준 미달 새 보상 0XP·기존 XP 유지 PASS; 최초 통과 100XP PASS; 문서 의미 일치 PASS; React 컴포넌트 훅·접근성·렌더링 품질 점검 PASS; lint/typecheck/87 tests/build/audit/실제 Chrome PASS; 원격 push·PR·main 병합·Vercel 배포 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 코드·테스트 실패는 없었다. PDF용 Chrome 정리 중 이미 종료된 일부 하위 프로세스에 `NoProcessFoundForGivenId` 경고가 있었으나 전용 임시 폴더 삭제와 산출물 검증은 완료됐고 제품 동작과 무관하다.
+- 잔여 위험: 로컬 변경은 아직 원격과 공개 production에 반영되지 않았다. 실제 iOS/Android 물리 기기와 화면 읽기 프로그램 평가는 자동화 범위 밖이다. 사용자 소유 합본 PDF는 비추적 상태로 그대로 보존했다.
+- 다음 작업: 사용자 승인 후 이 R19 변경만 검토·커밋하고 feature 브랜치 push → PR → main 병합 → 기존 Vercel production 배포 → 공개 URL 문구·전체 스모크를 수행한다.
 
 ### 2026-11-25 16:16 KST — R18
 - 상태: DONE
@@ -684,6 +706,7 @@
 | 2026-11-25 14:53 KST | `endingSeen`과 RPG 전용 저장 원장을 완전히 폐기하고 과거 키는 시작 시 자동 삭제 | 엔딩 확인 기록을 보존할 제품 요구가 없고 공유 미션 완료 원장만으로 조각·엔딩 조건을 결정할 수 있음 | 저장 원장은 교육 진행 `unitymission:v1` 하나로 단순화되며 엔딩은 5개 통과 후 언제든 재실행 |
 | 2026-11-25 15:04 KST | 통과 기준 도입 전의 유효 완료 기록은 인정하고 신규·재도전에만 2/3 기준을 강제 | 소급 취소 시 XP·잠금·배지·수료증이 연쇄 삭제되어 사용자 학습 기록 손실이 더 큼 | 레거시 하위 호환을 테스트로 고정하고 새 엔진은 기준 미달 완료를 생성하지 않음 |
 | 2026-11-25 15:04 KST | 신규 Playwright 의존성 없이 기존 CDP 스모크를 단일 npm 명령으로 자동화 | 실제 Chrome 검증 범위를 유지하면서 의존성과 설정 복잡도를 늘리지 않음 | build·임시 서버·격리 Chrome·전체 플레이·정리를 `npm run test:e2e:rpg`로 재현 |
+| 2026-11-25 17:21 KST | 기준 미달을 “이번 도전 보상 0XP·기존 XP 유지”로 표현 | “실패한 시도에는 XP가 지급되지 않는다”는 문구가 누적 XP 차감 또는 전체 무보상으로 오해될 수 있음 | 대시보드·RPG·문서·E2E가 최초 통과 보상과 기존 XP 보존을 같은 문장으로 설명 |
 
 ## 최종 출시 판정
-현재: **R18_DONE / PRODUCTION_PASS** — 통과 기준·오답 힌트·재도전, 불필요 아이템/RPG 전용 저장 제거, 모바일 소리 접근, 보안 헤더, 공식 출처 링크, 단일 명령 Chrome E2E가 PR #9를 통해 main `90bca5a`에 병합됐다. Vercel production `https://unity-mission.vercel.app/`은 배포 성공 상태이며 전체 경로·보안 헤더·데스크톱/360px 실제 RPG 플레이·저장·엔딩·수료증·런타임 오류 0 검증을 통과했다. 사용자 소유 합본 PDF만 의도적으로 비추적 상태로 남아 있다.
+현재: **R19_DONE_LOCAL / REMOTE_NOT_RUN** — 실패 보상 안내를 “이번 도전 보상 0XP·기존 XP 유지·2문항 이상 최초 통과 100XP”로 명확히 했고 lint·typecheck·87 tests·build·audit·실제 Chrome 전체 RPG·9쪽 사용자 PDF 검증을 통과했다. 이 변경은 `fix/clarify-xp-copy` 로컬 브랜치에 있으며 아직 push·PR·main 병합·Vercel 배포를 실행하지 않았다. 공개 `https://unity-mission.vercel.app/`은 R18 production 상태다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.
