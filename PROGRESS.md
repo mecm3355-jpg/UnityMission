@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R19_DONE_LOCAL / REMOTE_NOT_RUN**. 실패 시 XP 안내를 명확히 했고 로컬 전체 게이트를 통과했습니다. 공개 production은 아직 R18 버전입니다.
+> 현재 상태: **R19-REL_DONE / PRODUCTION_PASS**. 실패 시 XP 안내를 명확히 하고 PR #11로 main에 병합했으며 Vercel production 전체 플레이까지 통과했습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -41,16 +41,18 @@
 | R17 | DONE | 2026-11-25 15:04 KST | 2026-11-25 15:14 KST | PASS | 최종 점검 후속 하드닝: 모바일 소리 설정·보안 헤더·출처 링크·E2E 실행 계약 |
 | R18 | DONE | 2026-11-25 16:16 KST | 2026-11-25 17:01 KST | PASS | PR #9·main `90bca5a`·Vercel production·공개 URL 전체 RPG 검증 |
 | R19 | DONE | 2026-11-25 17:16 KST | 2026-11-25 17:21 KST | PASS | 실패 시 XP 안내·계약·사용자 매뉴얼 명확화 및 실제 Chrome 회귀 통과 |
-| R19-REL | IN_PROGRESS | 2026-11-25 17:24 KST | - | NOT_RUN | R19 선별 커밋·PR·main 병합·기존 Vercel production 반영 |
+| R19-REL | DONE | 2026-11-25 17:24 KST | 2026-11-25 17:37 KST | PASS | commit `a6b6aba`·PR #11·main `ca01874`·Vercel production 전체 검증 |
 
 ### 2026-11-25 17:24 KST — R19-REL
-- 상태: IN_PROGRESS
+- 상태: DONE
 - 목표·완료 조건: 검증 완료된 R19 파일만 커밋하고 사용자 소유 합본 PDF를 제외한다. 원격 main과 충돌 여부 및 비밀정보를 확인한 뒤 feature 브랜치 push, main 대상 PR 검사·병합, 기존 Vercel production 자동 배포와 공개 URL 문구·전체 플레이를 검증한다.
-- 변경 파일: `PROGRESS.md`
-- 실행 명령 / 종료코드: 필수 문서 7종 조회 `0`; 현재 브랜치·remote·작업 트리 확인 `0`; Vercel `deployments-cicd` 스킬 조회 `0`
-- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화·선별 커밋·push·PR·병합·production 배포·공개 URL 검증 모두 NOT_RUN
-- 잔여 위험: 공개 production은 현재 R18 버전이며, Vercel 프로젝트 소유 팀과 연결 도구 계정이 달라 상세 대시보드 조회가 제한될 수 있다.
-- 다음 작업: 원격 main을 fetch하고 분기·보호 상태·비밀정보·stage 대상을 검증한 뒤 커밋과 PR 절차를 진행한다.
+- 변경 파일: R19 검증 완료 파일 15개와 `PROGRESS.md`; 사용자 소유 `docs/UnityMission_사용자_매뉴얼_및_구현_설명서.pdf`는 제외
+- 구현 결과: R19 변경을 commit `a6b6aba`로 만들고 `fix/clarify-xp-copy`에 push했다. PR #11의 Vercel Preview 검사 2개 SUCCESS와 `MERGEABLE/CLEAN`을 확인한 뒤 일반 merge 방식으로 병합했다. 기능 반영 main merge commit은 `ca01874`이며 Vercel production 자동 배포 `Deployment has completed` 후 공개 URL에서 새 실패 보상 안내와 전체 RPG를 검증했다.
+- 실행 명령 / 종료코드: 필수 문서 7종·Vercel 배포 스킬 조회 `0`; `git fetch origin --prune` `0`; 원격 main/HEAD 분기 `0/0`; GitHub 인증 PASS; main 보호 조회 `404 Branch not protected`; 첫 stage `1`(샌드박스 `.git/index.lock` 권한), 권한 확장 동일 stage `0`; 명시적 15파일 stage·`git diff --cached --check`·비밀정보 패턴 검사 `0`; 합본 PDF 비stage 확인 PASS; `git commit` `0`(`a6b6aba`); `git push -u origin fix/clarify-xp-copy` `0`; PR #11 생성 `0`; Vercel Preview 검사 2개 SUCCESS·CLEAN·MERGEABLE; `gh pr merge 11 --merge` `0`; 원격 main `ca01874`; Vercel production status `success`·`Deployment has completed`; 공개 정상 경로 9개와 매뉴얼 PDF `200`, 잘못된 미션 `404`; CSP·HSTS·`nosniff`·`DENY`·Referrer Policy·Permissions Policy PASS; 실제 production Chrome 전체 RPG 스모크 `0`(새 0XP/기존 XP 유지 문구·재도전·100XP·이동·충돌·NPC·엔딩·360px·모바일, 런타임 오류 0); 검증 Chrome·임시 프로필 정리 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화 PASS; 선별 커밋·합본 PDF 제외·비밀정보 검사 PASS; feature push PASS; PR #11 검사 PASS; main 정상 병합 PASS; Vercel production 배포 PASS; 공개 문구·경로·보안 헤더·데스크톱/360px 전체 플레이 PASS; R19-REL 최종 게이트 PASS
+- 오류·원인·수정 시도(최대 2회): 첫 GitHub 조회는 새 셸 PATH에 `gh`가 없어 실패했고 설치된 절대 경로를 사용해 재실행했다. main은 보호 규칙이 없었지만 강제 push 없이 PR 병합을 유지했다. 첫 stage는 샌드박스의 `.git/index.lock` 쓰기 제한으로 실패해 승인된 권한 확장 동일 명령에서 성공했다. 제품 코드·빌드·배포·production 플레이 오류는 없었다.
+- 잔여 위험: Vercel 프로젝트 소유 팀은 `unitiymission`이고 연결 도구 계정은 달라 상세 런타임 로그·드레인 조회는 소유 계정 대시보드에서 해야 한다. 실제 iOS/Android 물리 기기와 화면 읽기 프로그램 평가는 자동화 범위 밖이다. 사용자 소유 합본 PDF는 비추적 상태로 보존했다.
+- 다음 작업: 기능과 production 반영은 완료됐다. 이 완료 기록만 별도 커밋·PR로 main에 반영하고 최종 production 상태를 확인한다.
 
 ### 2026-11-25 17:16 KST — R19
 - 상태: DONE
@@ -709,4 +711,4 @@
 | 2026-11-25 17:21 KST | 기준 미달을 “이번 도전 보상 0XP·기존 XP 유지”로 표현 | “실패한 시도에는 XP가 지급되지 않는다”는 문구가 누적 XP 차감 또는 전체 무보상으로 오해될 수 있음 | 대시보드·RPG·문서·E2E가 최초 통과 보상과 기존 XP 보존을 같은 문장으로 설명 |
 
 ## 최종 출시 판정
-현재: **R19_DONE_LOCAL / REMOTE_NOT_RUN** — 실패 보상 안내를 “이번 도전 보상 0XP·기존 XP 유지·2문항 이상 최초 통과 100XP”로 명확히 했고 lint·typecheck·87 tests·build·audit·실제 Chrome 전체 RPG·9쪽 사용자 PDF 검증을 통과했다. 이 변경은 `fix/clarify-xp-copy` 로컬 브랜치에 있으며 아직 push·PR·main 병합·Vercel 배포를 실행하지 않았다. 공개 `https://unity-mission.vercel.app/`은 R18 production 상태다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.
+현재: **R19-REL_DONE / PRODUCTION_PASS** — 실패 보상 안내를 “이번 도전 보상 0XP·기존 XP 유지·2문항 이상 최초 통과 100XP”로 명확히 했고 lint·typecheck·87 tests·build·audit·9쪽 사용자 PDF 검증 후 commit `a6b6aba`, PR #11, main `ca01874`로 반영했다. Vercel production `https://unity-mission.vercel.app/`은 배포 완료 상태이며 새 문구·전체 경로·보안 헤더·데스크톱/360px 실제 RPG 플레이·저장·엔딩·수료증·런타임 오류 0 검증을 통과했다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.
