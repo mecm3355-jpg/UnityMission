@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useProgress } from "../../context/progress-context";
 import { getLevelSummary, MISSION_PASS_CORRECT_COUNT } from "../../lib/game-engine";
+import { FAILED_ATTEMPT_REWARD_MESSAGE } from "../../lib/reward-copy";
 import { MISSION_IDS, type Mission } from "../../types/content";
 import { StorageWarning } from "../storage-warning";
 
@@ -80,14 +81,14 @@ export function MissionResult({ mission, scoreParam, xpParam, firstParam, passPa
             <p className="mt-2 text-3xl font-bold">{correctCount}/3</p>
           </div>
           <div className="rounded-2xl bg-[#0D1730] p-6">
-            <p className="text-sm text-slate-400">이번 획득 경험치</p>
-            <p className="mt-2 text-3xl font-bold text-[#F5C968]">+{xpAwarded} XP</p>
+            <p className="text-sm text-slate-400">이번 도전 보상</p>
+            <p className="mt-2 text-3xl font-bold text-[#F5C968]">{xpAwarded > 0 ? `+${xpAwarded} XP` : "0 XP"}</p>
           </div>
         </div>
 
         {!passed ? (
           <p className="mt-5 text-base leading-7 text-slate-300">
-            실패한 시도에는 XP가 지급되지 않습니다. 힌트와 해설을 떠올리며 다시 도전해 보세요.
+            {FAILED_ATTEMPT_REWARD_MESSAGE} 힌트와 해설을 떠올리며 다시 도전해 보세요.
           </p>
         ) : xpAwarded === 0 ? (
           <p className="mt-5 text-base leading-7 text-slate-300">

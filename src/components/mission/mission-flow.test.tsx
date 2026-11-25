@@ -15,6 +15,7 @@ import {
   submitCurrentAnswer,
 } from "../../lib/game-engine";
 import { PROGRESS_STORAGE_KEY } from "../../lib/progress-storage";
+import { FAILED_ATTEMPT_REWARD_MESSAGE } from "../../lib/reward-copy";
 import type { CorrectIndex } from "../../types/content";
 import type { UnityMissionProgress } from "../../types/progress";
 import { MissionDetail } from "./mission-detail";
@@ -299,7 +300,9 @@ describe("mission result", () => {
     );
 
     expect(await screen.findByRole("heading", { name: "통과 기준에 조금 못 미쳤어요" })).toBeTruthy();
-    expect(screen.getByText("실패한 시도에는 XP가 지급되지 않습니다. 힌트와 해설을 떠올리며 다시 도전해 보세요.")).toBeTruthy();
+    expect(screen.getByText(`${FAILED_ATTEMPT_REWARD_MESSAGE} 힌트와 해설을 떠올리며 다시 도전해 보세요.`)).toBeTruthy();
+    expect(screen.getByText("이번 도전 보상")).toBeTruthy();
+    expect(screen.getByText("0 XP")).toBeTruthy();
     expect(screen.queryByRole("link", { name: "다음 미션 보기" })).toBeNull();
     expect(screen.getByRole("link", { name: "미션 다시 도전" })).toHaveProperty(
       "href",

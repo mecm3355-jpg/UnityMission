@@ -286,6 +286,8 @@ for (let questionIndex = 0; questionIndex < 3; questionIndex += 1) {
 
 await waitFor(`document.body.innerText.includes("TRY AGAIN")`, "통과 기준 미달 결과");
 await waitFor(`document.body.innerText.includes("통과하려면 2/3 이상이 필요합니다")`, "2/3 통과 기준 안내");
+await waitFor(`document.body.innerText.includes("이번 도전 보상은 0XP입니다")`, "실패 시 이번 도전 보상 안내");
+await waitFor(`document.body.innerText.includes("이전에 획득한 XP는 유지됩니다")`, "실패 시 기존 XP 유지 안내");
 const failedQuestProgress = await evaluate(`JSON.parse(localStorage.getItem("unitymission:v1"))`);
 if (failedQuestProgress.completedMissions["mission-1"] || failedQuestProgress.activeAttempt !== null) {
   throw new Error(`미통과 시 보상 또는 진행 상태가 잘못 저장됐습니다: ${JSON.stringify(failedQuestProgress)}`);
