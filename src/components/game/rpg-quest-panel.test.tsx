@@ -68,6 +68,24 @@ afterEach(() => {
 });
 
 describe("R05 RPG quest panel", () => {
+  it("guides an empty submission to the first answer and clears the message after selection", async () => {
+    const user = userEvent.setup();
+    const initial = createInitialProgress("안내별", "2026-11-23T09:00:00.000Z");
+    window.localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(initial));
+    render(<ProgressProvider><QuestHarness /></ProgressProvider>);
+
+    await user.click(await screen.findByRole("button", { name: "테스트 퀘스트 시작" }));
+    const submitButton = await screen.findByRole("button", { name: "답안 제출" });
+    expect(submitButton).toHaveProperty("disabled", false);
+    await user.click(submitButton);
+
+    expect((await screen.findByRole("alert")).textContent).toContain("먼저 답안을 선택해 주세요.");
+    const firstOption = (await screen.findAllByRole("radio"))[0];
+    expect(document.activeElement).toBe(firstOption);
+    await user.click(firstOption);
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
   it("reuses all three existing questions, explanations, and the shared completion ledger", async () => {
     const user = userEvent.setup();
     const initial = createInitialProgress("평화별", "2026-11-23T09:00:00.000Z");

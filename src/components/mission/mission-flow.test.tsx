@@ -100,6 +100,30 @@ describe("mission route guards and start", () => {
 });
 
 describe("mission learning flow", () => {
+  it("asks for an answer, focuses the first option, and clears the guidance after selection", async () => {
+    const user = userEvent.setup();
+    const initial = createInitialProgress("안내별", "2026-11-23T09:00:00.000Z");
+    storeProgress(startMissionAttempt(initial, "mission-1", "2026-11-23T09:01:00.000Z"));
+    render(
+      <ProgressProvider>
+        <MissionPlay mission={missions[0]} />
+      </ProgressProvider>,
+    );
+
+    const submitButton = await screen.findByRole("button", { name: "답안 제출" });
+    expect(submitButton).toHaveProperty("disabled", false);
+    await user.click(submitButton);
+
+    expect((await screen.findByRole("alert")).textContent).toContain("먼저 답안을 선택해 주세요.");
+    const firstOption = screen.getByRole("radio", { name: missions[0].questions[0].options[0] });
+    expect(document.activeElement).toBe(firstOption);
+    const storedBeforeSelection = JSON.parse(window.localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "{}");
+    expect(storedBeforeSelection.activeAttempt.answers[0]).toBeNull();
+
+    await user.click(firstOption);
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
   it("supports radio selection and submission with the keyboard", async () => {
     const user = userEvent.setup();
     const initial = createInitialProgress("평화별", "2026-11-23T09:00:00.000Z");

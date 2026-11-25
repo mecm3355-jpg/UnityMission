@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useProgress } from "../../context/progress-context";
 import { getMissionById } from "../../content/missions";
 import {
@@ -22,6 +22,8 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
   const { advanceQuestion, beginMission, completeMission, progress, revealAnswer, selectAnswer } = useProgress();
   const [completion, setCompletion] = useState<CompletionResult | null>(null);
   const [retryGuard, setRetryGuard] = useState<{ questionId: string; rejectedAnswer: number } | null>(null);
+  const [selectionErrorQuestionId, setSelectionErrorQuestionId] = useState<string | null>(null);
+  const firstOptionRef = useRef<HTMLInputElement>(null);
   const mission = getMissionById(missionId);
 
   if (!mission) return null;
@@ -65,6 +67,7 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
               beginMission(missionId);
               setCompletion(null);
               setRetryGuard(null);
+              setSelectionErrorQuestionId(null);
             }}
             type="button"
           >
@@ -94,7 +97,9 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
   const lastQuestion = index === mission.questions.length - 1;
   const retryPending = retryGuard?.questionId === question.id;
   const retrySelectionChanged = retryPending && answer !== retryGuard.rejectedAnswer;
-  const submitDisabled = answer === null || (retryPending && !retrySelectionChanged);
+  const submitDisabled = retryPending && !retrySelectionChanged;
+  const hasSelectionError = selectionErrorQuestionId === question.id;
+  const selectionErrorId = `${question.id}-selection-error`;
 
   function handleContinue() {
     if (lastQuestion) {
@@ -106,7 +111,11 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
   }
 
   function handleSubmitAnswer() {
-    if (answer === null) return;
+    if (answer === null) {
+      setSelectionErrorQuestionId(question.id);
+      firstOptionRef.current?.focus();
+      return;
+    }
     if (!correct && !retryPending) {
       setRetryGuard({ questionId: question.id, rejectedAnswer: answer });
       onAnswerFeedback?.(false);
@@ -114,6 +123,11 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
     }
     revealAnswer();
     onAnswerFeedback?.(correct);
+  }
+
+  function handleSelectAnswer(optionIndex: number) {
+    setSelectionErrorQuestionId(null);
+    selectAnswer(optionIndex);
   }
 
   return (
@@ -132,7 +146,11 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
         </div>
 
         <h2 className="mt-5 text-2xl font-black leading-10" id="rpg-question-title">{question.prompt}</h2>
-        <fieldset className="mt-6 grid gap-3">
+        <fieldset
+          aria-describedby={hasSelectionError ? selectionErrorId : undefined}
+          aria-invalid={hasSelectionError}
+          className="mt-6 grid gap-3"
+        >
           <legend className="sr-only">답안 선택</legend>
           {question.options.map((option, optionIndex) => (
             <label className={`quest-option flex cursor-pointer items-start gap-3 px-4 py-3 text-base leading-7 ${answer === optionIndex ? "is-selected" : ""}`} key={option}>
@@ -141,13 +159,20 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
                 className="mt-1 h-5 w-5 shrink-0 accent-[#F5C968]"
                 disabled={revealed}
                 name={question.id}
-                onChange={() => selectAnswer(optionIndex)}
+                onChange={() => handleSelectAnswer(optionIndex)}
+                ref={optionIndex === 0 ? firstOptionRef : undefined}
                 type="radio"
               />
               <span>{option}</span>
             </label>
           ))}
         </fieldset>
+
+        {hasSelectionError ? (
+          <p className="mt-4 rounded-xl border border-rose-300/50 bg-rose-300/10 px-4 py-3 font-semibold text-rose-100" id={selectionErrorId} role="alert">
+            먼저 답안을 선택해 주세요.
+          </p>
+        ) : null}
 
         {!revealed ? (
           <>

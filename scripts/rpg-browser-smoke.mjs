@@ -272,11 +272,17 @@ await clickButton("퀘스트를 도울게요");
 await advanceDialogueUntilButton("퀘스트 시작");
 await clickButton("퀘스트 시작");
 await waitFor(`document.body.innerText.includes("문항 1/3")`, "교육 퀘스트 시작");
+await clickButton("답안 제출");
+await waitFor(`document.body.innerText.includes("먼저 답안을 선택해 주세요.")`, "미선택 답안 안내");
+await waitFor(`document.activeElement === document.querySelector('input[type="radio"]')`, "미선택 시 첫 답안 포커스");
 
 const missionOneCorrectAnswers = [0, 1, 2];
 for (let questionIndex = 0; questionIndex < 3; questionIndex += 1) {
   const wrongIndex = (missionOneCorrectAnswers[questionIndex] + 1) % 4;
   await evaluate(`document.querySelectorAll('input[type="radio"]')[${wrongIndex}].click()`);
+  if (questionIndex === 0) {
+    await waitFor(`!document.body.innerText.includes("먼저 답안을 선택해 주세요.")`, "답안 선택 후 미선택 안내 해제");
+  }
   await clickButton("답안 제출");
   await waitFor(`document.body.innerText.includes("힌트를 확인하고 다시 선택해 보세요")`, `문항 ${questionIndex + 1} 오답 힌트`);
   await waitFor(`document.querySelector("button[disabled]")?.textContent?.includes("다시 제출")`, `문항 ${questionIndex + 1} 선택 변경 전 재제출 차단`);
