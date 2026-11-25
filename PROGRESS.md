@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R21_DONE_LOCAL / REMOTE_NOT_RUN**. 답안 미선택 제출 안내·선택지 포커스·선택 시 오류 해제 구현과 전체 로컬 검증을 완료했습니다.
+> 현재 상태: **R21-REL_DONE / PRODUCTION_PASS**. 답안 미선택 안내·선택지 포커스 개선을 PR #15로 main에 병합하고 Vercel production 전체 플레이까지 통과했습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -45,16 +45,18 @@
 | R20 | DONE | 2026-11-25 18:00 KST | 2026-11-25 18:08 KST | PASS | 오답 후 선택 변경 전 재제출 차단·전체 미션 완료 팡파르·문서 갱신 |
 | R20-REL | DONE | 2026-11-25 18:11 KST | 2026-11-25 18:15 KST | PASS | commit `c00a697`·PR #13·main `8283aa9`·Vercel production 전체 검증 |
 | R21 | DONE | 2026-11-25 18:36 KST | 2026-11-25 18:40 KST | PASS | 답안 미선택 제출 안내·선택지 포커스·선택 시 오류 자동 해제 |
-| R21-REL | IN_PROGRESS | 2026-11-25 18:42 KST | - | NOT_RUN | R21 선별 커밋·PR·main 병합·기존 Vercel production 반영 |
+| R21-REL | DONE | 2026-11-25 18:42 KST | 2026-11-25 18:45 KST | PASS | commit `44aeb7f`·PR #15·main `44558c8`·Vercel production 전체 검증 |
 
 ### 2026-11-25 18:42 KST — R21-REL
-- 상태: IN_PROGRESS
+- 상태: DONE
 - 목표·완료 조건: 검증 완료된 R21 코드·테스트·분리 PDF만 커밋하고 사용자 소유 합본 PDF를 제외한다. PR 검사와 정상 병합 후 기존 Vercel production에서 미선택 안내·포커스·선택 후 해제와 전체 RPG·PDF를 검증한다.
-- 변경 파일: `PROGRESS.md`
-- 실행 명령 / 종료코드: Vercel `deployments-cicd` 스킬·필수 문서 7종 조회 `0`; 현재 브랜치·remote·작업 트리·HEAD 확인 `0`
-- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화·선별 커밋·push·PR·병합·production 배포·공개 URL 검증 모두 NOT_RUN
-- 잔여 위험: 공개 production은 아직 R20 버전이며 실제 화면 읽기 프로그램 사용성은 자동화로 판정할 수 없다.
-- 다음 작업: 원격 main 최신 상태와 GitHub 인증을 확인하고 R21 파일만 stage·검사한다.
+- 변경 파일: R21 검증 완료 파일 16개와 `PROGRESS.md`; 사용자 소유 `docs/UnityMission_사용자_매뉴얼_및_구현_설명서.pdf`는 제외
+- 구현 결과: R21 변경을 commit `44aeb7f`로 만들고 `fix/answer-selection-guidance`에 push했다. PR #15의 Vercel Preview 검사 2개 SUCCESS와 `MERGEABLE/CLEAN`을 확인한 뒤 일반 merge 방식으로 병합했다. 기능 반영 main merge commit은 `44558c8`이며 Vercel production 자동 배포 완료 후 공개 URL에서 미선택 안내·첫 선택지 포커스·선택 후 해제와 전체 RPG·분리 PDF를 검증했다.
+- 실행 명령 / 종료코드: Vercel 배포 스킬·필수 문서 7종 조회 `0`; `git fetch origin --prune` `0`; 원격 main/HEAD 분기 `0/0`; GitHub 인증 PASS; main 보호 조회 `404 Branch not protected`; 명시적 16파일 stage·`git diff --cached --check`·비밀정보 패턴 검사 `0`; 합본 PDF 비stage 확인 PASS; `git commit` `0`(`44aeb7f`); `git push -u origin fix/answer-selection-guidance` `0`; PR #15 생성 `0`; Vercel Preview 검사 2개 SUCCESS·CLEAN·MERGEABLE; `gh pr merge 15 --merge` `0`; 원격 main `44558c8`; Vercel production `success`·`Deployment has completed`; 실제 production Chrome 전체 RPG 스모크 `0`(미선택 안내·첫 라디오 포커스·선택 후 해제·재제출 잠금·미통과·재도전·100XP·이동·충돌·NPC·엔딩·360px·모바일, 런타임 오류 0); 정상 경로 8개·사용자/구현 PDF `200 application/pdf`, 잘못된 미션 `404`; CSP·HSTS·`nosniff`·`DENY`·Referrer Policy·Permissions Policy PASS; 검증 Chrome·임시 프로필 정리 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화 PASS; 선별 커밋·합본 PDF 제외·비밀정보 검사 PASS; feature push PASS; PR #15 검사 PASS; main 정상 병합 PASS; Vercel production 배포 PASS; 공개 미선택 안내·포커스·선택 후 해제·경로·PDF·보안 헤더·전체 플레이 PASS; R21-REL 최종 게이트 PASS
+- 오류·원인·수정 시도(최대 2회): 제품 코드·테스트·PR 검사·배포·production 플레이 오류는 없었다. main에는 보호 규칙이 없지만 강제 push 없이 PR 병합을 유지했다.
+- 잔여 위험: 실제 화면 읽기 프로그램 사용성 평가는 자동화 범위 밖이다. Vercel 상세 로그·드레인은 소유 팀 계정에서 확인해야 한다. 사용자 소유 합본 PDF는 비추적 상태로 보존했다.
+- 다음 작업: 기능과 production 반영은 완료됐다. 이 완료 기록만 별도 커밋·PR로 main에 반영하고 최종 production 상태를 확인한다.
 
 ### 2026-11-25 18:36 KST — R21
 - 상태: DONE
@@ -759,4 +761,4 @@
 | 2026-11-25 18:40 KST | 최초 미선택 제출은 활성 버튼의 검증 오류로 처리하고 오답 재제출은 네이티브 비활성화 유지 | 비활성 버튼은 클릭 안내를 제공할 수 없지만 오답 후에는 실수 재제출을 물리적으로 막아야 함 | 단계별 요구가 다른 두 상태를 분리하고 오류 안내·포커스·자동 해제를 접근 가능하게 제공 |
 
 ## 최종 출시 판정
-현재: **R21_DONE_LOCAL / REMOTE_NOT_RUN** — 답안 미선택 제출 시 진행을 막고 인라인 안내·첫 선택지 포커스·선택 후 자동 해제를 제공하도록 구현했다. lint·typecheck·91 tests·build·audit·실제 Chrome 전체 RPG·사용자 PDF 9쪽·구현 PDF 11쪽 검증을 통과했다. 변경은 `fix/answer-selection-guidance` 로컬 브랜치에 있으며 아직 push·PR·main 병합·Vercel 배포를 실행하지 않았다. 공개 `https://unity-mission.vercel.app/`은 R20 production 상태다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.
+현재: **R21-REL_DONE / PRODUCTION_PASS** — 답안 미선택 제출 시 진행을 막고 인라인 안내·첫 선택지 포커스·선택 후 자동 해제를 제공하도록 구현했다. lint·typecheck·91 tests·build·audit·사용자 PDF 9쪽·구현 PDF 11쪽 검증 후 commit `44aeb7f`, PR #15, main `44558c8`로 반영했다. Vercel production `https://unity-mission.vercel.app/`은 배포 완료 상태이며 새 입력 안내·전체 경로·분리 PDF·보안 헤더·데스크톱/360px 실제 RPG 플레이·저장·엔딩·수료증·런타임 오류 0 검증을 통과했다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.
