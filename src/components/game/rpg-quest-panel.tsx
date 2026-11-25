@@ -15,13 +15,13 @@ type RpgQuestPanelProps = {
   missionId: MissionId;
   onClose: () => void;
   onAnswerFeedback?: (correct: boolean) => void;
-  onMissionComplete?: (rewarded: boolean) => void;
+  onMissionComplete?: (result: CompletionResult) => void;
 };
 
 export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionComplete }: RpgQuestPanelProps) {
   const { advanceQuestion, beginMission, completeMission, progress, revealAnswer, selectAnswer } = useProgress();
   const [completion, setCompletion] = useState<CompletionResult | null>(null);
-  const [hintedQuestionId, setHintedQuestionId] = useState<string | null>(null);
+  const [retryGuard, setRetryGuard] = useState<{ questionId: string; rejectedAnswer: number } | null>(null);
   const mission = getMissionById(missionId);
 
   if (!mission) return null;
@@ -64,7 +64,7 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
               }
               beginMission(missionId);
               setCompletion(null);
-              setHintedQuestionId(null);
+              setRetryGuard(null);
             }}
             type="button"
           >
@@ -92,20 +92,23 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
   const revealed = attempt.revealedExplanation[index];
   const correct = answer === question.correctIndex;
   const lastQuestion = index === mission.questions.length - 1;
+  const retryPending = retryGuard?.questionId === question.id;
+  const retrySelectionChanged = retryPending && answer !== retryGuard.rejectedAnswer;
+  const submitDisabled = answer === null || (retryPending && !retrySelectionChanged);
 
   function handleContinue() {
     if (lastQuestion) {
       const result = completeMission();
       setCompletion(result);
-      onMissionComplete?.(result.xpAwarded > 0);
+      onMissionComplete?.(result);
     }
     else advanceQuestion();
   }
 
   function handleSubmitAnswer() {
     if (answer === null) return;
-    if (!correct && hintedQuestionId !== question.id) {
-      setHintedQuestionId(question.id);
+    if (!correct && !retryPending) {
+      setRetryGuard({ questionId: question.id, rejectedAnswer: answer });
       onAnswerFeedback?.(false);
       return;
     }
@@ -148,14 +151,15 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
 
         {!revealed ? (
           <>
-            {hintedQuestionId === question.id ? (
+            {retryPending ? (
               <div aria-live="assertive" className="mt-5 rounded-2xl border border-amber-300/50 bg-amber-300/10 p-4" tabIndex={-1}>
                 <h3 className="font-bold text-amber-100">힌트를 확인하고 다시 선택해 보세요</h3>
                 <p className="mt-2 leading-7">{question.hint}</p>
+                <p className="mt-2 text-sm font-semibold text-amber-100">다른 번호를 선택하면 다시 제출 버튼이 활성화됩니다.</p>
               </div>
             ) : null}
-            <button className="pixel-button is-primary mt-6 px-6 py-3 font-black disabled:cursor-not-allowed disabled:opacity-40" disabled={answer === null} onClick={handleSubmitAnswer} type="button">
-              {hintedQuestionId === question.id ? "다시 제출" : "답안 제출"}
+            <button className="pixel-button is-primary mt-6 px-6 py-3 font-black disabled:cursor-not-allowed disabled:opacity-40" disabled={submitDisabled} onClick={handleSubmitAnswer} type="button">
+              {retryPending ? "다시 제출" : "답안 제출"}
             </button>
           </>
         ) : (

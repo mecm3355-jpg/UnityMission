@@ -279,6 +279,10 @@ for (let questionIndex = 0; questionIndex < 3; questionIndex += 1) {
   await evaluate(`document.querySelectorAll('input[type="radio"]')[${wrongIndex}].click()`);
   await clickButton("답안 제출");
   await waitFor(`document.body.innerText.includes("힌트를 확인하고 다시 선택해 보세요")`, `문항 ${questionIndex + 1} 오답 힌트`);
+  await waitFor(`document.querySelector("button[disabled]")?.textContent?.includes("다시 제출")`, `문항 ${questionIndex + 1} 선택 변경 전 재제출 차단`);
+  const secondWrongIndex = (missionOneCorrectAnswers[questionIndex] + 2) % 4;
+  await evaluate(`document.querySelectorAll('input[type="radio"]')[${secondWrongIndex}].click()`);
+  await waitFor(`[...document.querySelectorAll("button")].some((button) => button.textContent?.includes("다시 제출") && !button.disabled)`, `문항 ${questionIndex + 1} 선택 변경 후 재제출 허용`);
   await clickButton("다시 제출");
   await waitFor(`document.body.innerText.includes("출처 확인:")`, `문항 ${questionIndex + 1} 해설`);
   await clickButton(questionIndex === 2 ? "퀘스트 완료" : "다음 문항");
