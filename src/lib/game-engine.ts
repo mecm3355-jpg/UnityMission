@@ -11,6 +11,7 @@ import type {
 
 export const XP_PER_MISSION = 100;
 export const MAX_XP = 500;
+export const MISSION_PASS_CORRECT_COUNT = 2;
 
 const LEVEL_TITLES: Record<LevelNumber, string> = {
   1: "첫걸음 탐험가",
@@ -26,6 +27,7 @@ export type CompletionResult = {
   correctCount: number;
   xpAwarded: 0 | 100;
   firstCompletion: boolean;
+  passed: boolean;
 };
 
 function assertIsoTimestamp(value: string): void {
@@ -241,22 +243,28 @@ export function completeActiveAttempt(
     return count + (answer === mission.questions[index].correctIndex ? 1 : 0);
   }, 0);
   const previous = progress.completedMissions[attempt.missionId];
-  const firstCompletion = previous === undefined;
+  const passed = correctCount >= MISSION_PASS_CORRECT_COUNT;
+  const firstCompletion = passed && previous === undefined;
 
-  const completedMissions: CompletedMissions = {
-    ...progress.completedMissions,
-    [attempt.missionId]: previous
-      ? {
+  const completedMissions: CompletedMissions = previous
+    ? {
+        ...progress.completedMissions,
+        [attempt.missionId]: {
           ...previous,
           bestCorrectCount: Math.max(previous.bestCorrectCount, correctCount),
           attemptCount: previous.attemptCount + 1,
-        }
-      : {
-          completedAt,
-          bestCorrectCount: correctCount,
-          attemptCount: 1,
         },
-  };
+      }
+    : passed
+      ? {
+          ...progress.completedMissions,
+          [attempt.missionId]: {
+            completedAt,
+            bestCorrectCount: correctCount,
+            attemptCount: 1,
+          },
+        }
+      : progress.completedMissions;
 
   return {
     progress: {
@@ -269,5 +277,6 @@ export function completeActiveAttempt(
     correctCount,
     xpAwarded: firstCompletion ? XP_PER_MISSION : 0,
     firstCompletion,
+    passed,
   };
 }

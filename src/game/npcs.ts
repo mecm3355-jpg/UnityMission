@@ -74,8 +74,8 @@ export const NPCS: readonly NpcDefinition[] = [
     color: 0x67bd91,
     greeting: "혼자서는 풀 수 없는 문제도 힘을 합치면 길이 보여요. 협력의 원리를 조사해 주세요.",
     playerReply: "마을 사람들이 함께 해결할 수 있는 방법을 조사해 볼게요.",
-    questPrompt: "연구 준비 완료! 세 가지 협력 사례를 분석하면 공명석의 비밀도 가까워질 거예요.",
-    completedMessage: "협력 조각의 공명이 안정됐어요. 연구소의 세 공명석도 이제 당신의 손길을 기다립니다.",
+    questPrompt: "연구 준비 완료! 세 가지 협력 사례를 분석해 함께 해결하는 힘을 확인해 봐요.",
+    completedMessage: "협력 조각이 안정됐어요. 서로의 필요를 살피는 협력이 마을을 더 단단하게 만들었네요.",
   },
   {
     id: "future-designer",

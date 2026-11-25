@@ -62,6 +62,7 @@ describe("XP and level derivation", () => {
 
     expect(result.xpAwarded).toBe(100);
     expect(result.firstCompletion).toBe(true);
+    expect(result.passed).toBe(true);
     expect(result.correctCount).toBe(3);
     expect(getLevelSummary(result.progress)).toEqual({ xp: 100, level: 2, title: "평화의 새싹" });
   });
@@ -128,7 +129,7 @@ describe("mission locking and attempt rules", () => {
     );
   });
 
-  it("allows wrong answers but requires all three explanations before completion", () => {
+  it("requires all explanations and at least two correct answers for completion rewards", () => {
     const initial = createInitialProgress("평화별", CREATED_AT);
     let progress = startMissionAttempt(initial, "mission-1", timestamp(1));
     progress = submitCurrentAnswer(progress, 3, timestamp(2));
@@ -140,15 +141,23 @@ describe("mission locking and attempt rules", () => {
     );
 
     const completed = playMission(initial, "mission-1", [3, 3, 3]);
-    expect(completed.firstCompletion).toBe(true);
-    expect(completed.correctCount).toBeGreaterThanOrEqual(0);
+    expect(completed.passed).toBe(false);
+    expect(completed.firstCompletion).toBe(false);
+    expect(completed.xpAwarded).toBe(0);
+    expect(completed.progress.completedMissions["mission-1"]).toBeUndefined();
+    expect(completed.progress.activeAttempt).toBeNull();
+
+    const passed = playMission(initial, "mission-1", [0, 1, 0], 20);
+    expect(passed.correctCount).toBe(2);
+    expect(passed.passed).toBe(true);
+    expect(passed.xpAwarded).toBe(100);
   });
 
   it("keeps the first completion time and only raises the best replay score", () => {
     const first = playMission(
       createInitialProgress("평화별", CREATED_AT),
       "mission-1",
-      [0, 0, 0],
+      [0, 1, 0],
     );
     const firstRecord = first.progress.completedMissions["mission-1"];
     const better = playMission(first.progress, "mission-1", undefined, 20);

@@ -35,6 +35,7 @@ describe("mission content schema", () => {
       expect(Number.isInteger(question.correctIndex)).toBe(true);
       expect(question.correctIndex).toBeGreaterThanOrEqual(0);
       expect(question.correctIndex).toBeLessThanOrEqual(3);
+      expect(question.hint.trim().length).toBeGreaterThan(0);
       expect(question.explanation.trim().length).toBeGreaterThan(0);
     }
   });
@@ -49,6 +50,14 @@ describe("mission content schema", () => {
       expect(question.source.url).toMatch(/^https:\/\//);
       expect(question.source.reviewedAt).toBe("2026-11-23");
     }
+  });
+
+  it("uses the stable UN guidance page instead of a signed direct PDF URL", () => {
+    const mediationQuestions = missions[2].questions.slice(1);
+    expect(mediationQuestions.map((question) => question.source.url)).toEqual([
+      "https://peacemaker.un.org/en/documents/united-nations-guidance-effective-mediation-0",
+      "https://peacemaker.un.org/en/documents/united-nations-guidance-effective-mediation-0",
+    ]);
   });
 
   it("rejects malformed IDs, choices, answer indexes, and source URLs", () => {

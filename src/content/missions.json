@@ -21,6 +21,7 @@
           "제헌 국회의 첫 총선거를 실시함"
         ],
         "correctIndex": 0,
+        "hint": "1945년 8월 15일은 정부 수립보다 3년 앞선 날입니다. 식민 지배가 끝난 사건을 떠올려 보세요.",
         "explanation": "1945년 8월 15일 한국은 일본의 지배에서 벗어나 광복을 맞았습니다. 대한민국 정부 수립 선포는 그로부터 3년 뒤인 1948년 8월 15일입니다.",
         "source": {
           "title": "대한민국 정부 수립",
@@ -39,6 +40,7 @@
           "유엔 창설"
         ],
         "correctIndex": 1,
+        "hint": "광복 3년 뒤, 제헌국회와 대통령 선출을 거쳐 공식적으로 선포된 일을 생각해 보세요.",
         "explanation": "제헌국회 구성과 대통령·부통령 선출, 내각 구성을 거쳐 1948년 8월 15일 대한민국 정부 수립이 선포되었습니다.",
         "source": {
           "title": "대한민국 정부 수립",
@@ -57,6 +59,7 @@
           "한국전쟁이 시작되었음을 알린 선언"
         ],
         "correctIndex": 2,
+        "hint": "정전은 전쟁을 법적으로 끝내는 평화조약이 아니라 당장의 전투를 멈추는 합의입니다.",
         "explanation": "정전협정은 교전 당사자들이 한국전쟁의 전투를 중지하기로 한 합의입니다. 전투를 멈추는 정전은 전쟁 상태를 법적으로 끝내는 평화조약과 같지 않습니다.",
         "source": {
           "title": "정전협정의 체결",
@@ -89,6 +92,7 @@
           "남측 표준어-제주, 북측 문화어-함흥"
         ],
         "correctIndex": 0,
+        "hint": "남측의 규범어는 수도 서울, 북측의 문화어는 수도 평양을 기준으로 삼습니다.",
         "explanation": "남측은 서울말을 중심으로 표준어와 표준 발음을 설정하고, 북측은 평양말을 중심으로 문화어와 그 발음 기준을 설정했습니다.",
         "source": {
           "title": "남북 규범어의 통합 방안",
@@ -107,6 +111,7 @@
           "달력의 월별 날짜 수"
         ],
         "correctIndex": 2,
+        "hint": "단어의 첫소리 표기와 단어 사이를 띄우는 규칙은 남북에서 차이가 나타나는 대표 항목입니다.",
         "explanation": "국립국어원 자료는 두음법칙, 사이시옷, 형태 표기, 띄어쓰기 등에서 남북 규범의 차이가 나타난다고 설명합니다.",
         "source": {
           "title": "남북 규범어의 통합 방안",
@@ -125,6 +130,7 @@
           "아침(남)-저녁(북)"
         ],
         "correctIndex": 1,
+        "hint": "남측 표현에는 사이시옷이 들어가지만 북측 표현에는 들어가지 않는 가게 관련 낱말을 찾아보세요.",
         "explanation": "국립국어원은 형태 차이의 사례로 남측의 ‘가겟방’과 북측의 ‘가게방’을 제시합니다. 이런 차이를 알면 서로의 표현을 성급히 틀렸다고 판단하지 않고 의미를 확인할 수 있습니다.",
         "source": {
           "title": "남북한 언어 차이 조사 Ⅰ·Ⅱ 발간",
@@ -157,6 +163,7 @@
           "상대방 배제"
         ],
         "correctIndex": 0,
+        "hint": "당사자들이 직접 대화를 통해 합의점을 찾는 가장 기본적인 평화적 방법입니다.",
         "explanation": "유엔 헌장 제33조는 협상, 조사, 중재, 조정, 중재재판, 사법적 해결 등을 평화적 해결 방법으로 제시합니다.",
         "source": {
           "title": "United Nations Charter: Chapter VI, Article 33",
@@ -175,11 +182,12 @@
           "당사자의 참여를 막는 것"
         ],
         "correctIndex": 0,
+        "hint": "중재는 강제로 시작하는 절차가 아닙니다. 당사자들이 자발적으로 참여하려면 무엇이 필요할까요?",
         "explanation": "중재는 자발적인 과정이므로 갈등 당사자의 동의가 중요합니다. 동의가 없으면 성실한 협상과 과정에 대한 책임 있는 참여를 기대하기 어렵습니다.",
         "source": {
           "title": "United Nations Guidance for Effective Mediation",
           "organization": "United Nations",
-          "url": "https://digitallibrary.un.org/nanna/record/4026222/files/1387704EN.pdf?registerDownload=1&version=1&withMetadata=0&withWatermark=0",
+          "url": "https://peacemaker.un.org/en/documents/united-nations-guidance-effective-mediation-0",
           "reviewedAt": "2026-11-23"
         }
       },
@@ -193,11 +201,12 @@
           "불리한 사실은 한쪽에만 숨긴다."
         ],
         "correctIndex": 1,
+        "hint": "공정한 중재자는 한쪽 편을 들거나 결과에서 사적 이익을 얻어서는 안 됩니다.",
         "explanation": "공정한 중재자는 결과에 사적 이해관계를 두지 않고, 관련 당사자들을 공정하고 균형 있게 대하며 대화할 수 있어야 합니다.",
         "source": {
           "title": "United Nations Guidance for Effective Mediation",
           "organization": "United Nations",
-          "url": "https://digitallibrary.un.org/nanna/record/4026222/files/1387704EN.pdf?registerDownload=1&version=1&withMetadata=0&withWatermark=0",
+          "url": "https://peacemaker.un.org/en/documents/united-nations-guidance-effective-mediation-0",
           "reviewedAt": "2026-11-23"
         }
       }
@@ -225,6 +234,7 @@
           "언론에 많이 보도된 사람만 돕는다."
         ],
         "correctIndex": 1,
+        "hint": "공평성은 사람의 소속이나 신념보다 도움이 얼마나 필요하고 긴급한지를 먼저 봅니다.",
         "explanation": "공평성은 국적, 인종, 종교, 계급, 정치적 견해로 차별하지 않고 오직 필요에 따라 지원하며 가장 긴급한 고통을 우선하는 원칙입니다.",
         "source": {
           "title": "IHL and humanitarian principles",
@@ -243,6 +253,7 @@
           "문화 차이에 대한 대화를 금지한다."
         ],
         "correctIndex": 0,
+        "hint": "문화 다양성은 차이를 없애는 것이 아니라 서로 존중하며 대화하고 교류하는 데서 살아납니다.",
         "explanation": "유네스코는 문화 다양성에 대한 존중, 관용, 대화와 협력이 상호 신뢰와 이해 속에서 평화와 안전에 기여한다고 설명합니다.",
         "source": {
           "title": "UNESCO Universal Declaration on Cultural Diversity",
@@ -261,6 +272,7 @@
           "환경 문제를 갈등과 무관하다고 본다."
         ],
         "correctIndex": 2,
+        "hint": "공유 자원은 서로 차지하려 하기보다 함께 조사하고 관리할 때 신뢰와 공동 이익을 만듭니다.",
         "explanation": "유엔환경계획은 공유 자연자원이 협력과 신뢰 형성의 기반이 될 수 있으며, 기술적 전문성과 공동 이익을 활용해 자원 갈등을 협력의 기회로 바꿀 수 있다고 설명합니다.",
         "source": {
           "title": "Environmental cooperation and peacebuilding",
@@ -293,6 +305,7 @@
           "세계 문제는 개인과 전혀 관계없다고 본다."
         ],
         "correctIndex": 1,
+        "hint": "세계시민교육은 다른 관점을 이해하고 다양한 사람과 협력해 문제를 해결하는 태도를 강조합니다.",
         "explanation": "유네스코 세계시민교육은 비판적으로 질문하고, 다른 관점과 의견을 이해하며, 다양한 배경의 사람들과 협력해 문제를 해결하는 역량을 강조합니다.",
         "source": {
           "title": "Global citizenship education and peace education: what you need to know",
@@ -311,6 +324,7 @@
           "반대 의견을 처음부터 제외하는 결정"
         ],
         "correctIndex": 2,
+        "hint": "목표 16.7의 핵심 낱말은 포용, 참여, 대표성입니다.",
         "explanation": "지속가능발전목표 16.7은 모든 수준에서 대응성 있고 포용적이며 참여적이고 대표성 있는 의사결정을 보장하는 것을 목표로 합니다.",
         "source": {
           "title": "Sustainable Development Goal 16",
@@ -329,6 +343,7 @@
           "가장 자극적인 표현을 사실로 선택한다."
         ],
         "correctIndex": 2,
+        "hint": "온라인 정보를 바로 믿거나 공유하기 전에 누가 썼고 어떤 근거를 제시했는지부터 살펴보세요.",
         "explanation": "미디어·정보 리터러시는 정보를 찾고 평가하며 책임 있게 활용하는 역량입니다. 작성 주체와 근거를 확인하고 다른 신뢰할 만한 정보와 비교해야 합니다.",
         "source": {
           "title": "Media and information literacy",

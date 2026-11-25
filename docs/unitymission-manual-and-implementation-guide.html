@@ -498,8 +498,7 @@
     <table>
       <tr><th>기능</th><th>키</th><th>설명</th></tr>
       <tr><td>이동</td><td><code>W A S D</code> 또는 방향키</td><td>위·왼쪽·아래·오른쪽으로 이동합니다.</td></tr>
-      <tr><td>대화·조사</td><td><code>E</code></td><td>가까운 NPC, 공명석, 평화의 나무와 상호작용합니다.</td></tr>
-      <tr><td>인벤토리</td><td><code>I</code></td><td>평화 조각과 조화의 열쇠를 확인합니다.</td></tr>
+      <tr><td>대화·조사</td><td><code>E</code></td><td>가까운 NPC와 평화의 나무와 상호작용합니다.</td></tr>
       <tr><td>대화 닫기</td><td><code>Esc</code></td><td>열린 대화창을 닫습니다.</td></tr>
       <tr><td>소리</td><td><code>🔊</code>·볼륨</td><td>상단 버튼과 슬라이더로 음소거·크기를 조절합니다.</td></tr>
     </table>
@@ -516,7 +515,7 @@
       </figure>
     </div>
 
-    <div class="callout tip"><strong>처음 소리가 안 날 때</strong> 브라우저 정책상 첫 키 입력이나 터치 후 음악이 시작됩니다. 음소거와 볼륨 설정은 자동 저장됩니다.</div>
+    <div class="callout tip"><strong>모바일 소리 조절</strong> 상단의 🔊·−·+ 버튼으로 음소거와 10% 단위 볼륨을 조절합니다. 브라우저 정책상 첫 키 입력이나 터치 후 음악이 시작되며 설정은 자동 저장됩니다.</div>
     <span class="doc-mark">1부 · 사용자 매뉴얼</span><span class="page-number">6</span>
   </section>
 
@@ -580,9 +579,11 @@
     <h3>문제 풀이 규칙</h3>
     <ul>
       <li>각 미션은 <strong>3문항</strong>이고, 각 문항에는 보기 4개가 있습니다.</li>
-      <li>답을 고른 뒤 제출하면 정답·오답과 해설, 공식 출처가 표시됩니다.</li>
+      <li>오답을 처음 제출하면 힌트가 표시되며, 답을 다시 고를 수 있습니다.</li>
+      <li>다시 제출하면 정답·오답과 해설, 공식 출처가 표시됩니다.</li>
       <li>해설을 확인한 뒤에만 다음 문항으로 넘어갈 수 있습니다.</li>
-      <li>정답 개수와 관계없이 3문항을 모두 진행하면 미션이 완료됩니다.</li>
+      <li><strong>3문항 중 2문항 이상</strong>을 맞혀야 미션을 통과합니다.</li>
+      <li>통과하지 못하면 XP 없이 다시 도전할 수 있습니다.</li>
     </ul>
 
     <h3>XP와 레벨</h3>
@@ -596,7 +597,7 @@
       <tr><td>5개</td><td>500</td><td>Lv.6</td><td>Unity Master</td></tr>
     </table>
 
-    <div class="callout warn"><strong>중복 보상 방지</strong> 같은 미션을 다시 풀어도 XP는 한 번만 지급됩니다. 최초 완료 때 평화 조각 연출과 레벨업 효과가 나타납니다.</div>
+    <div class="callout warn"><strong>보상 규칙</strong> 통과해야 최초 1회 100XP를 받습니다. 같은 미션을 다시 풀어도 XP는 중복 지급되지 않으며, 최초 통과 때 평화 조각 연출과 레벨업 효과가 나타납니다.</div>
     <h3>대시보드에서 볼 수 있는 것</h3>
     <p>미션 잠금·완료 상태, XP와 레벨, 진행률, 배지 5개, 수료증 링크를 확인할 수 있습니다. RPG와 대시보드는 같은 학습 기록을 사용합니다.</p>
     <span class="doc-mark">1부 · 사용자 매뉴얼</span><span class="page-number">9</span>
@@ -604,14 +605,14 @@
 
   <section class="page">
     <span class="part-label">1부 · 사용자 매뉴얼</span>
-    <h2>7. 공명석 퍼즐, 엔딩, 수료증</h2>
+    <h2>7. 미션 통과, 엔딩, 수료증</h2>
     <hr class="section-rule" />
-    <h3>공명석 퍼즐</h3>
-    <p>협력 구역에는 세 개의 공명석이 있습니다. 가까이 다가가 안내가 나타나면 상호작용하세요.</p>
+    <h3>통과와 재도전</h3>
+    <p>각 미션에서 2문항 이상을 맞히면 평화 조각을 획득하고 다음 NPC가 열립니다. 0~1문항 정답이면 해설을 복습한 뒤 바로 다시 도전하세요.</p>
     <div class="flow" style="grid-template-columns: repeat(3, 1fr); max-width: 125mm;">
-      <div class="flow-item">1 · 푸른 공명석</div><div class="flow-item">2 · 황금 공명석</div><div class="flow-item">3 · 초록 공명석</div>
+      <div class="flow-item">오답<br />힌트 확인</div><div class="flow-item">답 다시<br />선택</div><div class="flow-item">2/3 이상<br />통과</div>
     </div>
-    <div class="callout tip"><strong>정답 보상</strong> 순서대로 활성화하면 인벤토리에 <em>조화의 열쇠</em>가 저장됩니다. 순서를 틀리면 푸른색부터 다시 시작하면 됩니다.</div>
+    <div class="callout tip"><strong>학습 팁</strong> 힌트는 정답을 그대로 알려 주기보다 핵심 개념을 떠올리도록 돕습니다. 해설과 공식 출처도 함께 확인해 보세요.</div>
 
     <h3>최종 엔딩</h3>
     <div class="steps">
@@ -756,7 +757,6 @@ npm run start</pre>
 │  ├─ bridge.ts             # React↔Phaser 연결
 │  ├─ audio.ts              # Web Audio 음악·효과음
 │  ├─ audio-settings.ts     # 볼륨 설정 검증·저장
-│  └─ rpg-progress.ts       # 퍼즐·엔딩 저장 검증
 ├─ lib/                     # 교육 엔진·저장·배지
 └─ data/                    # 5미션·15문항 콘텐츠</div>
 
@@ -768,11 +768,10 @@ npm run start</pre>
     <span class="part-label">2부 · 구현 설명서</span>
     <h2>12. 상태와 저장 구조</h2>
     <hr class="section-rule" />
-    <p>교육 기록, RPG 보조 기록, 오디오 설정을 분리합니다. 기존 대시보드 호환성을 유지하면서 게임 기능과 개인 설정을 안전하게 확장할 수 있습니다.</p>
+    <p>교육 기록과 오디오 설정을 분리합니다. RPG의 XP·조각·엔딩 조건은 모두 교육 기록에서 계산해 중복 상태를 만들지 않습니다.</p>
     <table>
       <tr><th>저장 키</th><th>담당 데이터</th><th>원칙</th></tr>
       <tr><td><code>unitymission:v1</code></td><td>닉네임, 완료 미션, 최고 점수, 시도 횟수, 진행 중 답안</td><td>XP·레벨·배지의 유일한 근거</td></tr>
-      <tr><td><code>unitymission:rpg:v1</code></td><td>공명석 순서, 조화의 열쇠, 엔딩 확인</td><td>교육 보상을 저장하지 않음</td></tr>
       <tr><td><code>unitymission:audio:v1</code></td><td>음소거, 마스터 볼륨</td><td>범위를 검증하고 진행 기록과 분리</td></tr>
     </table>
 
@@ -857,27 +856,28 @@ XP = 완료 미션 수 × 100
     <span class="part-label">2부 · 구현 설명서</span>
     <h2>15. 테스트와 품질 게이트</h2>
     <hr class="section-rule" />
-    <p>실제 명령의 종료 코드가 0이어야 완료입니다. R14에서는 18개 파일·83개 테스트와 공개 URL 브라우저 스모크가 통과했습니다.</p>
+    <p>명령 종료 코드가 0이어야 완료이며 실제 Chrome 전체 플레이까지 확인합니다.</p>
     <h3>필수 명령</h3>
     <pre>npm run lint
 npx tsc --noEmit
 npm run test
 npm run build
-npm audit --omit=dev</pre>
+npm audit --omit=dev
+npm run test:e2e:rpg</pre>
     <table class="compact">
       <tr><th>명령</th><th>찾는 문제</th></tr>
       <tr><td><code>lint</code></td><td>React 훅, 접근성, 코드 품질 규칙 위반</td></tr>
       <tr><td><code>tsc</code></td><td>잘못된 타입, 누락된 속성, null 가능성</td></tr>
-      <tr><td><code>test</code></td><td>XP·저장·잠금·대화·퍼즐·컴포넌트 회귀</td></tr>
+      <tr><td><code>test</code></td><td>통과 기준·힌트·XP·저장·잠금·대화·컴포넌트 회귀</td></tr>
       <tr><td><code>build</code></td><td>실제 배포 번들, 정적 페이지, 서버/클라이언트 경계</td></tr>
       <tr><td><code>audit</code></td><td>설치된 운영 의존성의 알려진 취약점</td></tr>
     </table>
 
     <h3>브라우저 전체 플레이</h3>
-    <p><code>scripts/rpg-browser-smoke.mjs</code>는 실제 Chrome을 제어해 다음을 확인합니다.</p>
+    <p><code>npm run test:e2e:rpg</code>는 실제 Chrome을 자동 실행·제어해 다음을 확인하고 임시 프로세스를 정리합니다.</p>
     <ul class="checklist">
       <li>캐릭터 이동과 분수 충돌</li><li>NPC 근접·대화·이동 잠금</li><li>교대 대화와 퀘스트 시작</li>
-      <li>3문항·해설·100XP·저장</li><li>완료 NPC 반응</li><li>공명석 퍼즐·인벤토리</li>
+      <li>오답 힌트·3문항·해설·통과·100XP·저장</li><li>완료 NPC 반응</li><li>평화 조각 인벤토리</li>
       <li>5조각 엔딩·수료증</li><li>360px 모바일 조작·가로 넘침</li><li>사운드·방향 안내·6프레임 애니메이션</li><li>런타임 오류 0건</li>
     </ul>
     <div class="callout warn"><strong>테스트 실패 처리</strong> 로그를 읽고 코드·환경·의존성·콘텐츠·권한 중 원인을 분류합니다. 최소 수정 후 같은 테스트를 다시 실행하며, 실행하지 않은 항목을 PASS라고 기록하지 않습니다.</div>
@@ -937,7 +937,7 @@ npm audit --omit=dev</pre>
       <tr><td>대화 디자인</td><td><code>dialogue-panel.tsx</code>, CSS</td><td>360px, 포커스, reduced-motion</td></tr>
       <tr><td>캐릭터·충돌</td><td><code>game/runtime.ts</code>, <code>world.ts</code></td><td>실제 브라우저 입력·충돌</td></tr>
       <tr><td>XP·잠금</td><td><code>lib/game-engine.ts</code></td><td>중복 XP와 URL 잠금</td></tr>
-      <tr><td>저장 구조</td><td><code>progress-storage.ts</code>, <code>rpg-progress.ts</code></td><td>이전 데이터 호환·손상 복구</td></tr>
+      <tr><td>저장 구조</td><td><code>progress-storage.ts</code></td><td>이전 데이터 정리·손상 복구</td></tr>
     </table>
     <div class="callout tip"><strong>가장 중요한 습관</strong> 수정 뒤 저장·복원·모바일·기존 대시보드까지 테스트하세요.</div>
     <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">20</span>

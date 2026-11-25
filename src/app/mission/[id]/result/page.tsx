@@ -24,6 +24,7 @@ export default async function MissionResultPage({ params, searchParams }: Missio
     <MissionResult
       firstParam={firstValue(query.first)}
       mission={mission}
+      passParam={firstValue(query.pass)}
       scoreParam={firstValue(query.score)}
       xpParam={firstValue(query.xp)}
     />

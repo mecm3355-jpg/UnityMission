@@ -273,10 +273,30 @@ await advanceDialogueUntilButton("퀘스트 시작");
 await clickButton("퀘스트 시작");
 await waitFor(`document.body.innerText.includes("문항 1/3")`, "교육 퀘스트 시작");
 
+const missionOneCorrectAnswers = [0, 1, 2];
 for (let questionIndex = 0; questionIndex < 3; questionIndex += 1) {
-  await evaluate(`document.querySelector('input[type="radio"]').click()`);
+  const wrongIndex = (missionOneCorrectAnswers[questionIndex] + 1) % 4;
+  await evaluate(`document.querySelectorAll('input[type="radio"]')[${wrongIndex}].click()`);
   await clickButton("답안 제출");
+  await waitFor(`document.body.innerText.includes("힌트를 확인하고 다시 선택해 보세요")`, `문항 ${questionIndex + 1} 오답 힌트`);
+  await clickButton("다시 제출");
   await waitFor(`document.body.innerText.includes("출처 확인:")`, `문항 ${questionIndex + 1} 해설`);
+  await clickButton(questionIndex === 2 ? "퀘스트 완료" : "다음 문항");
+}
+
+await waitFor(`document.body.innerText.includes("TRY AGAIN")`, "통과 기준 미달 결과");
+await waitFor(`document.body.innerText.includes("통과하려면 2/3 이상이 필요합니다")`, "2/3 통과 기준 안내");
+const failedQuestProgress = await evaluate(`JSON.parse(localStorage.getItem("unitymission:v1"))`);
+if (failedQuestProgress.completedMissions["mission-1"] || failedQuestProgress.activeAttempt !== null) {
+  throw new Error(`미통과 시 보상 또는 진행 상태가 잘못 저장됐습니다: ${JSON.stringify(failedQuestProgress)}`);
+}
+await clickButton("미션 다시 도전");
+await waitFor(`document.body.innerText.includes("문항 1/3")`, "미션 즉시 재도전");
+
+for (let questionIndex = 0; questionIndex < 3; questionIndex += 1) {
+  await evaluate(`document.querySelectorAll('input[type="radio"]')[${missionOneCorrectAnswers[questionIndex]}].click()`);
+  await clickButton("답안 제출");
+  await waitFor(`document.body.innerText.includes("출처 확인:")`, `재도전 문항 ${questionIndex + 1} 해설`);
   await clickButton(questionIndex === 2 ? "퀘스트 완료" : "다음 문항");
 }
 
@@ -300,24 +320,6 @@ await waitFor(`document.body.innerText.includes("함께 만든 변화를 기억�
 await clickButton("대화 마치기");
 await waitFor(`!document.querySelector('[role="dialog"]')`, "완료 대화 닫기");
 
-await send("Page.navigate", { url: `${baseUrl}/game` });
-await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.gameReady === "true"`, "환경 퍼즐 장면 준비", 20000);
-await moveUntilAtLeast("playerY", 820, "ArrowDown");
-await moveUntilText("E 키: 푸른 공명석 상호작용", "ArrowRight");
-await holdKey("KeyE", 80);
-await waitFor(`document.body.innerText.includes("공명석이 빛났습니다")`, "첫 공명석 활성화");
-await moveUntilText("E 키: 황금 공명석 상호작용", "ArrowRight", 12);
-await holdKey("KeyE", 80);
-await moveUntilText("E 키: 초록 공명석 상호작용", "ArrowRight", 12);
-await holdKey("KeyE", 80);
-await waitFor(`document.body.innerText.includes("환경 퍼즐 완료")`, "공명석 퍼즐 완료");
-const rpgProgress = await evaluate(`JSON.parse(localStorage.getItem("unitymission:rpg:v1"))`);
-if (!rpgProgress.puzzleSolved || !rpgProgress.harmonyKey) {
-  throw new Error(`환경 퍼즐 저장이 올바르지 않습니다: ${JSON.stringify(rpgProgress)}`);
-}
-await clickButton("🎒 조각 1/5");
-await waitFor(`document.body.innerText.includes("조화의 열쇠: 획득")`, "인벤토리 퍼즐 보상");
-
 await evaluate(`(() => {
   const progress = JSON.parse(localStorage.getItem("unitymission:v1"));
   const now = new Date().toISOString();
@@ -335,8 +337,8 @@ await holdKey("KeyE", 80);
 await waitFor(`document.body.innerText.includes("평화마을이 다시 빛납니다")`, "최종 엔딩");
 await waitFor(`document.body.innerText.includes("최종 레벨 Lv.6")`, "엔딩 최종 레벨");
 await waitFor(`document.querySelector('a[href="/certificate"]')`, "엔딩 수료증 접근");
-const endingProgress = await evaluate(`JSON.parse(localStorage.getItem("unitymission:rpg:v1"))`);
-if (!endingProgress.endingSeen) throw new Error("엔딩 상태가 저장되지 않았습니다.");
+const retiredRpgStorage = await evaluate(`localStorage.getItem("unitymission:rpg:v1")`);
+if (retiredRpgStorage !== null) throw new Error("폐기된 RPG 전용 저장 키가 남아 있습니다.");
 await clickButton("다시 탐험하기");
 await waitFor(`!document.body.innerText.includes("평화마을이 다시 빛납니다")`, "엔딩 후 재탐험");
 
@@ -356,6 +358,21 @@ await send("Page.navigate", { url: `${baseUrl}/game` });
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.gameReady === "true"`, "모바일 게임 장면 준비", 20000);
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.reducedMotion === "true"`, "모션 감소 설정");
 await waitFor(`document.querySelector('button[aria-label="오른쪽으로 이동"]')`, "모바일 방향키");
+const mobileAudioControls = await evaluate(`(() => {
+  const decrease = document.querySelector('button[aria-label="게임 음량 줄이기"]');
+  const increase = document.querySelector('button[aria-label="게임 음량 높이기"]');
+  return {
+    decreaseVisible: Boolean(decrease && getComputedStyle(decrease).display !== "none"),
+    increaseVisible: Boolean(increase && getComputedStyle(increase).display !== "none"),
+  };
+})()`);
+if (!mobileAudioControls.decreaseVisible || !mobileAudioControls.increaseVisible) {
+  throw new Error(`모바일 음량 버튼이 표시되지 않습니다: ${JSON.stringify(mobileAudioControls)}`);
+}
+await clickButton("게임 음량 높이기");
+await waitFor(`JSON.parse(localStorage.getItem("unitymission:audio:v1"))?.volume === 46`, "모바일 음량 높이기 저장");
+await clickButton("게임 음량 줄이기");
+await waitFor(`JSON.parse(localStorage.getItem("unitymission:audio:v1"))?.volume === 36`, "모바일 음량 줄이기 저장");
 const mobileStartX = Number(await evaluate(`document.querySelector('[data-testid="phaser-game-container"]').dataset.playerX`));
 const mobileMovedX = await moveMobileUntilText("E 키: 평화의 나무 상호작용", "오른쪽으로 이동", mobileStartX);
 if (mobileMovedX <= mobileStartX + 70) throw new Error(`모바일 오른쪽 이동이 확인되지 않았습니다: ${mobileStartX} -> ${mobileMovedX}`);
@@ -379,10 +396,9 @@ const result = await evaluate(`(() => {
 result.movement = { startX, movedX };
 result.collision = collision;
 result.npcInteraction = { npcX, pausedX, movementLocked: Math.abs(pausedX - npcX) <= 2 };
-result.quest = { missionId: "mission-1", xp: 100, completed: true, restoredNpcReaction: true };
-result.puzzle = { order: rpgProgress.puzzleSequence, solved: rpgProgress.puzzleSolved, harmonyKey: rpgProgress.harmonyKey };
-result.ending = { fragments: 5, level: 6, certificateLink: true, endingSeen: endingProgress.endingSeen };
-result.mobile = { startX: mobileStartX, movedX: mobileMovedX, interaction: true, reducedMotion: true, ...mobileLayout };
+result.quest = { missionId: "mission-1", failedAttemptVerified: true, retryPassed: true, xp: 100, completed: true, restoredNpcReaction: true };
+result.ending = { fragments: 5, level: 6, certificateLink: true, replayable: true };
+result.mobile = { startX: mobileStartX, movedX: mobileMovedX, interaction: true, reducedMotion: true, audioControls: mobileAudioControls, ...mobileLayout };
 result.enhancements = enhancementState;
 
 if (result.canvasWidth !== 960 || result.canvasHeight !== 540) {

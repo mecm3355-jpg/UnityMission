@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **RELEASE_READY_PRODUCTION_R14 / DOC03_DONE**. 독립 PDF 두 파일의 GitHub main 반영과 Vercel production 공개 다운로드 검증을 완료했습니다.
+> 현재 상태: **R17_DONE_LOCAL / REMOTE_NOT_RUN**. 모바일 소리 접근·보안 헤더·공식 출처 링크·단일 명령 E2E를 보강하고 전체 자동·빌드·브라우저·문서 검증을 통과했으며, 원격 반영은 아직 수행하지 않았습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -36,6 +36,53 @@
 | R12 | DONE | 2026-11-24 16:29 KST | 2026-11-24 16:33 KST | PASS | 다음 NPC 마커·화면 가장자리 방향 화살표·현재 목표·NPC 3상태 색상 |
 | R13 | DONE | 2026-11-24 16:33 KST | 2026-11-24 16:58 KST | PASS | 6프레임 보행·NPC 대기/감정·대화 마주보기·조각/레벨업 연출·전체 브라우저 회귀 |
 | R14 | DONE | 2026-11-24 17:03 KST | 2026-11-24 17:13 KST | PASS | commit `f12cca1`·PR #5·main `409df9e`·공개 production 전체 플레이·360px PASS |
+| R15 | DONE | 2026-11-25 14:31 KST | 2026-11-25 14:48 KST | PASS | 2/3 통과·오답 힌트·재도전·0XP 실패 처리, 퍼즐/열쇠 제거와 저장 마이그레이션 |
+| R16 | DONE | 2026-11-25 14:53 KST | 2026-11-25 15:00 KST | PASS | 엔딩 기록·RPG 전용 저장소 완전 제거 및 최종 전수 검증 |
+| R17 | DONE | 2026-11-25 15:04 KST | 2026-11-25 15:14 KST | PASS | 최종 점검 후속 하드닝: 모바일 소리 설정·보안 헤더·출처 링크·E2E 실행 계약 |
+| R18 | IN_PROGRESS | 2026-11-25 16:16 KST | - | NOT_RUN | 최종 릴리스: 선별 커밋·PR·main 병합·Vercel production·공개 URL 검증 |
+
+### 2026-11-25 16:16 KST — R18
+- 상태: IN_PROGRESS
+- 목표·완료 조건: R15~R17의 검증된 변경만 커밋하고 사용자 소유 합본 PDF를 제외한다. 원격 main과 충돌·보호 설정을 확인한 뒤 feature 브랜치 push, main 대상 PR과 검사, 정상 병합, 기존 Vercel production 배포, 공개 URL 전체 Chrome 스모크를 순서대로 완료한다.
+- 변경 파일: `PROGRESS.md`
+- 실행 명령 / 종료코드: Vercel deployments-cicd 스킬 전체 조회 `0`; 로컬 remote·브랜치·worktree·CLI 확인 `1`(`git` 정상, `gh`·전역 `vercel` 미설치)
+- 수락 조건 PASS/FAIL/NOT_RUN: 선별 커밋·push·PR·병합·production 배포·공개 검증 모두 NOT_RUN
+- 잔여 위험: 현재 브랜치는 origin보다 1커밋 앞서고 main은 오래된 로컬 포인터다. 사용자 소유의 추적되지 않은 합본 PDF가 있어 전체 `git add .`를 사용하지 않는다. GitHub/Vercel 계정 도구 연결 또는 인증 상태를 먼저 확인해야 한다.
+- 다음 작업: 원격을 fetch하고 main/feature 분기와 기존 PR 상태를 읽기 전용 확인한 뒤, 검증된 파일만 명시적으로 stage한다.
+
+### 2026-11-25 15:04 KST — R17
+- 상태: DONE
+- 목표·완료 조건: 기존 진행을 파괴하지 않으면서 최종 점검의 실행 가능한 결함을 보완한다. 모바일에서도 음소거·볼륨에 접근할 수 있어야 하고, 정적 보안 응답 헤더가 적용되며, 불안정한 UN 직접 PDF 출처를 공식 안정 페이지로 교체하고, 실제 Chrome 스모크를 표준 npm 명령으로 재실행할 수 있어야 한다. 기존 저점수 완료 기록은 저장 계약상 완료 당시 정답 수를 보유하므로 별도 소급 정책의 안전성을 테스트로 확정한다.
+- 변경 파일: `next.config.ts`, `package.json`, `scripts/{run-rpg-browser-smoke,rpg-browser-smoke}.mjs`, `src/components/game/game-page.{tsx,test.tsx}`, `src/content/missions.{json,ts,test.ts}`, `src/lib/{progress-storage.test,security-headers.test}.ts`, `PRD.md`, `README.md`, `RPG_PRD.md`, `SECURITY.md`, `TEST_PLAN.md`, `docs/unitymission-manual-and-implementation-guide.html`, 분리 PDF 4개, `PROGRESS.md`
+- 구현 결과: 모바일 상단에 항상 보이는 음소거와 10% 단위 음량 −/+ 버튼을 추가하고 설정 저장을 검증했다. 모든 경로에 CSP·MIME 스니핑 방지·Referrer Policy·프레임 차단·카메라/마이크/위치 권한 차단 헤더를 적용했다. 만료성 쿼리가 포함된 UN Digital Library 직접 PDF를 UN Peacemaker 공식 문서 안내 페이지로 교체했다. `npm run test:e2e:rpg`가 production build→가용 포트 임시 서버→격리 Chrome→전체 RPG 스모크→프로세스/프로필 정리를 자동 수행하도록 만들었다. 기존 저점수 완료는 학습 기록 손실 방지를 위해 소급 취소하지 않고, 신규·재도전에는 2/3 기준을 적용하는 정책을 문서와 테스트로 확정했다.
+- 실행 명령 / 종료코드: 관련 최종 `0`(4파일, 25테스트); 전체 `npm.cmd run test` `0`(18파일, 86테스트); `npm.cmd run lint` `0`(경고 0); `npx.cmd tsc --noEmit` `0`; `npm.cmd audit --omit=dev` `0`(0 vulnerabilities); 신규 `npm.cmd run test:e2e:rpg` 최초 `1`(`spawn EPERM`, 환경 권한), 권한 확장 최종 `0`(production build 및 실제 Chrome 전체 플레이, 런타임 오류 0); 최종 별도 `npm.cmd run build` `0`; 로컬 8개 정상 경로 `200`, 잘못된 미션 `404`; `/game` 실제 응답에서 CSP·`nosniff`·Referrer Policy·`DENY`·Permissions Policy 확인; 문서 사용자 9쪽 PASS, 구현 11쪽 최종 PASS; PDF 원본/다운로드 복사본 SHA-256 일치; 스크립트 2개 `node --check` `0`; `git diff --check` `0`(줄바꿈 경고만)
+- 수락 조건 PASS/FAIL/NOT_RUN: 모바일 음소거·음량 조절·자동 저장 PASS; 360px 가로 넘침 없음 PASS; 보안 헤더 단위/실응답 PASS; 공식 안내 페이지 URL·허용 호스트 스키마 PASS; 단일 E2E 명령과 자동 정리 PASS; 기존 저점수 기록 보존 정책 PASS; 신규 2/3 기준 PASS; lint/typecheck/86 tests/build/audit PASS; 실제 Chrome 이동·충돌·NPC·미통과·힌트·재도전·XP·엔딩·모바일 PASS; 문서 9/11쪽 PASS; 원격 GitHub·PR·main 병합·Vercel 배포 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 신규 E2E 첫 실행은 코드가 아닌 샌드박스 build worker 권한의 `spawn EPERM`으로 실패했고 권한 확장 동일 명령에서 통과했다. 구현 설명서 첫 검사에서 E2E 표 추가로 50px 넘침이 발생해 중복 표 행을 제거했으나 16px가 남았고, 두 번째로 도입 문장을 압축한 동일 재검사에서 11쪽 모두 통과했다. UN 사이트는 자동 직접 조회에 403 정책을 적용하지만 검색 색인에서 공식 문서 제목·내용·언어별 다운로드가 확인되므로 만료성 PDF 대신 사람용 공식 안내 페이지를 사용했다.
+- 잔여 위험: 기존 저점수 완료 기록은 의도적인 하위 호환 정책으로 계속 인정된다. UN Peacemaker는 외부 사이트이므로 자동 접근 정책이 바뀔 수 있다. CSP는 Next.js 인라인 부트스트랩 호환을 위해 `script-src`·`style-src`에 `'unsafe-inline'`을 허용하므로 nonce 기반 CSP보다 강도가 낮다. 실제 iOS/Android 물리 기기와 화면 읽기 프로그램 사용자 평가는 자동화 밖이다. 원격 반영은 승인 전이라 NOT_RUN이다.
+- 다음 작업: 기능 확장으로 분리한 첫 실행 튜토리얼·도움말 재보기(R18) 또는 유지보수 리팩터링(R19)을 선택할 수 있다. 출시를 우선하면 현재 변경을 검토·커밋한 뒤 승인된 push→PR→main 병합→Vercel production→공개 URL 전체 스모크 순으로 진행한다.
+
+### 2026-11-25 14:53 KST — R16
+- 상태: DONE
+- 목표·완료 조건: 기능적으로 사용되지 않는 `endingSeen`과 `unitymission:rpg:v1` 저장소를 완전히 제거하고, 엔딩을 `unitymission:v1`의 미션 5개 통과 여부만으로 실행한다. 전체 코드·문서·테스트에서 불필요한 참조가 없어야 하며 lint/typecheck/test/build/audit/실제 브라우저 전체 플레이와 전수 정적 점검을 통과해야 한다.
+- 변경 파일: `src/components/game/game-page.tsx`, `src/lib/progress-storage.{ts,test.ts}`, 삭제 `src/game/{rpg-progress.ts,rpg-progress.test.ts,use-rpg-progress.ts}`, `scripts/rpg-browser-smoke.mjs`, `README.md`, `RPG_PRD.md`, `docs/unitymission-manual-and-implementation-guide.html`, 분리 PDF 4개, `PROGRESS.md` 및 R15 변경 파일 일체
+- 구현 결과: 별도 RPG 진행 원장과 `endingSeen`을 제거했다. 평화 조각 수와 엔딩 조건은 검증된 `unitymission:v1.completedMissions`만 사용하고, 과거 `unitymission:rpg:v1` 키는 메인 진행 로드를 방해하지 않는 최선 노력 방식으로 자동 삭제한다. 엔딩은 5개 미션 통과 후 언제든 다시 볼 수 있다. 브라우저 스모크에 고의 3문항 오답→힌트·해설·미통과 0XP→즉시 재도전→3문항 정답·100XP 흐름과 폐기 키 미생성을 추가했다. 문서/PDF도 단일 진행 원장 기준으로 갱신했다.
+- 실행 명령 / 종료코드: 관련 테스트 최종 `0`(3파일, 17테스트); `npm.cmd run lint` `0`(경고 0); `npx.cmd tsc --noEmit` `0`; 전체 `npm.cmd run test` `0`(17파일, 83테스트); `npm.cmd audit --omit=dev` `0`(0 vulnerabilities); 최초 `npm.cmd run build` `1`(`spawn EPERM`, 환경 권한), 권한 확장 동일 재실행 `0`; 로컬 production 8개 정상 경로 `200`, 잘못된 미션 `404`; 실제 Chrome RPG 스모크 `0`(이동·충돌·NPC 근접 상호작용·대화 중 이동 잠금·미통과/힌트/재도전·100XP·5조각·Lv.6·엔딩 재실행·수료증·360px·런타임 오류 0); 사용자 PDF 9쪽·구현 PDF 11쪽 시각 검사 `0`; `git diff --check` `0`(줄바꿈 변환 경고만); 금지 API·비밀정보·네트워크 호출·TODO 전수 검색은 제품 코드 일치 없음; 게임 이미지 2개 참조와 실제 파일 존재 PASS; 공식 근거 12개 확인 중 11개 페이지 직접 접근 PASS, UN Digital Library PDF 직접 URL은 자동 조회 `403`이나 동일 공식 레코드/UN Peacemaker 문서는 접근 PASS
+- 수락 조건 PASS/FAIL/NOT_RUN: `endingSeen` 런타임 제거 PASS; RPG 전용 저장 모듈 제거 PASS; 과거 키 자동 정리 PASS; 공유 원장 단일화 PASS; 2/3 통과·미통과 0XP·힌트·재도전 PASS; 중복 XP 방지·기존 저장 호환 PASS; 대시보드/RPG/배지/수료증 회귀 PASS; lint/typecheck/83 tests/build/audit PASS; 실제 Chrome 데스크톱·360px 플레이 PASS; PDF 9/11쪽 PASS; 원격 GitHub·PR·main 병합·Vercel 배포 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 최초 build는 코드가 아닌 샌드박스 하위 프로세스 권한 때문에 `spawn EPERM`이 발생했고 권한 확장 1회 재실행으로 통과했다. 자산 참조 점검용 PowerShell 정규식은 따옴표 해석 문제로 1회 실패했으며 파일 목록과 코드 참조를 별도 조회해 두 자산의 존재를 확인했다.
+- 최종 점검 발견사항: (1) R15 이전에 이미 낮은 점수로 완료된 `unitymission:v1` 기록은 하위 호환을 위해 그대로 인정되므로 새 2/3 기준이 소급 적용되지 않는다. (2) 360px에서는 게임 내 음소거·볼륨과 대시보드 바로가기가 `sm` 미만에서 숨겨진다. (3) `next.config.ts`에 CSP·`X-Content-Type-Options`·`Referrer-Policy`·프레임 차단 같은 명시적 보안 헤더가 없으며 로컬 응답에서도 확인되지 않았다. (4) UN 중재 지침의 직접 PDF URL은 자동 조회에서 403이므로 안정적인 공식 레코드 또는 UN Peacemaker 페이지로 교체를 권장한다. (5) 실제 Chrome 스모크는 동작하지만 `package.json`/CI에 Playwright E2E 명령으로 연결되어 있지 않다. (6) 첫 실행 튜토리얼·도움말 재보기는 하루 범위에서 구현하지 않은 확장 항목이다. (7) `runtime.ts` 547줄과 `progress-storage.ts` 411줄은 기능 오류는 아니나 이후 유지보수 시 분리 후보이다.
+- 잔여 위험: 기존 저점수 완료 기록을 무효화하려면 사용자 진행을 소급 변경하는 별도 정책 결정이 필요하다. 보안 헤더·모바일 소리 설정·외부 링크·CI E2E는 핵심 기능 실패가 아니므로 이번 전수점검에서는 임의 수정하지 않았다. 원격 브랜치 push·PR·main 병합·Vercel production 배포와 최신 공개 URL 회귀는 승인 전이므로 NOT_RUN이다. 사용자 소유의 추적되지 않은 합본 PDF는 수정·삭제하지 않았다.
+- 다음 작업: 사용자가 발견사항의 수정 우선순위를 정하면 별도 작업으로 하나씩 처리한 뒤 전체 게이트를 재실행한다. 원격 반영은 명시적 승인 후 커밋·push·PR·병합·Vercel 배포·공개 URL 스모크 순으로 진행한다.
+
+### 2026-11-25 14:31 KST — R15
+- 상태: DONE
+- 목표·완료 조건: 미션 3문항 중 2문항 이상 정답일 때만 최초 완료·100XP를 지급하고, 오답 제출 시 힌트와 재선택 기회를 제공한다. 공명석·조화의 열쇠를 게임 진행·저장·UI·문서에서 제거하되 기존 저장 데이터의 엔딩 기록은 보존한다.
+- 변경 파일: `PRD.md`, `ACCEPTANCE.md`, `TEST_PLAN.md`, `README.md`, `RPG_PRD.md`, `src/types/content.ts`, `src/content/missions.{json,ts,test.ts}`, `src/lib/game-engine.{ts,test.ts}`, `src/components/mission/**`, `src/components/game/**`, `src/game/{rpg-progress,use-rpg-progress,world-interactions,bridge,runtime,npcs}*`, `scripts/rpg-browser-smoke.mjs`, `docs/unitymission-manual-and-implementation-guide.html`, 분리 PDF 4개, `PROGRESS.md`
+- 구현 결과: 15문항에 개념 힌트를 추가했다. 첫 오답은 힌트와 재선택을 제공하고, 두 번째 제출에서 정오답·해설을 확정한다. 3문항 중 2문항 이상만 통과·최초 100XP·평화 조각·다음 미션 해금을 허용하며 0~1문항은 0XP와 즉시 재도전을 제공한다. 공명석·조화의 열쇠를 월드·HUD·NPC·저장·브라우저 스모크·문서에서 제거했고 RPG 저장을 schemaVersion 2로 마이그레이션해 기존 엔딩 확인값만 보존한다.
+- 실행 명령 / 종료코드: 관련 8파일/37테스트 `0`; 전체 `npm.cmd run test` `0`(18파일, 85테스트); `npm.cmd run lint` `0`(경고 0); `npx.cmd tsc --noEmit` `0`; `npm.cmd audit --omit=dev` `0`(0 vulnerabilities); 최초 `npm.cmd run build` `1`(`spawn EPERM`, 환경 권한), 권한 확장 재실행 `0`; 로컬 production 서버 `0`; 실제 Chrome RPG 전체 스모크 `0`(이동·충돌·NPC 대화 중 이동 잠금·오답 힌트·재선택·100XP·완료 NPC 반응·5조각 엔딩·수료증·360px 모바일·런타임 오류 0); 사용자 PDF 9쪽·구현 PDF 11쪽 CDP A4 검사와 출력 각 `0`; `git diff --check` `0`(줄바꿈 경고만)
+- 수락 조건 PASS/FAIL/NOT_RUN: 2/3 통과 PASS; 미통과 0XP·미해금 PASS; 첫 오답 힌트·재선택 PASS; 대시보드/RPG 공통 원장 PASS; 중복 XP 방지 PASS; 기존 RPG 저장 엔딩값 마이그레이션 PASS; 공명석·열쇠 런타임 제거 PASS; lint/typecheck/85 tests/build/audit PASS; 실제 Chrome 데스크톱·360px 플레이 PASS; PDF 9/11쪽 PASS; 원격 GitHub·Vercel NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 최초 build는 코드가 아닌 샌드박스 하위 프로세스 권한으로 `spawn EPERM`이 발생해 권한 확장 1회 재실행으로 통과했다. 첫 문서 검사는 분리 모드 질의 문자열 누락으로 합본 21쪽을 읽어 실패했으며 `?part=user`를 추가한 동일 검사에서 통과했다. headless Chrome 포트는 시작 직후 조회해 1회 연결이 거부됐고 프로세스 준비 후 재검사에서 통과했다.
+- 잔여 위험: 원격 브랜치 push·PR·main 병합·Vercel production 배포 및 공개 URL 회귀는 승인 전이므로 NOT_RUN이다. 오래된 schemaVersion 1의 퍼즐 필드는 의도적으로 폐기하며 엔딩 확인값만 유지한다.
+- 다음 작업: 사용자 승인 후 현재 브랜치를 커밋·푸시하고 main 대상 PR을 만든 뒤 병합·Vercel production 배포와 공개 URL 전체 스모크를 수행한다.
 
 ### 2026-11-23 19:22 KST — R01
 - 상태: IN_PROGRESS
@@ -630,6 +677,11 @@
 | 2026-11-23 18:14 KST | `window.localStorage`는 `ProgressProvider` 마운트 후 1회만 접근 | Next SSR/hydration 일치와 브라우저 전용 API 제약 | 서버·초기 클라이언트 렌더는 동일한 로딩 UI, 복원 후에만 신규/이어하기 분기 |
 | 2026-11-23 18:15 KST | T04 흐름은 JSDOM React 상호작용 테스트로 자동화 | 실제 브라우저 조작 도구가 없는 환경에서 신규·복귀·초기화·HTML 비해석을 반복 검증 | 테스트 전용 의존성 3개 추가, 실제 브라우저 시각/키보드 검토는 T07에 유지 |
 | 2026-11-23 18:35 KST | 수료증 완료일은 순차 학습의 마지막인 미션 5 최초 `completedAt`으로 표시 | 저장 계약에 별도 수료일을 추가하지 않고 검증된 기존 기록에서 결정해야 함 | 재풀이 후에도 수료일이 바뀌지 않고 저장 스키마 중복 없음 |
+| 2026-11-25 14:31 KST | 미션 통과선을 3문항 중 2문항으로 하고 첫 오답에는 힌트·재선택을 제공 | 정답 여부와 무관한 보상을 막으면서 초보 학습자의 성공 가능성을 높이라는 최신 사용자 지시 | 미통과 시 0XP·미해금·재도전, 통과 시에만 기존 완료 원장과 보상 갱신 |
+| 2026-11-25 14:31 KST | 공명석·조화의 열쇠를 제거하고 RPG 저장 v1 키 안의 스키마를 2로 마이그레이션 | 교육 문항과 무관한 요소가 핵심 진행을 혼동시키며 엔딩에는 원래 필요하지 않았음 | 기존 퍼즐 필드는 폐기하되 `endingSeen`과 갱신 시각은 보존 |
+| 2026-11-25 14:53 KST | `endingSeen`과 RPG 전용 저장 원장을 완전히 폐기하고 과거 키는 시작 시 자동 삭제 | 엔딩 확인 기록을 보존할 제품 요구가 없고 공유 미션 완료 원장만으로 조각·엔딩 조건을 결정할 수 있음 | 저장 원장은 교육 진행 `unitymission:v1` 하나로 단순화되며 엔딩은 5개 통과 후 언제든 재실행 |
+| 2026-11-25 15:04 KST | 통과 기준 도입 전의 유효 완료 기록은 인정하고 신규·재도전에만 2/3 기준을 강제 | 소급 취소 시 XP·잠금·배지·수료증이 연쇄 삭제되어 사용자 학습 기록 손실이 더 큼 | 레거시 하위 호환을 테스트로 고정하고 새 엔진은 기준 미달 완료를 생성하지 않음 |
+| 2026-11-25 15:04 KST | 신규 Playwright 의존성 없이 기존 CDP 스모크를 단일 npm 명령으로 자동화 | 실제 Chrome 검증 범위를 유지하면서 의존성과 설정 복잡도를 늘리지 않음 | build·임시 서버·격리 Chrome·전체 플레이·정리를 `npm run test:e2e:rpg`로 재현 |
 
 ## 최종 출시 판정
-현재: **RELEASE_READY_PRODUCTION_R14 / DOC03_DONE** — T01~T08, R01~R14와 DOC01~DOC03의 자동·빌드·PR·Vercel production 게이트 PASS. production main은 `fb145fd`, 공개 URL은 `https://unity-mission.vercel.app/`. 사용자 매뉴얼 9쪽과 구현 설명서 11쪽을 시작 화면과 고정 다운로드 URL에서 제공하며, 실제 Chrome 360px 링크·PDF 200·원본 SHA-256 일치 PASS. 실제 청감·물리 모바일·화면 읽기 프로그램·다른 PDF 뷰어·Vercel 소유 팀 관측 설정 확인은 잔여 운영 권고다.
+현재: **R17_DONE_LOCAL / REMOTE_NOT_RUN** — 통과 기준·오답 힌트·재도전, 불필요 아이템/RPG 전용 저장 제거, 모바일 소리 접근, 보안 헤더, 공식 출처 링크, 단일 명령 실제 Chrome E2E는 lint·typecheck·86 tests·build·audit·실제 Chrome 전체 플레이·PDF 9/11쪽 검증을 모두 통과했다. 현재 브랜치는 `feature/rpg-dialogue-cutscene`, 기준 HEAD는 `4742a1f`이며 변경사항은 아직 커밋·push·PR·main 병합·Vercel production 배포하지 않았다. 기존 공개 production은 `https://unity-mission.vercel.app/`이지만 R15~R17 반영 전 버전이므로 최신 기능 검증 대상이 아니다.

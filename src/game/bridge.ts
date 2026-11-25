@@ -4,8 +4,6 @@ import type { ZoneId } from "./world";
 
 export type GameWorldSnapshot = {
   fragmentCount: number;
-  puzzleSequence: string[];
-  puzzleSolved: boolean;
   nextNpcId?: NpcId | null;
   npcQuestStates?: Partial<Record<NpcId, NpcQuestState>>;
   questTarget?: { x: number; y: number; label: string } | null;

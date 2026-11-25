@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useProgress } from "../../context/progress-context";
-import { getLevelSummary } from "../../lib/game-engine";
+import { getLevelSummary, MISSION_PASS_CORRECT_COUNT } from "../../lib/game-engine";
 import { MISSION_IDS, type Mission } from "../../types/content";
 import { StorageWarning } from "../storage-warning";
 
@@ -11,6 +11,7 @@ type MissionResultProps = {
   scoreParam?: string;
   xpParam?: string;
   firstParam?: string;
+  passParam?: string;
 };
 
 function parseScore(value: string | undefined): number | null {
@@ -20,7 +21,7 @@ function parseScore(value: string | undefined): number | null {
   return Number(value);
 }
 
-export function MissionResult({ mission, scoreParam, xpParam, firstParam }: MissionResultProps) {
+export function MissionResult({ mission, scoreParam, xpParam, firstParam, passParam }: MissionResultProps) {
   const { isHydrated, lastCompletion, progress, warning } = useProgress();
 
   if (!isHydrated) {
@@ -38,14 +39,16 @@ export function MissionResult({ mission, scoreParam, xpParam, firstParam }: Miss
   }
 
   const completion = progress.completedMissions[mission.id];
-  if (!completion) {
+  const sameCompletion = lastCompletion?.progress.lastVisitedMissionId === mission.id ? lastCompletion : null;
+  const parsedScore = parseScore(scoreParam);
+  const failedAttemptFromUrl = passParam === "0" && parsedScore !== null;
+  if (!completion && !sameCompletion && !failedAttemptFromUrl) {
     return <MissingResult description="세 문항과 해설을 모두 확인한 뒤 결과를 볼 수 있습니다." href={`/mission/${mission.id}`} />;
   }
 
-  const sameCompletion = lastCompletion?.progress.lastVisitedMissionId === mission.id ? lastCompletion : null;
-  const parsedScore = parseScore(scoreParam);
-  const correctCount = sameCompletion?.correctCount ?? parsedScore ?? completion.bestCorrectCount;
-  const reportedFirstCompletion = firstParam === "1" && xpParam === "100" && completion.attemptCount === 1;
+  const correctCount = sameCompletion?.correctCount ?? parsedScore ?? completion?.bestCorrectCount ?? 0;
+  const passed = sameCompletion?.passed ?? (passParam === "1" || correctCount >= MISSION_PASS_CORRECT_COUNT);
+  const reportedFirstCompletion = firstParam === "1" && xpParam === "100" && completion?.attemptCount === 1;
   const xpAwarded = sameCompletion?.xpAwarded ?? (reportedFirstCompletion ? 100 : 0);
   const levelSummary = getLevelSummary(progress);
   const currentMissionIndex = MISSION_IDS.indexOf(mission.id);
@@ -63,9 +66,13 @@ export function MissionResult({ mission, scoreParam, xpParam, firstParam }: Miss
       <StorageWarning warning={warning} />
 
       <section className="mt-8 rounded-3xl border border-white/10 bg-[#152448] p-6 text-center sm:p-10">
-        <p className="text-sm font-bold tracking-wider text-[#5279CE]">MISSION COMPLETE</p>
-        <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{mission.title} 완료</h1>
-        <p className="mt-4 text-lg text-slate-300">해설까지 모두 확인했습니다.</p>
+        <p className="text-sm font-bold tracking-wider text-[#5279CE]">{passed ? "MISSION COMPLETE" : "TRY AGAIN"}</p>
+        <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
+          {passed ? `${mission.title} 완료` : "통과 기준에 조금 못 미쳤어요"}
+        </h1>
+        <p className="mt-4 text-lg text-slate-300">
+          {passed ? "해설까지 모두 확인했습니다." : `3문항 중 ${MISSION_PASS_CORRECT_COUNT}문항 이상을 맞혀야 통과합니다.`}
+        </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl bg-[#0D1730] p-6">
@@ -78,7 +85,11 @@ export function MissionResult({ mission, scoreParam, xpParam, firstParam }: Miss
           </div>
         </div>
 
-        {xpAwarded === 0 ? (
+        {!passed ? (
+          <p className="mt-5 text-base leading-7 text-slate-300">
+            실패한 시도에는 XP가 지급되지 않습니다. 힌트와 해설을 떠올리며 다시 도전해 보세요.
+          </p>
+        ) : xpAwarded === 0 ? (
           <p className="mt-5 text-base leading-7 text-slate-300">
             복습에서는 XP가 중복 지급되지 않으며, 최고 기록만 갱신됩니다.
           </p>
@@ -89,7 +100,7 @@ export function MissionResult({ mission, scoreParam, xpParam, firstParam }: Miss
         </p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          {nextMissionId ? (
+          {passed && nextMissionId ? (
             <Link className="min-h-12 rounded-xl bg-[#F5C968] px-6 py-3 font-bold text-[#0D1730]" href={`/mission/${nextMissionId}`}>
               다음 미션 보기
             </Link>
@@ -98,7 +109,7 @@ export function MissionResult({ mission, scoreParam, xpParam, firstParam }: Miss
             대시보드로
           </Link>
           <Link className="min-h-12 rounded-xl border border-white/20 px-6 py-3 font-semibold" href={`/mission/${mission.id}`}>
-            다시 풀기
+            {passed ? "다시 풀기" : "미션 다시 도전"}
           </Link>
         </div>
       </section>
