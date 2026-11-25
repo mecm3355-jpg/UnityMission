@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getCompletedMissionIds, getLevelSummary, hasCompletedAllMissions } from "../../lib/game-engine";
+import { getCompletedMissionIds, getLevelSummary } from "../../lib/game-engine";
 import { useProgress } from "../../context/progress-context";
 import { NPCS, getNextQuestNpc, getNpcById, getNpcQuestState, type NpcId, type NpcQuestState } from "../../game/npcs";
 import type { GameBridge } from "../../game/bridge";
@@ -33,12 +33,13 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
 
   const handleWorldInteract = useCallback(() => {
     if (fragmentCountRef.current === 5) {
+      playEffect("finale");
       setEndingOpen(true);
       setFeedback(null);
     } else {
       setFeedback(`평화의 나무를 깨우려면 조각 ${5 - fragmentCountRef.current}개가 더 필요합니다.`);
     }
-  }, []);
+  }, [playEffect]);
 
   const bridge = useMemo<GameBridge>(
     () => ({
@@ -215,9 +216,6 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
               if (result.xpAwarded <= 0) return;
               playEffect("fragment");
               window.setTimeout(() => playEffect("level-up"), 260);
-              if (hasCompletedAllMissions(result.progress)) {
-                window.setTimeout(() => playEffect("finale"), 680);
-              }
             }}
           />
         ) : null}

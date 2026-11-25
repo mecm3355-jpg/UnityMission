@@ -185,6 +185,27 @@ async function moveMobileUntilText(text, buttonLabel, startX, minDelta = 70, max
 
 await send("Page.enable");
 await send("Runtime.enable");
+await send("Page.addScriptToEvaluateOnNewDocument", {
+  source: `(() => {
+    window.__unityMissionAudioNotes = [];
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const prototype = AudioContextClass.prototype;
+    const originalCreateOscillator = prototype.createOscillator;
+    if (originalCreateOscillator.__unityMissionTracked) return;
+    function trackedCreateOscillator(...args) {
+      const oscillator = originalCreateOscillator.apply(this, args);
+      const originalSetValueAtTime = oscillator.frequency.setValueAtTime.bind(oscillator.frequency);
+      oscillator.frequency.setValueAtTime = (value, time) => {
+        window.__unityMissionAudioNotes.push(value);
+        return originalSetValueAtTime(value, time);
+      };
+      return oscillator;
+    }
+    trackedCreateOscillator.__unityMissionTracked = true;
+    prototype.createOscillator = trackedCreateOscillator;
+  })();`,
+});
 await send("Emulation.setDeviceMetricsOverride", {
   width: 960,
   height: 720,
@@ -345,7 +366,13 @@ await send("Page.navigate", { url: `${baseUrl}/game` });
 await waitFor(`document.querySelector('[data-testid="phaser-game-container"]')?.dataset.gameReady === "true"`, "엔딩 장면 준비", 20000);
 await waitFor(`document.body.innerText.includes("Lv.6 · 500XP")`, "최종 레벨 공유");
 await moveUntilText("E 키: 평화의 나무 상호작용", "ArrowRight", 12);
+await evaluate(`window.__unityMissionAudioNotes = []`);
 await holdKey("KeyE", 80);
+await waitFor(`(() => {
+  const notes = window.__unityMissionAudioNotes ?? [];
+  const finale = [523.25, 659.25, 783.99, 1046.5, 1318.51];
+  return notes.some((_, start) => finale.every((note, offset) => Math.abs(notes[start + offset] - note) < 0.01));
+})()`, "평화의 나무 엔딩 팡파르");
 await waitFor(`document.body.innerText.includes("평화마을이 다시 빛납니다")`, "최종 엔딩");
 await waitFor(`document.body.innerText.includes("최종 레벨 Lv.6")`, "엔딩 최종 레벨");
 await waitFor(`document.querySelector('a[href="/certificate"]')`, "엔딩 수료증 접근");
@@ -409,7 +436,7 @@ result.movement = { startX, movedX };
 result.collision = collision;
 result.npcInteraction = { npcX, pausedX, movementLocked: Math.abs(pausedX - npcX) <= 2 };
 result.quest = { missionId: "mission-1", failedAttemptVerified: true, retryPassed: true, xp: 100, completed: true, restoredNpcReaction: true };
-result.ending = { fragments: 5, level: 6, certificateLink: true, replayable: true };
+result.ending = { fragments: 5, level: 6, certificateLink: true, replayable: true, treeTriggeredFanfare: true };
 result.mobile = { startX: mobileStartX, movedX: mobileMovedX, interaction: true, reducedMotion: true, audioControls: mobileAudioControls, ...mobileLayout };
 result.enhancements = enhancementState;
 
