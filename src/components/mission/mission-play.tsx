@@ -21,7 +21,7 @@ export function MissionPlay({ mission }: { mission: Mission }) {
   } = useProgress();
   const feedbackRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
-  const [hintedQuestionId, setHintedQuestionId] = useState<string | null>(null);
+  const [retryGuard, setRetryGuard] = useState<{ questionId: string; rejectedAnswer: number } | null>(null);
   const attempt = progress?.activeAttempt?.missionId === mission.id ? progress.activeAttempt : null;
   const currentIndex = attempt?.currentIndex ?? 0;
   const revealed = attempt?.revealedExplanation[currentIndex] ?? false;
@@ -33,10 +33,10 @@ export function MissionPlay({ mission }: { mission: Mission }) {
   }, [currentIndex, revealed]);
 
   useEffect(() => {
-    if (hintedQuestionId) {
+    if (retryGuard?.questionId) {
       hintRef.current?.focus();
     }
-  }, [hintedQuestionId]);
+  }, [retryGuard?.questionId]);
 
   if (!isHydrated) {
     return (
@@ -70,6 +70,9 @@ export function MissionPlay({ mission }: { mission: Mission }) {
   const selectedAnswer = attempt.answers[currentIndex];
   const isCorrect = selectedAnswer === question.correctIndex;
   const isLastQuestion = currentIndex === mission.questions.length - 1;
+  const retryPending = retryGuard?.questionId === question.id;
+  const retrySelectionChanged = retryPending && selectedAnswer !== retryGuard.rejectedAnswer;
+  const submitDisabled = selectedAnswer === null || (retryPending && !retrySelectionChanged);
 
   function handleContinue() {
     if (isLastQuestion) {
@@ -89,8 +92,8 @@ export function MissionPlay({ mission }: { mission: Mission }) {
 
   function handleSubmitAnswer() {
     if (selectedAnswer === null) return;
-    if (!isCorrect && hintedQuestionId !== question.id) {
-      setHintedQuestionId(question.id);
+    if (!isCorrect && !retryPending) {
+      setRetryGuard({ questionId: question.id, rejectedAnswer: selectedAnswer });
       return;
     }
     revealAnswer();
@@ -154,7 +157,7 @@ export function MissionPlay({ mission }: { mission: Mission }) {
           })}
         </fieldset>
 
-        {!revealed && hintedQuestionId === question.id ? (
+        {!revealed && retryPending ? (
           <div
             aria-live="assertive"
             className="mt-6 rounded-2xl border border-amber-300/50 bg-amber-300/10 p-5"
@@ -163,6 +166,7 @@ export function MissionPlay({ mission }: { mission: Mission }) {
           >
             <h2 className="text-lg font-bold text-amber-100">힌트를 확인하고 다시 선택해 보세요</h2>
             <p className="mt-2 leading-7 text-slate-100">{question.hint}</p>
+            <p className="mt-2 text-sm font-semibold text-amber-100">다른 번호를 선택하면 다시 제출 버튼이 활성화됩니다.</p>
           </div>
         ) : null}
 
@@ -190,11 +194,11 @@ export function MissionPlay({ mission }: { mission: Mission }) {
         ) : (
           <button
             className="mt-7 min-h-12 rounded-xl bg-[#F5C968] px-6 py-3 text-base font-bold text-[#0D1730] disabled:cursor-not-allowed disabled:opacity-40"
-            disabled={selectedAnswer === null}
+            disabled={submitDisabled}
             onClick={handleSubmitAnswer}
             type="button"
           >
-            {hintedQuestionId === question.id ? "다시 제출" : "답안 제출"}
+            {retryPending ? "다시 제출" : "답안 제출"}
           </button>
         )}
 

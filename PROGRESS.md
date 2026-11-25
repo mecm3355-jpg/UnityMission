@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R19-REL_DONE / PRODUCTION_PASS**. 실패 시 XP 안내를 명확히 하고 PR #11로 main에 병합했으며 Vercel production 전체 플레이까지 통과했습니다.
+> 현재 상태: **R20_DONE_LOCAL / REMOTE_NOT_RUN**. 오답 재제출 안전장치와 5개 미션 완료 팡파르 구현·전체 로컬 검증을 완료했습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -42,6 +42,28 @@
 | R18 | DONE | 2026-11-25 16:16 KST | 2026-11-25 17:01 KST | PASS | PR #9·main `90bca5a`·Vercel production·공개 URL 전체 RPG 검증 |
 | R19 | DONE | 2026-11-25 17:16 KST | 2026-11-25 17:21 KST | PASS | 실패 시 XP 안내·계약·사용자 매뉴얼 명확화 및 실제 Chrome 회귀 통과 |
 | R19-REL | DONE | 2026-11-25 17:24 KST | 2026-11-25 17:37 KST | PASS | commit `a6b6aba`·PR #11·main `ca01874`·Vercel production 전체 검증 |
+| R20 | DONE | 2026-11-25 18:00 KST | 2026-11-25 18:08 KST | PASS | 오답 후 선택 변경 전 재제출 차단·전체 미션 완료 팡파르·문서 갱신 |
+| R20-REL | IN_PROGRESS | 2026-11-25 18:11 KST | - | NOT_RUN | R20 선별 커밋·PR·main 병합·기존 Vercel production 반영 |
+
+### 2026-11-25 18:11 KST — R20-REL
+- 상태: IN_PROGRESS
+- 목표·완료 조건: 검증 완료된 R20 파일만 커밋하고 사용자 소유 합본 PDF를 제외한다. 원격 main과 충돌·비밀정보·PR 검사를 확인한 뒤 정상 병합하고 기존 Vercel production에서 재제출 잠금·전체 RPG·PDF 접근을 검증한다.
+- 변경 파일: `PROGRESS.md`
+- 실행 명령 / 종료코드: Vercel `deployments-cicd` 스킬·필수 문서 7종 조회 `0`; 현재 브랜치·remote·작업 트리·HEAD 확인 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화·선별 커밋·push·PR·병합·production 배포·공개 URL 검증 모두 NOT_RUN
+- 잔여 위험: 공개 production은 아직 R19 버전이며 브라우저 자동화로 실제 스피커 청감은 판정할 수 없다.
+- 다음 작업: 원격 main 최신 상태와 GitHub 인증을 확인하고 R20 파일만 stage·검사한다.
+
+### 2026-11-25 18:00 KST — R20
+- 상태: DONE
+- 목표·완료 조건: 첫 오답 뒤 사용자가 다른 번호를 선택하기 전에는 `다시 제출` 버튼이 비활성화되고, 선택 변경 시에만 활성화되어 같은 오답의 실수 재제출을 막는다. 5번째 미션 최초 통과 시 기존 음소거·볼륨 설정을 따르는 경쾌한 완료 팡파르를 1회 재생한다. 대시보드와 RPG 문제 풀이 모두 동일하게 동작해야 한다.
+- 변경 파일: `src/components/mission/mission-play.tsx`, `src/components/game/{rpg-quest-panel,game-page}.tsx`, `src/game/audio.ts`, 관련 테스트 3개, `scripts/rpg-browser-smoke.mjs`, 요구사항·수락·테스트·README·RPG 문서, 매뉴얼 HTML·분리 PDF 4개, `PROGRESS.md`
+- 구현 결과: 대시보드와 RPG 문제 화면이 첫 오답의 문항 ID와 선택 번호를 함께 기억한다. 현재 선택이 그 번호와 같으면 `다시 제출`이 비활성화되고, 다른 번호 선택 시 즉시 활성화된다. 힌트 영역에 활성 조건도 명시했다. 다섯 번째 미션 최초 보상 결과에서 조각·레벨업 효과 뒤 C5→E5→G5→C6→E6 상승 5음 `finale` 팡파르를 재생하며 기존 음소거·볼륨 설정을 그대로 적용한다. 폐기된 퍼즐·엔딩 저장 설명도 구현 문서에서 바로잡았다.
+- 실행 명령 / 종료코드: 필수 문서 7종·관련 코드 검색·브랜치 생성 `0`; 관련 `npm.cmd run test -- ...` `0`(3파일, 13테스트); `npx.cmd tsc --noEmit` `0`; 사용자 매뉴얼 PDF 시각 검사 `0`(9쪽); 구현 설명서 PDF 시각 검사 `0`(11쪽); 원본/배포용 PDF SHA-256 각각 일치; 전체 `npm.cmd run test` `0`(19파일, 89테스트); `npm.cmd run lint` `0`; 최종 `npx.cmd tsc --noEmit` `0`; `npm.cmd audit --omit=dev` `0`(0 vulnerabilities); `npm.cmd run test:e2e:rpg` `0`(production build·실제 Chrome 선택 변경 전 재제출 차단/변경 후 활성화·미통과·재도전·100XP·이동·충돌·NPC·엔딩·360px·모바일, 런타임 오류 0); `git diff --check` `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 대시보드 선택 변경 전 재제출 비활성화 PASS; RPG 동일 동작 PASS; 다른 번호 선택 후 활성화 PASS; 변경 답안 최종 판정 PASS; 다섯 번째 미션 완료 결과 판정 PASS; 음소거·볼륨을 따르는 상승 5음 팡파르 Web Audio 단위 테스트 PASS; React 훅·접근성·파생 상태 점검 PASS; lint/typecheck/89 tests/build/audit/실제 Chrome PASS; 사용자 PDF 9쪽·구현 PDF 11쪽 PASS; 원격 push·PR·main 병합·Vercel 배포 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 코드·테스트·빌드 실패는 없었다. 안내 문구 추가용 첫 패치는 패치 구분 형식 오류로 적용되지 않았고 파일 변경 없이 즉시 올바른 형식으로 재실행해 성공했다.
+- 잔여 위험: 자동 테스트는 Web Audio의 팡파르 주파수·재생 요청과 설정 준수를 검증하지만 스피커를 통한 사람의 실제 청감 평가는 NOT_RUN이다. 로컬 변경은 아직 GitHub와 공개 production에 반영되지 않았다. 사용자 소유 합본 PDF는 비추적 상태로 보존했다.
+- 다음 작업: 사용자 승인 후 R20 변경만 선별 커밋하고 feature push → PR → main 병합 → 기존 Vercel production 배포 → 공개 URL 전체 스모크와 사람 청감 확인을 수행한다.
 
 ### 2026-11-25 17:24 KST — R19-REL
 - 상태: DONE
@@ -709,6 +731,7 @@
 | 2026-11-25 15:04 KST | 통과 기준 도입 전의 유효 완료 기록은 인정하고 신규·재도전에만 2/3 기준을 강제 | 소급 취소 시 XP·잠금·배지·수료증이 연쇄 삭제되어 사용자 학습 기록 손실이 더 큼 | 레거시 하위 호환을 테스트로 고정하고 새 엔진은 기준 미달 완료를 생성하지 않음 |
 | 2026-11-25 15:04 KST | 신규 Playwright 의존성 없이 기존 CDP 스모크를 단일 npm 명령으로 자동화 | 실제 Chrome 검증 범위를 유지하면서 의존성과 설정 복잡도를 늘리지 않음 | build·임시 서버·격리 Chrome·전체 플레이·정리를 `npm run test:e2e:rpg`로 재현 |
 | 2026-11-25 17:21 KST | 기준 미달을 “이번 도전 보상 0XP·기존 XP 유지”로 표현 | “실패한 시도에는 XP가 지급되지 않는다”는 문구가 누적 XP 차감 또는 전체 무보상으로 오해될 수 있음 | 대시보드·RPG·문서·E2E가 최초 통과 보상과 기존 XP 보존을 같은 문장으로 설명 |
+| 2026-11-25 18:08 KST | 첫 오답 번호와 현재 선택이 같으면 재제출을 차단하고, 다섯 번째 최초 통과에 별도 팡파르 재생 | 같은 번호의 실수 재제출로 학습 기회가 사라지는 문제를 막고 전체 완수의 성취감을 높이라는 사용자 지시 | 대시보드·RPG 입력 안전성 통일, 기존 오디오 설정을 공유하는 5음 상승 완료 효과 추가 |
 
 ## 최종 출시 판정
-현재: **R19-REL_DONE / PRODUCTION_PASS** — 실패 보상 안내를 “이번 도전 보상 0XP·기존 XP 유지·2문항 이상 최초 통과 100XP”로 명확히 했고 lint·typecheck·87 tests·build·audit·9쪽 사용자 PDF 검증 후 commit `a6b6aba`, PR #11, main `ca01874`로 반영했다. Vercel production `https://unity-mission.vercel.app/`은 배포 완료 상태이며 새 문구·전체 경로·보안 헤더·데스크톱/360px 실제 RPG 플레이·저장·엔딩·수료증·런타임 오류 0 검증을 통과했다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.
+현재: **R20_DONE_LOCAL / REMOTE_NOT_RUN** — 오답 후 다른 번호를 선택하기 전까지 재제출을 차단하고 다섯 번째 미션 최초 통과 시 5음 상승 팡파르를 재생하도록 구현했다. lint·typecheck·89 tests·build·audit·실제 Chrome 전체 RPG·사용자 PDF 9쪽·구현 PDF 11쪽 검증을 통과했다. 변경은 `fix/retry-selection-finale-audio` 로컬 브랜치에 있으며 아직 push·PR·main 병합·Vercel 배포를 실행하지 않았다. 공개 `https://unity-mission.vercel.app/`은 R19 production 상태다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.

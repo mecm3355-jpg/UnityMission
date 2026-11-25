@@ -580,7 +580,8 @@
     <ul>
       <li>각 미션은 <strong>3문항</strong>이고, 각 문항에는 보기 4개가 있습니다.</li>
       <li>오답을 처음 제출하면 힌트가 표시되며, 답을 다시 고를 수 있습니다.</li>
-      <li>다시 제출하면 정답·오답과 해설, 공식 출처가 표시됩니다.</li>
+      <li>같은 번호의 실수 재제출을 막기 위해 다른 번호를 고르기 전까지 <strong>다시 제출</strong> 버튼이 비활성화됩니다.</li>
+      <li>다른 번호를 고른 뒤 다시 제출하면 정답·오답과 해설, 공식 출처가 표시됩니다.</li>
       <li>해설을 확인한 뒤에만 다음 문항으로 넘어갈 수 있습니다.</li>
       <li><strong>3문항 중 2문항 이상</strong>을 맞혀야 미션을 통과합니다.</li>
       <li>통과하지 못하면 이번 도전 보상은 0XP이며, 이전에 획득한 XP는 그대로 유지됩니다.</li>
@@ -616,7 +617,7 @@
 
     <h3>최종 엔딩</h3>
     <div class="steps">
-      <div class="step">다섯 미션을 완료해 평화 조각 <strong>5/5</strong>를 만듭니다.</div>
+      <div class="step">다섯 미션을 완료해 평화 조각 <strong>5/5</strong>를 만들면 경쾌한 완료 팡파르가 재생됩니다.</div>
       <div class="step">중앙 광장의 <strong>평화의 나무</strong>로 이동합니다.</div>
       <div class="step">상호작용하면 조각 결합, 마을 복원, 최종 레벨 화면이 나타납니다.</div>
       <div class="step"><strong>수료증 보기</strong> 또는 <strong>다시 탐험하기</strong>를 선택합니다.</div>
@@ -814,9 +815,9 @@ XP = 완료 미션 수 × 100
       <tr><td>미션 완료·100XP</td><td>변경·저장</td><td>읽어서 표현</td></tr>
       <tr><td>캐릭터 이동·충돌</td><td>모바일 입력 전달</td><td>계산·렌더링</td></tr>
       <tr><td>NPC 대화 UI</td><td>렌더링·선택 처리</td><td>근접 대상 전달</td></tr>
-      <tr><td>퍼즐</td><td>결과 저장</td><td>오브젝트·근접 상호작용</td></tr>
+      <tr><td>오답 재선택</td><td>힌트·재제출 잠금</td><td>관여하지 않음</td></tr>
       <tr><td>엔딩</td><td>오버레이·수료증 링크</td><td>최종 오브젝트 활성화</td></tr>
-      <tr><td>사운드·안내</td><td>설정·퀘스트 UI·음악 제어</td><td>구역·걸음·목표 좌표 전달</td></tr>
+      <tr><td>사운드·안내</td><td>설정·퀘스트 UI·음악·완료 팡파르 제어</td><td>구역·걸음·목표 좌표 전달</td></tr>
     </table>
     <div class="callout tip"><strong>디버깅 요령</strong> 화면 UI 문제는 React부터, 캐릭터 위치·충돌 문제는 Phaser부터 확인하세요. XP가 틀리면 Phaser가 아니라 완료 미션 원장을 확인합니다.</div>
     <span class="doc-mark">2부 · 구현 설명서</span><span class="page-number">16</span>
@@ -877,7 +878,7 @@ npm run test:e2e:rpg</pre>
     <p><code>npm run test:e2e:rpg</code>는 실제 Chrome을 자동 실행·제어해 다음을 확인하고 임시 프로세스를 정리합니다.</p>
     <ul class="checklist">
       <li>캐릭터 이동과 분수 충돌</li><li>NPC 근접·대화·이동 잠금</li><li>교대 대화와 퀘스트 시작</li>
-      <li>오답 힌트·3문항·해설·통과·100XP·저장</li><li>완료 NPC 반응</li><li>평화 조각 인벤토리</li>
+      <li>오답 힌트·선택 변경 전 재제출 잠금·3문항·해설·통과·100XP·저장</li><li>완료 NPC 반응</li><li>평화 조각 인벤토리</li>
       <li>5조각 엔딩·수료증</li><li>360px 모바일 조작·가로 넘침</li><li>사운드·방향 안내·6프레임 애니메이션</li><li>런타임 오류 0건</li>
     </ul>
     <div class="callout warn"><strong>테스트 실패 처리</strong> 로그를 읽고 코드·환경·의존성·콘텐츠·권한 중 원인을 분류합니다. 최소 수정 후 같은 테스트를 다시 실행하며, 실행하지 않은 항목을 PASS라고 기록하지 않습니다.</div>

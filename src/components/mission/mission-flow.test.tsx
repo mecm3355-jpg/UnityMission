@@ -123,7 +123,9 @@ describe("mission learning flow", () => {
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "답안 제출" }));
     await user.keyboard("[Enter]");
     expect(await screen.findByRole("heading", { name: "힌트를 확인하고 다시 선택해 보세요" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "다시 제출" })).toHaveProperty("disabled", true);
     await user.click(firstOption);
+    expect(screen.getByRole("button", { name: "다시 제출" })).toHaveProperty("disabled", false);
     await user.click(screen.getByRole("button", { name: "다시 제출" }));
     expect(await screen.findByRole("heading", { name: /정답입니다.|오답입니다./ })).toBeTruthy();
   });
@@ -151,6 +153,11 @@ describe("mission learning flow", () => {
       await user.click(screen.getByRole("button", { name: "답안 제출" }));
       if (index === 0) {
         expect(await screen.findByRole("heading", { name: "힌트를 확인하고 다시 선택해 보세요" })).toBeTruthy();
+        const retryButton = screen.getByRole("button", { name: "다시 제출" });
+        expect(retryButton).toHaveProperty("disabled", true);
+        const secondWrongIndex = ((question.correctIndex + 2) % 4) as CorrectIndex;
+        await user.click(screen.getByRole("radio", { name: question.options[secondWrongIndex] }));
+        expect(retryButton).toHaveProperty("disabled", false);
         await user.click(screen.getByRole("button", { name: "다시 제출" }));
       }
       const feedbackHeading = await screen.findByRole("heading", {

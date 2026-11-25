@@ -2,7 +2,7 @@ import type { GameAudioSettings } from "./audio-settings";
 import type { ZoneId } from "./world";
 
 export type AudioRegion = ZoneId | "path";
-export type GameSoundEffect = "step" | "dialogue" | "correct" | "wrong" | "level-up" | "fragment";
+export type GameSoundEffect = "step" | "dialogue" | "correct" | "wrong" | "level-up" | "fragment" | "finale";
 
 type AudioContextConstructor = new () => AudioContext;
 
@@ -22,6 +22,7 @@ const EFFECT_NOTES: Record<Exclude<GameSoundEffect, "step">, readonly number[]> 
   wrong: [293.66, 246.94],
   "level-up": [392, 523.25, 659.25, 783.99],
   fragment: [659.25, 880, 1046.5],
+  finale: [523.25, 659.25, 783.99, 1046.5, 1318.51],
 };
 
 export class GameAudioController {
@@ -69,8 +70,15 @@ export class GameAudioController {
         return;
       }
       const notes = EFFECT_NOTES[effect];
+      const finale = effect === "finale";
       notes.forEach((frequency, index) => {
-        this.playTone(frequency, 0.11, "square", 0.09, index * 0.075);
+        this.playTone(
+          frequency,
+          finale ? 0.18 : 0.11,
+          finale ? "triangle" : "square",
+          finale ? 0.12 : 0.09,
+          index * (finale ? 0.095 : 0.075),
+        );
       });
     });
   }

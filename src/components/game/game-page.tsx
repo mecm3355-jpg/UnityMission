@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getCompletedMissionIds, getLevelSummary } from "../../lib/game-engine";
+import { getCompletedMissionIds, getLevelSummary, hasCompletedAllMissions } from "../../lib/game-engine";
 import { useProgress } from "../../context/progress-context";
 import { NPCS, getNextQuestNpc, getNpcById, getNpcQuestState, type NpcId, type NpcQuestState } from "../../game/npcs";
 import type { GameBridge } from "../../game/bridge";
@@ -211,10 +211,13 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
             missionId={questMissionId}
             onAnswerFeedback={(correct) => playEffect(correct ? "correct" : "wrong")}
             onClose={() => setQuestMissionId(null)}
-            onMissionComplete={(rewarded) => {
-              if (!rewarded) return;
+            onMissionComplete={(result) => {
+              if (result.xpAwarded <= 0) return;
               playEffect("fragment");
               window.setTimeout(() => playEffect("level-up"), 260);
+              if (hasCompletedAllMissions(result.progress)) {
+                window.setTimeout(() => playEffect("finale"), 680);
+              }
             }}
           />
         ) : null}
