@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R17_DONE_LOCAL / REMOTE_NOT_RUN**. 모바일 소리 접근·보안 헤더·공식 출처 링크·단일 명령 E2E를 보강하고 전체 자동·빌드·브라우저·문서 검증을 통과했으며, 원격 반영은 아직 수행하지 않았습니다.
+> 현재 상태: **R18_DONE / PRODUCTION_PASS**. R15~R17 개선을 PR #9로 main에 병합하고 Vercel production 전체 플레이까지 통과했습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -39,16 +39,18 @@
 | R15 | DONE | 2026-11-25 14:31 KST | 2026-11-25 14:48 KST | PASS | 2/3 통과·오답 힌트·재도전·0XP 실패 처리, 퍼즐/열쇠 제거와 저장 마이그레이션 |
 | R16 | DONE | 2026-11-25 14:53 KST | 2026-11-25 15:00 KST | PASS | 엔딩 기록·RPG 전용 저장소 완전 제거 및 최종 전수 검증 |
 | R17 | DONE | 2026-11-25 15:04 KST | 2026-11-25 15:14 KST | PASS | 최종 점검 후속 하드닝: 모바일 소리 설정·보안 헤더·출처 링크·E2E 실행 계약 |
-| R18 | IN_PROGRESS | 2026-11-25 16:16 KST | - | NOT_RUN | 최종 릴리스: 선별 커밋·PR·main 병합·Vercel production·공개 URL 검증 |
+| R18 | DONE | 2026-11-25 16:16 KST | 2026-11-25 17:01 KST | PASS | PR #9·main `90bca5a`·Vercel production·공개 URL 전체 RPG 검증 |
 
 ### 2026-11-25 16:16 KST — R18
-- 상태: IN_PROGRESS
+- 상태: DONE
 - 목표·완료 조건: R15~R17의 검증된 변경만 커밋하고 사용자 소유 합본 PDF를 제외한다. 원격 main과 충돌·보호 설정을 확인한 뒤 feature 브랜치 push, main 대상 PR과 검사, 정상 병합, 기존 Vercel production 배포, 공개 URL 전체 Chrome 스모크를 순서대로 완료한다.
-- 변경 파일: `PROGRESS.md`
-- 실행 명령 / 종료코드: Vercel deployments-cicd 스킬 전체 조회 `0`; 로컬 remote·브랜치·worktree·CLI 확인 `1`(`git` 정상, `gh`·전역 `vercel` 미설치)
-- 수락 조건 PASS/FAIL/NOT_RUN: 선별 커밋·push·PR·병합·production 배포·공개 검증 모두 NOT_RUN
-- 잔여 위험: 현재 브랜치는 origin보다 1커밋 앞서고 main은 오래된 로컬 포인터다. 사용자 소유의 추적되지 않은 합본 PDF가 있어 전체 `git add .`를 사용하지 않는다. GitHub/Vercel 계정 도구 연결 또는 인증 상태를 먼저 확인해야 한다.
-- 다음 작업: 원격을 fetch하고 main/feature 분기와 기존 PR 상태를 읽기 전용 확인한 뒤, 검증된 파일만 명시적으로 stage한다.
+- 변경 파일: R15~R17 구현·테스트·문서 43개 파일, `PROGRESS.md`; 사용자 소유 `docs/UnityMission_사용자_매뉴얼_및_구현_설명서.pdf`는 제외
+- 구현 결과: 검증된 변경을 commit `760ed6c`로 만들고 기존 `feature/rpg-dialogue-cutscene`에 push했다. PR #9를 생성해 Vercel Preview 검사 2개 SUCCESS와 `MERGEABLE/CLEAN`을 확인하고 보호 설정을 우회하지 않은 merge 방식으로 병합했다. 원격 main merge commit은 `90bca5a`이며 `760ed6c` 포함을 확인했다. Vercel production 자동 배포가 SUCCESS/Deployment completed 상태가 된 뒤 `https://unity-mission.vercel.app/`에서 전체 흐름을 검증했다.
+- 실행 명령 / 종료코드: Vercel `deployments-cicd`·`access-protected-vercel-deployment` 스킬 전체 조회 `0`; `git fetch origin --prune` `0`; main/HEAD 분기 `0/0`; 명시적 stage·`git diff --cached --check`·비밀정보 패턴 검사 `0`; 합본 PDF 비추적/비stage 확인 `0`; `git commit` `0`(`760ed6c`); `git push origin feature/rpg-dialogue-cutscene` `0`; GitHub CLI 2.105.0 설치·표준 브라우저 인증 `0`; PR #9 생성 `0`; PR 상태 Vercel SUCCESS 2개·CLEAN·MERGEABLE; Preview는 Vercel Authentication 보호 및 연결 계정 팀 불일치로 브라우저 NOT_RUN; `gh pr merge 9 --merge` `0`; 원격 main `90bca5a`와 feature 포함 확인 `0`; main commit Vercel production status `success`, `Deployment has completed`; 공개 8개 정상 경로 `200`, 잘못된 미션 `404`; production CSP·Permissions Policy·Referrer Policy·`nosniff`·`DENY` 확인; 실제 production Chrome 전체 RPG 스모크 `0`(이동·충돌·NPC·대화 중 이동 제한·고의 미통과·힌트·0XP·즉시 재도전·100XP·완료 반응·5조각·Lv.6·재실행 엔딩·수료증·360px·모바일 음량 저장·런타임 오류 0); 임시 Chrome/프로필 정리 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 선별 커밋 PASS; feature push PASS; PR #9 검사 PASS; main 정상 병합 PASS; Vercel production commit status PASS; 공개 경로·보안 헤더 PASS; production 데스크톱·360px 전체 플레이 PASS; preview 인증 브라우저 테스트만 계정 팀 불일치로 NOT_RUN이나 동일 main production에서 전체 검증 PASS; R18 최종 게이트 PASS
+- 오류·원인·수정 시도(최대 2회): 전역 `gh`·`vercel` CLI가 없어 GitHub CLI를 공식 winget 패키지로 설치했다. 첫 GitHub device code는 사용자 승인 전 만료됐고 새 표준 브라우저 코드 인증 1회에서 성공했다. Git Credential Manager 토큰 재사용 시도는 보안 심사에서 거부되어 즉시 중단하고 우회하지 않았다. Preview는 소유 팀 `unitiymission`과 연결된 Vercel/MCP 계정 `mecm3355` 불일치로 인증 접근이 불가능했으며 보호 설정을 변경하지 않고 main production 배포 후 동일 스모크로 검증했다.
+- 잔여 위험: Vercel 프로젝트의 실제 소유 팀은 `unitiymission`이고 현재 연결된 Vercel 도구는 `mecm3355`만 조회하므로 대시보드 운영·로그 상세 조회는 소유 계정에서 해야 한다. CSP는 Next.js 호환을 위해 `'unsafe-inline'`을 포함한다. 실제 iOS/Android 물리 기기·화면 읽기 프로그램·독립 교육 전문가 검토는 자동화 범위 밖이다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 보존했다.
+- 다음 작업: 출시 기능과 배포는 완료됐다. 선택적으로 Vercel 소유 계정 연결을 정리하고 물리 기기·화면 읽기 프로그램·교육 전문가 운영 검토를 수행한다.
 
 ### 2026-11-25 15:04 KST — R17
 - 상태: DONE
@@ -684,4 +686,4 @@
 | 2026-11-25 15:04 KST | 신규 Playwright 의존성 없이 기존 CDP 스모크를 단일 npm 명령으로 자동화 | 실제 Chrome 검증 범위를 유지하면서 의존성과 설정 복잡도를 늘리지 않음 | build·임시 서버·격리 Chrome·전체 플레이·정리를 `npm run test:e2e:rpg`로 재현 |
 
 ## 최종 출시 판정
-현재: **R17_DONE_LOCAL / REMOTE_NOT_RUN** — 통과 기준·오답 힌트·재도전, 불필요 아이템/RPG 전용 저장 제거, 모바일 소리 접근, 보안 헤더, 공식 출처 링크, 단일 명령 실제 Chrome E2E는 lint·typecheck·86 tests·build·audit·실제 Chrome 전체 플레이·PDF 9/11쪽 검증을 모두 통과했다. 현재 브랜치는 `feature/rpg-dialogue-cutscene`, 기준 HEAD는 `4742a1f`이며 변경사항은 아직 커밋·push·PR·main 병합·Vercel production 배포하지 않았다. 기존 공개 production은 `https://unity-mission.vercel.app/`이지만 R15~R17 반영 전 버전이므로 최신 기능 검증 대상이 아니다.
+현재: **R18_DONE / PRODUCTION_PASS** — 통과 기준·오답 힌트·재도전, 불필요 아이템/RPG 전용 저장 제거, 모바일 소리 접근, 보안 헤더, 공식 출처 링크, 단일 명령 Chrome E2E가 PR #9를 통해 main `90bca5a`에 병합됐다. Vercel production `https://unity-mission.vercel.app/`은 배포 성공 상태이며 전체 경로·보안 헤더·데스크톱/360px 실제 RPG 플레이·저장·엔딩·수료증·런타임 오류 0 검증을 통과했다. 사용자 소유 합본 PDF만 의도적으로 비추적 상태로 남아 있다.
