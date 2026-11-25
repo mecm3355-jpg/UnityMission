@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R20_DONE_LOCAL / REMOTE_NOT_RUN**. 오답 재제출 안전장치와 5개 미션 완료 팡파르 구현·전체 로컬 검증을 완료했습니다.
+> 현재 상태: **R20-REL_DONE / PRODUCTION_PASS**. 오답 재제출 안전장치와 완료 팡파르를 PR #13으로 main에 병합하고 Vercel production 전체 플레이까지 통과했습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -43,16 +43,18 @@
 | R19 | DONE | 2026-11-25 17:16 KST | 2026-11-25 17:21 KST | PASS | 실패 시 XP 안내·계약·사용자 매뉴얼 명확화 및 실제 Chrome 회귀 통과 |
 | R19-REL | DONE | 2026-11-25 17:24 KST | 2026-11-25 17:37 KST | PASS | commit `a6b6aba`·PR #11·main `ca01874`·Vercel production 전체 검증 |
 | R20 | DONE | 2026-11-25 18:00 KST | 2026-11-25 18:08 KST | PASS | 오답 후 선택 변경 전 재제출 차단·전체 미션 완료 팡파르·문서 갱신 |
-| R20-REL | IN_PROGRESS | 2026-11-25 18:11 KST | - | NOT_RUN | R20 선별 커밋·PR·main 병합·기존 Vercel production 반영 |
+| R20-REL | DONE | 2026-11-25 18:11 KST | 2026-11-25 18:15 KST | PASS | commit `c00a697`·PR #13·main `8283aa9`·Vercel production 전체 검증 |
 
 ### 2026-11-25 18:11 KST — R20-REL
-- 상태: IN_PROGRESS
+- 상태: DONE
 - 목표·완료 조건: 검증 완료된 R20 파일만 커밋하고 사용자 소유 합본 PDF를 제외한다. 원격 main과 충돌·비밀정보·PR 검사를 확인한 뒤 정상 병합하고 기존 Vercel production에서 재제출 잠금·전체 RPG·PDF 접근을 검증한다.
-- 변경 파일: `PROGRESS.md`
-- 실행 명령 / 종료코드: Vercel `deployments-cicd` 스킬·필수 문서 7종 조회 `0`; 현재 브랜치·remote·작업 트리·HEAD 확인 `0`
-- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화·선별 커밋·push·PR·병합·production 배포·공개 URL 검증 모두 NOT_RUN
-- 잔여 위험: 공개 production은 아직 R19 버전이며 브라우저 자동화로 실제 스피커 청감은 판정할 수 없다.
-- 다음 작업: 원격 main 최신 상태와 GitHub 인증을 확인하고 R20 파일만 stage·검사한다.
+- 변경 파일: R20 검증 완료 파일 19개와 `PROGRESS.md`; 사용자 소유 `docs/UnityMission_사용자_매뉴얼_및_구현_설명서.pdf`는 제외
+- 구현 결과: R20 변경을 commit `c00a697`로 만들고 `fix/retry-selection-finale-audio`에 push했다. PR #13의 Vercel Preview 검사 2개 SUCCESS와 `MERGEABLE/CLEAN`을 확인한 뒤 일반 merge 방식으로 병합했다. 기능 반영 main merge commit은 `8283aa9`이며 Vercel production 자동 배포 완료 후 공개 URL에서 새 재제출 안전장치와 전체 RPG·분리 PDF를 검증했다.
+- 실행 명령 / 종료코드: Vercel 배포 스킬·필수 문서 7종 조회 `0`; `git fetch origin --prune` `0`; 원격 main/HEAD 분기 `0/0`; GitHub 인증 PASS; main 보호 조회 `404 Branch not protected`; 명시적 19파일 stage·`git diff --cached --check`·비밀정보 패턴 검사 `0`; 합본 PDF 비stage 확인 PASS; `git commit` `0`(`c00a697`); `git push -u origin fix/retry-selection-finale-audio` `0`; PR #13 생성 `0`; Vercel Preview 검사 2개 SUCCESS·CLEAN·MERGEABLE; `gh pr merge 13 --merge` `0`; 원격 main `8283aa9`; Vercel production `success`·`Deployment has completed`; 실제 production Chrome 전체 RPG 스모크 `0`(선택 변경 전 재제출 차단·변경 후 활성화·미통과·재도전·100XP·이동·충돌·NPC·엔딩·360px·모바일, 런타임 오류 0); 정상 경로 8개·사용자/구현 PDF `200 application/pdf`, 잘못된 미션 `404`; CSP·HSTS·`nosniff`·`DENY`·Referrer Policy·Permissions Policy PASS; 검증 Chrome·임시 프로필 정리 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화 PASS; 선별 커밋·합본 PDF 제외·비밀정보 검사 PASS; feature push PASS; PR #13 검사 PASS; main 정상 병합 PASS; Vercel production 배포 PASS; 공개 재제출 잠금·경로·PDF·보안 헤더·데스크톱/360px 전체 플레이 PASS; R20-REL 최종 게이트 PASS
+- 오류·원인·수정 시도(최대 2회): 제품 코드·테스트·PR 검사·배포·production 플레이 오류는 없었다. main에는 보호 규칙이 없었지만 강제 push 없이 PR 병합 절차를 유지했다.
+- 잔여 위험: 자동화는 Web Audio 재생 요청·주파수·음소거·볼륨 준수를 검증하지만 실제 스피커 청감은 사람 검토가 필요하다. Vercel 상세 로그·드레인은 소유 팀 계정에서 확인해야 한다. 사용자 소유 합본 PDF는 비추적 상태로 보존했다.
+- 다음 작업: 기능과 production 반영은 완료됐다. 이 완료 기록만 별도 커밋·PR로 main에 반영하고 최종 production 상태를 확인한다.
 
 ### 2026-11-25 18:00 KST — R20
 - 상태: DONE
@@ -734,4 +736,4 @@
 | 2026-11-25 18:08 KST | 첫 오답 번호와 현재 선택이 같으면 재제출을 차단하고, 다섯 번째 최초 통과에 별도 팡파르 재생 | 같은 번호의 실수 재제출로 학습 기회가 사라지는 문제를 막고 전체 완수의 성취감을 높이라는 사용자 지시 | 대시보드·RPG 입력 안전성 통일, 기존 오디오 설정을 공유하는 5음 상승 완료 효과 추가 |
 
 ## 최종 출시 판정
-현재: **R20_DONE_LOCAL / REMOTE_NOT_RUN** — 오답 후 다른 번호를 선택하기 전까지 재제출을 차단하고 다섯 번째 미션 최초 통과 시 5음 상승 팡파르를 재생하도록 구현했다. lint·typecheck·89 tests·build·audit·실제 Chrome 전체 RPG·사용자 PDF 9쪽·구현 PDF 11쪽 검증을 통과했다. 변경은 `fix/retry-selection-finale-audio` 로컬 브랜치에 있으며 아직 push·PR·main 병합·Vercel 배포를 실행하지 않았다. 공개 `https://unity-mission.vercel.app/`은 R19 production 상태다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.
+현재: **R20-REL_DONE / PRODUCTION_PASS** — 오답 후 다른 번호를 선택하기 전까지 재제출을 차단하고 다섯 번째 미션 최초 통과 시 5음 상승 팡파르를 재생하도록 구현했다. lint·typecheck·89 tests·build·audit·사용자 PDF 9쪽·구현 PDF 11쪽 검증 후 commit `c00a697`, PR #13, main `8283aa9`로 반영했다. Vercel production `https://unity-mission.vercel.app/`은 배포 완료 상태이며 새 재제출 흐름·전체 경로·분리 PDF·보안 헤더·데스크톱/360px 실제 RPG 플레이·저장·엔딩·수료증·런타임 오류 0 검증을 통과했다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.
