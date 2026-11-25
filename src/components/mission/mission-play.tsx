@@ -21,7 +21,9 @@ export function MissionPlay({ mission }: { mission: Mission }) {
   } = useProgress();
   const feedbackRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
+  const firstOptionRef = useRef<HTMLInputElement>(null);
   const [retryGuard, setRetryGuard] = useState<{ questionId: string; rejectedAnswer: number } | null>(null);
+  const [selectionErrorQuestionId, setSelectionErrorQuestionId] = useState<string | null>(null);
   const attempt = progress?.activeAttempt?.missionId === mission.id ? progress.activeAttempt : null;
   const currentIndex = attempt?.currentIndex ?? 0;
   const revealed = attempt?.revealedExplanation[currentIndex] ?? false;
@@ -72,7 +74,9 @@ export function MissionPlay({ mission }: { mission: Mission }) {
   const isLastQuestion = currentIndex === mission.questions.length - 1;
   const retryPending = retryGuard?.questionId === question.id;
   const retrySelectionChanged = retryPending && selectedAnswer !== retryGuard.rejectedAnswer;
-  const submitDisabled = selectedAnswer === null || (retryPending && !retrySelectionChanged);
+  const submitDisabled = retryPending && !retrySelectionChanged;
+  const hasSelectionError = selectionErrorQuestionId === question.id;
+  const selectionErrorId = `${question.id}-selection-error`;
 
   function handleContinue() {
     if (isLastQuestion) {
@@ -91,12 +95,21 @@ export function MissionPlay({ mission }: { mission: Mission }) {
   }
 
   function handleSubmitAnswer() {
-    if (selectedAnswer === null) return;
+    if (selectedAnswer === null) {
+      setSelectionErrorQuestionId(question.id);
+      firstOptionRef.current?.focus();
+      return;
+    }
     if (!isCorrect && !retryPending) {
       setRetryGuard({ questionId: question.id, rejectedAnswer: selectedAnswer });
       return;
     }
     revealAnswer();
+  }
+
+  function handleSelectAnswer(optionIndex: number) {
+    setSelectionErrorQuestionId(null);
+    selectAnswer(optionIndex);
   }
 
   return (
@@ -123,7 +136,11 @@ export function MissionPlay({ mission }: { mission: Mission }) {
         <p className="text-sm font-bold tracking-wider text-[#5279CE]">{mission.title}</p>
         <h1 className="mt-3 text-2xl font-bold leading-10 sm:text-3xl">{question.prompt}</h1>
 
-        <fieldset className="mt-7 space-y-3">
+        <fieldset
+          aria-describedby={hasSelectionError ? selectionErrorId : undefined}
+          aria-invalid={hasSelectionError}
+          className="mt-7 space-y-3"
+        >
           <legend className="sr-only">답안 선택</legend>
           {question.options.map((option, optionIndex) => {
             const selected = selectedAnswer === optionIndex;
@@ -148,7 +165,8 @@ export function MissionPlay({ mission }: { mission: Mission }) {
                   className="mt-1 h-5 w-5 shrink-0 accent-[#F5C968]"
                   disabled={revealed}
                   name={question.id}
-                  onChange={() => selectAnswer(optionIndex)}
+                  onChange={() => handleSelectAnswer(optionIndex)}
+                  ref={optionIndex === 0 ? firstOptionRef : undefined}
                   type="radio"
                 />
                 <span>{option}</span>
@@ -156,6 +174,12 @@ export function MissionPlay({ mission }: { mission: Mission }) {
             );
           })}
         </fieldset>
+
+        {hasSelectionError ? (
+          <p className="mt-4 rounded-xl border border-rose-300/50 bg-rose-300/10 px-4 py-3 font-semibold text-rose-100" id={selectionErrorId} role="alert">
+            먼저 답안을 선택해 주세요.
+          </p>
+        ) : null}
 
         {!revealed && retryPending ? (
           <div

@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R20-REL_DONE / PRODUCTION_PASS**. 오답 재제출 안전장치와 완료 팡파르를 PR #13으로 main에 병합하고 Vercel production 전체 플레이까지 통과했습니다.
+> 현재 상태: **R21_DONE_LOCAL / REMOTE_NOT_RUN**. 답안 미선택 제출 안내·선택지 포커스·선택 시 오류 해제 구현과 전체 로컬 검증을 완료했습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -44,6 +44,28 @@
 | R19-REL | DONE | 2026-11-25 17:24 KST | 2026-11-25 17:37 KST | PASS | commit `a6b6aba`·PR #11·main `ca01874`·Vercel production 전체 검증 |
 | R20 | DONE | 2026-11-25 18:00 KST | 2026-11-25 18:08 KST | PASS | 오답 후 선택 변경 전 재제출 차단·전체 미션 완료 팡파르·문서 갱신 |
 | R20-REL | DONE | 2026-11-25 18:11 KST | 2026-11-25 18:15 KST | PASS | commit `c00a697`·PR #13·main `8283aa9`·Vercel production 전체 검증 |
+| R21 | DONE | 2026-11-25 18:36 KST | 2026-11-25 18:40 KST | PASS | 답안 미선택 제출 안내·선택지 포커스·선택 시 오류 자동 해제 |
+| R21-REL | IN_PROGRESS | 2026-11-25 18:42 KST | - | NOT_RUN | R21 선별 커밋·PR·main 병합·기존 Vercel production 반영 |
+
+### 2026-11-25 18:42 KST — R21-REL
+- 상태: IN_PROGRESS
+- 목표·완료 조건: 검증 완료된 R21 코드·테스트·분리 PDF만 커밋하고 사용자 소유 합본 PDF를 제외한다. PR 검사와 정상 병합 후 기존 Vercel production에서 미선택 안내·포커스·선택 후 해제와 전체 RPG·PDF를 검증한다.
+- 변경 파일: `PROGRESS.md`
+- 실행 명령 / 종료코드: Vercel `deployments-cicd` 스킬·필수 문서 7종 조회 `0`; 현재 브랜치·remote·작업 트리·HEAD 확인 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화·선별 커밋·push·PR·병합·production 배포·공개 URL 검증 모두 NOT_RUN
+- 잔여 위험: 공개 production은 아직 R20 버전이며 실제 화면 읽기 프로그램 사용성은 자동화로 판정할 수 없다.
+- 다음 작업: 원격 main 최신 상태와 GitHub 인증을 확인하고 R21 파일만 stage·검사한다.
+
+### 2026-11-25 18:36 KST — R21
+- 상태: DONE
+- 목표·완료 조건: 최초 답안을 고르지 않고 `답안 제출`을 누르면 제출을 막고 “먼저 답안을 선택해 주세요.”를 표시하며 첫 선택지로 포커스를 옮긴다. 사용자가 번호를 선택하면 안내가 자동으로 사라져야 한다. 오답 이후 `다시 제출` 잠금은 R20 동작을 그대로 유지하며 대시보드와 RPG 화면이 동일해야 한다.
+- 변경 파일: `src/components/mission/mission-play.tsx`, `src/components/game/rpg-quest-panel.tsx`, 관련 테스트 2개, `scripts/rpg-browser-smoke.mjs`, 요구사항·수락·테스트·README·RPG 문서, 매뉴얼 HTML·분리 PDF 4개, `PROGRESS.md`
+- 구현 결과: 최초 미선택 상태의 `답안 제출`은 클릭 가능하게 두고 제출 함수가 진행을 차단한다. 대시보드와 RPG 모두 `role="alert"` 안내, `aria-invalid`·설명 연결, 첫 라디오 포커스를 제공하며 선택 즉시 오류를 해제한다. 오답 이후에는 R20의 실제 `disabled` 재제출 잠금을 유지한다. 사용자·구현 매뉴얼도 같은 동작으로 갱신했다.
+- 실행 명령 / 종료코드: 필수 문서 7종·관련 코드 검색·브랜치 생성·React 품질 지침 조회 `0`; 관련 테스트 최초 `1`(2개 실패, 미설치 matcher)·typecheck `1`; 기본 DOM 단언으로 수정 후 동일 테스트 `0`(2파일, 14테스트)·typecheck `0`; 사용자 PDF 최초 시각 검사 `1`(7쪽 4px 넘침), 문장 압축 후 동일 검사 `0`(9쪽); 구현 PDF 시각 검사 `0`(11쪽); 원본/배포용 PDF SHA-256 각각 일치; 전체 `npm.cmd run test` `0`(19파일, 91테스트); `npm.cmd run lint` `0`; `npx.cmd tsc --noEmit` `0`; `npm.cmd audit --omit=dev` `0`(0 vulnerabilities); `npm.cmd run test:e2e:rpg` `0`(production build·실제 Chrome 미선택 안내/첫 답안 포커스/선택 후 해제·재제출 잠금·미통과·재도전·100XP·이동·충돌·NPC·엔딩·360px·모바일, 런타임 오류 0); `git diff --check` `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 대시보드 미선택 제출 차단·안내·첫 선택지 포커스 PASS; RPG 동일 동작 PASS; 선택 후 안내 해제 PASS; 오답 재제출 잠금 회귀 PASS; React 훅·접근성·파생 상태 점검 PASS; lint/typecheck/91 tests/build/audit/실제 Chrome PASS; 사용자 PDF 9쪽·구현 PDF 11쪽 PASS; 원격 push·PR·main 병합·Vercel 배포 NOT_RUN
+- 오류·원인·수정 시도(최대 2회): 첫 테스트는 제품 코드가 아니라 이 저장소에 없는 `toHaveTextContent` matcher 사용으로 2개 테스트와 typecheck가 실패했고 기본 `textContent` 단언으로 1회 수정 후 통과했다. 첫 사용자 PDF는 안내 항목 추가로 4px 넘쳐 두 문장을 한 목록 항목으로 압축한 1회 수정 후 통과했다.
+- 잔여 위험: 로컬 변경은 아직 GitHub와 공개 production에 반영되지 않았다. 실제 화면 읽기 프로그램 사용성 평가는 자동화 범위 밖이다. 사용자 소유 합본 PDF는 비추적 상태로 보존했다.
+- 다음 작업: 사용자 승인 후 R21 변경만 선별 커밋하고 feature push → PR → main 병합 → 기존 Vercel production 배포 → 공개 URL 전체 스모크를 수행한다.
 
 ### 2026-11-25 18:11 KST — R20-REL
 - 상태: DONE
@@ -734,6 +756,7 @@
 | 2026-11-25 15:04 KST | 신규 Playwright 의존성 없이 기존 CDP 스모크를 단일 npm 명령으로 자동화 | 실제 Chrome 검증 범위를 유지하면서 의존성과 설정 복잡도를 늘리지 않음 | build·임시 서버·격리 Chrome·전체 플레이·정리를 `npm run test:e2e:rpg`로 재현 |
 | 2026-11-25 17:21 KST | 기준 미달을 “이번 도전 보상 0XP·기존 XP 유지”로 표현 | “실패한 시도에는 XP가 지급되지 않는다”는 문구가 누적 XP 차감 또는 전체 무보상으로 오해될 수 있음 | 대시보드·RPG·문서·E2E가 최초 통과 보상과 기존 XP 보존을 같은 문장으로 설명 |
 | 2026-11-25 18:08 KST | 첫 오답 번호와 현재 선택이 같으면 재제출을 차단하고, 다섯 번째 최초 통과에 별도 팡파르 재생 | 같은 번호의 실수 재제출로 학습 기회가 사라지는 문제를 막고 전체 완수의 성취감을 높이라는 사용자 지시 | 대시보드·RPG 입력 안전성 통일, 기존 오디오 설정을 공유하는 5음 상승 완료 효과 추가 |
+| 2026-11-25 18:40 KST | 최초 미선택 제출은 활성 버튼의 검증 오류로 처리하고 오답 재제출은 네이티브 비활성화 유지 | 비활성 버튼은 클릭 안내를 제공할 수 없지만 오답 후에는 실수 재제출을 물리적으로 막아야 함 | 단계별 요구가 다른 두 상태를 분리하고 오류 안내·포커스·자동 해제를 접근 가능하게 제공 |
 
 ## 최종 출시 판정
-현재: **R20-REL_DONE / PRODUCTION_PASS** — 오답 후 다른 번호를 선택하기 전까지 재제출을 차단하고 다섯 번째 미션 최초 통과 시 5음 상승 팡파르를 재생하도록 구현했다. lint·typecheck·89 tests·build·audit·사용자 PDF 9쪽·구현 PDF 11쪽 검증 후 commit `c00a697`, PR #13, main `8283aa9`로 반영했다. Vercel production `https://unity-mission.vercel.app/`은 배포 완료 상태이며 새 재제출 흐름·전체 경로·분리 PDF·보안 헤더·데스크톱/360px 실제 RPG 플레이·저장·엔딩·수료증·런타임 오류 0 검증을 통과했다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.
+현재: **R21_DONE_LOCAL / REMOTE_NOT_RUN** — 답안 미선택 제출 시 진행을 막고 인라인 안내·첫 선택지 포커스·선택 후 자동 해제를 제공하도록 구현했다. lint·typecheck·91 tests·build·audit·실제 Chrome 전체 RPG·사용자 PDF 9쪽·구현 PDF 11쪽 검증을 통과했다. 변경은 `fix/answer-selection-guidance` 로컬 브랜치에 있으며 아직 push·PR·main 병합·Vercel 배포를 실행하지 않았다. 공개 `https://unity-mission.vercel.app/`은 R20 production 상태다. 사용자 소유 합본 PDF는 의도적으로 비추적 상태로 남아 있다.
