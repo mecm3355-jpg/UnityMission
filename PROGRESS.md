@@ -1,6 +1,6 @@
 # UnityMission 실행 기록
 
-> 현재 상태: **R22-REL_IN_PROGRESS**. 검증된 평화의 나무 엔딩 팡파르 변경을 선별 커밋하고 GitHub PR·Vercel production에 반영 중입니다.
+> 현재 상태: **R22-REL_DONE / PRODUCTION_PASS**. 평화의 나무 엔딩 팡파르 변경을 PR #17로 main에 병합하고 Vercel production 전체 플레이까지 통과했습니다.
 
 ## 작업 현황
 | Task | 상태 | 시작 | 종료 | 검증 | 비고 |
@@ -47,16 +47,18 @@
 | R21 | DONE | 2026-11-25 18:36 KST | 2026-11-25 18:40 KST | PASS | 답안 미선택 제출 안내·선택지 포커스·선택 시 오류 자동 해제 |
 | R21-REL | DONE | 2026-11-25 18:42 KST | 2026-11-25 18:45 KST | PASS | commit `44aeb7f`·PR #15·main `44558c8`·Vercel production 전체 검증 |
 | R22 | DONE | 2026-11-25 19:12 KST | 2026-11-25 19:18 KST | PASS | 팡파르를 평화의 나무 클릭·엔딩 시작 시점으로 이동하고 실제 Chrome 재생 음계 검증 |
-| R22-REL | IN_PROGRESS | 2026-11-25 19:20 KST | - | NOT_RUN | R22 선별 커밋·PR·main 병합·Vercel production 검증 |
+| R22-REL | DONE | 2026-11-25 19:20 KST | 2026-11-25 19:25 KST | PASS | commit `80eb16a`·PR #17·main `31148ab`·Vercel production 전체 검증 |
 
 ### 2026-11-25 19:20 KST — R22-REL
-- 상태: IN_PROGRESS
+- 상태: DONE
 - 목표·완료 조건: 검증된 R22 코드·테스트·문서·분리 PDF만 커밋하고 사용자 소유 합본 PDF는 제외한다. 기존 GitHub 저장소의 feature 브랜치에 push해 main 대상 PR 검사 후 정상 병합하고, 기존 Vercel 프로젝트의 production 배포와 공개 URL에서 나무 클릭 팡파르·전체 RPG·PDF를 검증한다.
-- 변경 파일: `PROGRESS.md`
-- 실행 명령 / 종료코드: Vercel `deployments-cicd` 지침·필수 문서 조회 `0`
-- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화·선별 커밋·비밀정보 검사·feature push·PR 검사·main 병합·Vercel production·공개 전체 플레이 모두 NOT_RUN
-- 잔여 위험: 원격 main 변경이나 Vercel 프로젝트 소유 계정 차이가 확인되면 덮어쓰지 않고 중단해야 한다.
-- 다음 작업: Git remote/main 분기·GitHub 인증·Vercel 대상 프로젝트를 확인하고 정확한 R22 파일만 stage한다.
+- 변경 파일: R22 검증 완료 파일 14개와 `PROGRESS.md`; 사용자 소유 `docs/UnityMission_사용자_매뉴얼_및_구현_설명서.pdf`는 제외
+- 구현·릴리스 결과: R22 변경을 commit `80eb16a`로 만들고 `fix/tree-triggered-fanfare`에 push했다. PR #17의 Vercel Preview 검사 2개 SUCCESS와 `MERGEABLE/CLEAN`을 확인한 뒤 일반 merge 방식으로 병합했다. 원격 main merge commit은 `31148ab`이며 Vercel production `Deployment has completed` 후 공개 URL에서 평화의 나무 클릭 상승 5음 팡파르와 전체 RPG·360px·분리 PDF를 검증했다.
+- 실행 명령 / 종료코드: Vercel `deployments-cicd` 지침·필수 문서 조회 `0`; 대상 remote·기본 브랜치·GitHub 인증 확인 `0`; `git fetch origin --prune`·원격 main/HEAD 분기 `0/0`; 비밀정보 검사 첫 명령 `1`(PowerShell 따옴표 파싱, 파일 변경 없음)·단순화 재검사 `0`; 명시적 14파일 stage·`git diff --cached --check` `0`; 합본 PDF 비stage 확인 PASS; `git commit` `0`(`80eb16a`); `git push -u origin fix/tree-triggered-fanfare` `0`; PR #17 생성 `0`; Vercel Preview 검사 2개 SUCCESS·CLEAN·MERGEABLE; main 보호 조회 `404 Branch not protected`; `gh pr merge 17 --merge` `0`; 원격 main `31148ab`; 병합 커밋 Vercel 상태 `success`·`Deployment has completed`; 실제 production Chrome 전체 RPG 스모크 `0`(나무 클릭 C5→E5→G5→C6→E6 팡파르·이동·충돌·NPC·미통과·재도전·100XP·엔딩·360px·모바일, 런타임 오류 0); 정상 경로 8개·잘못된 미션 `404`; CSP·HSTS·`nosniff`·`DENY`·Referrer Policy·Permissions Policy PASS; 공개 사용자/구현 PDF SHA-256 로컬과 일치; 검증 Chrome·임시 파일 정리 `0`
+- 수락 조건 PASS/FAIL/NOT_RUN: 원격 동기화 PASS; 선별 커밋·합본 PDF 제외·비밀정보 검사 PASS; feature push PASS; PR #17 검사 PASS; main 정상 병합 PASS; Vercel production 배포 PASS; 공개 나무 클릭 팡파르·전체 RPG·360px·경로·PDF·보안 헤더 PASS; R22-REL 최종 게이트 PASS
+- 오류·원인·수정 시도(최대 2회): 첫 비밀정보 검사 명령은 PowerShell 따옴표 파싱 오류로 실행되지 않아 정규식을 단순화한 동일 검사에서 통과했다. Vercel MCP의 연결 계정은 production 소유 팀 `unitiymission` 권한이 없어 deployment 상세 조회가 403이었지만, GitHub의 해당 소유 팀 Vercel 검사·병합 커밋 production 성공 상태와 공개 URL 전체 검증으로 배포를 확인했다. 제품·PR·배포·production 플레이 오류는 없었다.
+- 잔여 위험: 실제 스피커 청감, iOS/Android 물리 기기와 화면 읽기 프로그램 평가는 자동화 밖이다. Vercel 런타임 오류 로그·드레인·모니터링 상세는 `unitiymission` 팀 권한이 없어 NOT_RUN이며 소유 계정에서 확인해야 한다. 사용자 소유 합본 PDF는 비추적 상태로 보존했다.
+- 다음 작업: 이 완료 기록의 후속 문서 PR까지 병합하면 R22 관련 추가 작업은 없다.
 
 ### 2026-11-25 19:12 KST — R22
 - 상태: DONE
