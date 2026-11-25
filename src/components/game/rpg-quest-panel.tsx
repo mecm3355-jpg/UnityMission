@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { useProgress } from "../../context/progress-context";
 import { getMissionById } from "../../content/missions";
-import { getLevelSummary, type CompletionResult } from "../../lib/game-engine";
+import {
+  getLevelSummary,
+  MISSION_PASS_CORRECT_COUNT,
+  type CompletionResult,
+} from "../../lib/game-engine";
 import type { MissionId } from "../../types/content";
 
 type RpgQuestPanelProps = {
@@ -14,8 +18,9 @@ type RpgQuestPanelProps = {
 };
 
 export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionComplete }: RpgQuestPanelProps) {
-  const { advanceQuestion, completeMission, progress, revealAnswer, selectAnswer } = useProgress();
+  const { advanceQuestion, beginMission, completeMission, progress, revealAnswer, selectAnswer } = useProgress();
   const [completion, setCompletion] = useState<CompletionResult | null>(null);
+  const [hintedQuestionId, setHintedQuestionId] = useState<string | null>(null);
   const mission = getMissionById(missionId);
 
   if (!mission) return null;
@@ -25,20 +30,44 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
     return (
       <div className="quest-backdrop absolute inset-0 z-30 grid place-items-center p-4">
         <section aria-labelledby="quest-complete-title" className="game-panel quest-complete-panel w-full max-w-2xl p-6 text-center" role="dialog" aria-modal="true">
-          <p className="text-sm font-bold tracking-[0.18em] text-[#F5C968]">QUEST COMPLETE</p>
-          <h2 className="mt-3 text-3xl font-bold" id="quest-complete-title">{mission.title} 완료</h2>
+          <p className="text-sm font-bold tracking-[0.18em] text-[#F5C968]">{completion.passed ? "QUEST COMPLETE" : "TRY AGAIN"}</p>
+          <h2 className="mt-3 text-3xl font-bold" id="quest-complete-title">
+            {completion.passed ? `${mission.title} 완료` : "통과 기준에 조금 못 미쳤어요"}
+          </h2>
           <p className="mt-4 text-lg text-slate-200">정답 {completion.correctCount}/3</p>
-          <p className="mt-2 text-xl font-bold text-[#F5C968]">{completion.xpAwarded > 0 ? "+100 XP · 평화 조각 획득" : "복습 완료 · 추가 XP 없음"}</p>
+          <p className="mt-2 text-xl font-bold text-[#F5C968]">
+            {completion.passed
+              ? completion.xpAwarded > 0
+                ? "+100 XP · 평화 조각 획득"
+                : "복습 통과 · 추가 XP 없음"
+              : `통과하려면 ${MISSION_PASS_CORRECT_COUNT}/3 이상이 필요합니다`}
+          </p>
           {completion.xpAwarded > 0 ? (
             <div aria-label="평화 조각 획득 애니메이션" className="quest-reward-burst mt-5" role="img">
               <span>◆</span><span>✦</span><span>◆</span><span>✦</span><span>◆</span>
             </div>
           ) : null}
-          <p className={`mt-3 text-lg font-bold text-sky-200 ${completion.xpAwarded > 0 ? "level-up-flash" : ""}`}>
-            {completion.xpAwarded > 0 ? `LEVEL UP · Lv.${level.level}` : `현재 Lv.${level.level}`}
-          </p>
-          <button className="pixel-button is-primary mt-7 px-6 py-3 font-black" onClick={onClose} type="button">
-            마을로 돌아가기
+          {completion.passed ? (
+            <p className={`mt-3 text-lg font-bold text-sky-200 ${completion.xpAwarded > 0 ? "level-up-flash" : ""}`}>
+              {completion.xpAwarded > 0 ? `LEVEL UP · Lv.${level.level}` : `현재 Lv.${level.level}`}
+            </p>
+          ) : (
+            <p className="mt-4 leading-7 text-slate-200">힌트와 해설을 떠올리며 바로 다시 도전해 보세요. 실패한 시도에는 XP가 지급되지 않습니다.</p>
+          )}
+          <button
+            className="pixel-button is-primary mt-7 px-6 py-3 font-black"
+            onClick={() => {
+              if (completion.passed) {
+                onClose();
+                return;
+              }
+              beginMission(missionId);
+              setCompletion(null);
+              setHintedQuestionId(null);
+            }}
+            type="button"
+          >
+            {completion.passed ? "마을로 돌아가기" : "미션 다시 도전"}
           </button>
         </section>
       </div>
@@ -72,7 +101,13 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
     else advanceQuestion();
   }
 
-  function handleRevealAnswer() {
+  function handleSubmitAnswer() {
+    if (answer === null) return;
+    if (!correct && hintedQuestionId !== question.id) {
+      setHintedQuestionId(question.id);
+      onAnswerFeedback?.(false);
+      return;
+    }
     revealAnswer();
     onAnswerFeedback?.(correct);
   }
@@ -111,9 +146,17 @@ export function RpgQuestPanel({ missionId, onAnswerFeedback, onClose, onMissionC
         </fieldset>
 
         {!revealed ? (
-          <button className="pixel-button is-primary mt-6 px-6 py-3 font-black disabled:cursor-not-allowed disabled:opacity-40" disabled={answer === null} onClick={handleRevealAnswer} type="button">
-            답안 제출
-          </button>
+          <>
+            {hintedQuestionId === question.id ? (
+              <div aria-live="assertive" className="mt-5 rounded-2xl border border-amber-300/50 bg-amber-300/10 p-4" tabIndex={-1}>
+                <h3 className="font-bold text-amber-100">힌트를 확인하고 다시 선택해 보세요</h3>
+                <p className="mt-2 leading-7">{question.hint}</p>
+              </div>
+            ) : null}
+            <button className="pixel-button is-primary mt-6 px-6 py-3 font-black disabled:cursor-not-allowed disabled:opacity-40" disabled={answer === null} onClick={handleSubmitAnswer} type="button">
+              {hintedQuestionId === question.id ? "다시 제출" : "답안 제출"}
+            </button>
+          </>
         ) : (
           <div className={`mt-6 rounded-2xl border p-5 ${correct ? "border-emerald-300/50 bg-emerald-300/10" : "border-rose-300/50 bg-rose-300/10"}`} tabIndex={-1}>
             <h3 className="text-xl font-bold">{correct ? "정답입니다." : "오답입니다."}</h3>

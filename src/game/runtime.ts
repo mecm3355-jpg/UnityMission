@@ -37,7 +37,7 @@ class PeaceVillageScene extends Phaser.Scene {
   private nearbyNpcId: NpcId | null = null;
   private nearbyWorldId: WorldInteractionId | null = null;
   private interactionLocked = false;
-  private worldSnapshot: GameWorldSnapshot = { fragmentCount: 0, puzzleSequence: [], puzzleSolved: false };
+  private worldSnapshot: GameWorldSnapshot = { fragmentCount: 0 };
   private readonly interactionVisuals = new Map<WorldInteractionId, Phaser.GameObjects.Rectangle>();
   private readonly npcRings = new Map<NpcId, Phaser.GameObjects.Ellipse>();
   private readonly npcMarkers = new Map<NpcId, Phaser.GameObjects.Text>();
@@ -187,15 +187,10 @@ class PeaceVillageScene extends Phaser.Scene {
     this.worldSnapshot = snapshot;
     this.questTarget = snapshot.questTarget ?? null;
     this.host.dataset.fragmentCount = String(snapshot.fragmentCount);
-    this.host.dataset.puzzleSolved = String(snapshot.puzzleSolved);
     for (const interaction of WORLD_INTERACTIONS) {
       const visual = this.interactionVisuals.get(interaction.id);
       if (!visual) continue;
-      if (interaction.kind === "ending") {
-        visual.setFillStyle(snapshot.fragmentCount === 5 ? 0xf5c968 : 0x667085, 1);
-      } else {
-        visual.setAlpha(snapshot.puzzleSequence.includes(interaction.id) ? 1 : 0.55);
-      }
+      visual.setFillStyle(snapshot.fragmentCount === 5 ? 0xf5c968 : 0x667085, 1);
     }
     NPCS.forEach((npc, index) => {
       const marker = this.npcMarkers.get(npc.id);
@@ -488,27 +483,15 @@ class PeaceVillageScene extends Phaser.Scene {
   }
 
   private createWorldInteractions() {
-    const colors: Record<string, number> = { blue: 0x55b8e8, gold: 0xf5c968, green: 0x63d391 };
     for (const interaction of WORLD_INTERACTIONS) {
-      if (interaction.kind === "puzzle") {
-        this.add.ellipse(interaction.x, interaction.y + 25, 48, 16, 0x07101f, 0.35).setDepth(interaction.y - 2);
-        this.add.rectangle(interaction.x, interaction.y + 17, 38, 20, 0x4d493f).setStrokeStyle(3, 0x262c38).setDepth(interaction.y - 1);
-        const stone = this.add.rectangle(interaction.x, interaction.y - 8, 28, 44, colors[interaction.id], 0.72)
-          .setStrokeStyle(4, 0xe8ffff, 0.85).setDepth(interaction.y);
-        this.interactionVisuals.set(interaction.id, stone);
-        this.add.text(interaction.x, interaction.y + 34, interaction.label, {
-          color: "#FFF7CF", backgroundColor: "#07101fcc", padding: { x: 5, y: 3 }, fontFamily: "monospace", fontSize: "12px", fontStyle: "bold",
-        }).setOrigin(0.5, 0).setDepth(interaction.y + 2);
-      } else {
-        this.add.circle(interaction.x, interaction.y - 8, 54, 0x214f35, 0.9).setStrokeStyle(5, 0x102f28).setDepth(interaction.y - 4);
-        this.add.circle(interaction.x - 33, interaction.y - 24, 30, 0x2d7142, 0.95).setStrokeStyle(4, 0x102f28).setDepth(interaction.y - 3);
-        this.add.circle(interaction.x + 34, interaction.y - 21, 32, 0x3a8a4d, 0.95).setStrokeStyle(4, 0x102f28).setDepth(interaction.y - 3);
-        this.add.rectangle(interaction.x, interaction.y + 35, 18, 68, 0x76503a).setStrokeStyle(4, 0x382d29).setDepth(interaction.y - 2);
-        const altar = this.add.rectangle(interaction.x, interaction.y, 54, 54, 0x667085, 1)
-          .setStrokeStyle(5, 0xffefb0, 0.9).setAngle(45).setDepth(interaction.y + 1);
-        this.interactionVisuals.set(interaction.id, altar);
-        if (!this.reduceMotion) this.tweens.add({ targets: altar, angle: 405, duration: 12000, repeat: -1 });
-      }
+      this.add.circle(interaction.x, interaction.y - 8, 54, 0x214f35, 0.9).setStrokeStyle(5, 0x102f28).setDepth(interaction.y - 4);
+      this.add.circle(interaction.x - 33, interaction.y - 24, 30, 0x2d7142, 0.95).setStrokeStyle(4, 0x102f28).setDepth(interaction.y - 3);
+      this.add.circle(interaction.x + 34, interaction.y - 21, 32, 0x3a8a4d, 0.95).setStrokeStyle(4, 0x102f28).setDepth(interaction.y - 3);
+      this.add.rectangle(interaction.x, interaction.y + 35, 18, 68, 0x76503a).setStrokeStyle(4, 0x382d29).setDepth(interaction.y - 2);
+      const altar = this.add.rectangle(interaction.x, interaction.y, 54, 54, 0x667085, 1)
+        .setStrokeStyle(5, 0xffefb0, 0.9).setAngle(45).setDepth(interaction.y + 1);
+      this.interactionVisuals.set(interaction.id, altar);
+      if (!this.reduceMotion) this.tweens.add({ targets: altar, angle: 405, duration: 12000, repeat: -1 });
     }
     this.syncWorldState(this.worldSnapshot);
   }

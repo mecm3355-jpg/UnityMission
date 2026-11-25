@@ -121,6 +121,9 @@ describe("mission learning flow", () => {
     await user.tab();
     expect(document.activeElement).toBe(screen.getByRole("button", { name: "답안 제출" }));
     await user.keyboard("[Enter]");
+    expect(await screen.findByRole("heading", { name: "힌트를 확인하고 다시 선택해 보세요" })).toBeTruthy();
+    await user.click(firstOption);
+    await user.click(screen.getByRole("button", { name: "다시 제출" }));
     expect(await screen.findByRole("heading", { name: /정답입니다.|오답입니다./ })).toBeTruthy();
   });
 
@@ -145,6 +148,10 @@ describe("mission learning flow", () => {
       expect(selectedState.activeAttempt.answers[index]).toBe(selectedIndex);
 
       await user.click(screen.getByRole("button", { name: "답안 제출" }));
+      if (index === 0) {
+        expect(await screen.findByRole("heading", { name: "힌트를 확인하고 다시 선택해 보세요" })).toBeTruthy();
+        await user.click(screen.getByRole("button", { name: "다시 제출" }));
+      }
       const feedbackHeading = await screen.findByRole("heading", {
         name: index === 0 ? "오답입니다." : "정답입니다.",
       });
@@ -159,7 +166,7 @@ describe("mission learning flow", () => {
 
     await waitFor(() =>
       expect(router.push).toHaveBeenCalledWith(
-        "/mission/mission-1/result?score=2&xp=100&first=1",
+        "/mission/mission-1/result?score=2&xp=100&first=1&pass=1",
       ),
     );
     const stored = JSON.parse(window.localStorage.getItem(PROGRESS_STORAGE_KEY) ?? "{}");
@@ -197,8 +204,8 @@ describe("mission learning flow", () => {
   it("awards zero duplicate XP on replay while updating the best score", async () => {
     const user = userEvent.setup();
     const mission = missions[0];
-    const wrongAnswers = mission.questions.map(
-      (question) => ((question.correctIndex + 1) % 4) as CorrectIndex,
+    const passingAnswers = mission.questions.map(
+      (question, index) => index < 2 ? question.correctIndex : ((question.correctIndex + 1) % 4) as CorrectIndex,
     ) as [CorrectIndex, CorrectIndex, CorrectIndex];
     const correctAnswers = mission.questions.map((question) => question.correctIndex) as [
       CorrectIndex,
@@ -207,7 +214,7 @@ describe("mission learning flow", () => {
     ];
     const initial = createInitialProgress("평화별", "2026-11-23T09:00:00.000Z");
     const firstAttempt = startMissionAttempt(initial, mission.id, "2026-11-23T09:01:00.000Z");
-    const firstCompletion = completeAttempt(firstAttempt, wrongAnswers, "2026-11-23T09:02:00.000Z");
+    const firstCompletion = completeAttempt(firstAttempt, passingAnswers, "2026-11-23T09:02:00.000Z");
     let replay = startMissionAttempt(firstCompletion.progress, mission.id, "2026-11-23T10:00:00.000Z");
 
     for (let index = 0; index < 3; index += 1) {
@@ -228,7 +235,7 @@ describe("mission learning flow", () => {
     await user.click(await screen.findByRole("button", { name: "미션 완료" }));
     await waitFor(() =>
       expect(router.push).toHaveBeenCalledWith(
-        "/mission/mission-1/result?score=3&xp=0&first=0",
+        "/mission/mission-1/result?score=3&xp=0&first=0&pass=1",
       ),
     );
 
@@ -272,6 +279,31 @@ describe("mission result", () => {
     expect(screen.getByRole("link", { name: "다음 미션 보기" })).toHaveProperty(
       "href",
       expect.stringContaining("/mission/mission-2"),
+    );
+  });
+
+  it("shows a retry result without XP or unlocking the next mission below the pass mark", async () => {
+    const mission = missions[0];
+    storeProgress(createInitialProgress("재도전자", "2026-11-23T09:00:00.000Z"));
+
+    render(
+      <ProgressProvider>
+        <MissionResult
+          firstParam="0"
+          mission={mission}
+          passParam="0"
+          scoreParam="1"
+          xpParam="0"
+        />
+      </ProgressProvider>,
+    );
+
+    expect(await screen.findByRole("heading", { name: "통과 기준에 조금 못 미쳤어요" })).toBeTruthy();
+    expect(screen.getByText("실패한 시도에는 XP가 지급되지 않습니다. 힌트와 해설을 떠올리며 다시 도전해 보세요.")).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "다음 미션 보기" })).toBeNull();
+    expect(screen.getByRole("link", { name: "미션 다시 도전" })).toHaveProperty(
+      "href",
+      expect.stringContaining("/mission/mission-1"),
     );
   });
 });

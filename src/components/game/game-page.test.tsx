@@ -16,7 +16,7 @@ const bridge: GameBridge = {
   onNearbyWorldInteractionChange: vi.fn(),
   onWorldInteract: vi.fn(),
 };
-const worldSnapshot = { fragmentCount: 0, puzzleSequence: [], puzzleSolved: false };
+const worldSnapshot = { fragmentCount: 0 };
 
 afterEach(() => {
   cleanup();
@@ -100,6 +100,10 @@ describe("R02 Phaser game host", () => {
     );
 
     await screen.findByRole("heading", { name: "소리별의 평화마을" });
+    expect(screen.getByRole("button", { name: "게임 음량 줄이기" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "게임 음량 높이기" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "게임 음량 줄이기" }));
+    expect(screen.getByRole("slider", { name: "게임 음량" })).toHaveProperty("value", "45");
     fireEvent.change(screen.getByRole("slider", { name: "게임 음량" }), { target: { value: "32" } });
     fireEvent.click(screen.getByRole("button", { name: "게임 소리 끄기" }));
 

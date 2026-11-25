@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useProgress } from "../../context/progress-context";
 import { isMissionUnlocked } from "../../lib/game-engine";
 import type { Mission } from "../../types/content";
@@ -20,6 +20,8 @@ export function MissionPlay({ mission }: { mission: Mission }) {
     warning,
   } = useProgress();
   const feedbackRef = useRef<HTMLDivElement>(null);
+  const hintRef = useRef<HTMLDivElement>(null);
+  const [hintedQuestionId, setHintedQuestionId] = useState<string | null>(null);
   const attempt = progress?.activeAttempt?.missionId === mission.id ? progress.activeAttempt : null;
   const currentIndex = attempt?.currentIndex ?? 0;
   const revealed = attempt?.revealedExplanation[currentIndex] ?? false;
@@ -29,6 +31,12 @@ export function MissionPlay({ mission }: { mission: Mission }) {
       feedbackRef.current?.focus();
     }
   }, [currentIndex, revealed]);
+
+  useEffect(() => {
+    if (hintedQuestionId) {
+      hintRef.current?.focus();
+    }
+  }, [hintedQuestionId]);
 
   if (!isHydrated) {
     return (
@@ -70,12 +78,22 @@ export function MissionPlay({ mission }: { mission: Mission }) {
         score: String(result.correctCount),
         xp: String(result.xpAwarded),
         first: result.firstCompletion ? "1" : "0",
+        pass: result.passed ? "1" : "0",
       });
       router.push(`/mission/${mission.id}/result?${query.toString()}`);
       return;
     }
 
     advanceQuestion();
+  }
+
+  function handleSubmitAnswer() {
+    if (selectedAnswer === null) return;
+    if (!isCorrect && hintedQuestionId !== question.id) {
+      setHintedQuestionId(question.id);
+      return;
+    }
+    revealAnswer();
   }
 
   return (
@@ -136,6 +154,18 @@ export function MissionPlay({ mission }: { mission: Mission }) {
           })}
         </fieldset>
 
+        {!revealed && hintedQuestionId === question.id ? (
+          <div
+            aria-live="assertive"
+            className="mt-6 rounded-2xl border border-amber-300/50 bg-amber-300/10 p-5"
+            ref={hintRef}
+            tabIndex={-1}
+          >
+            <h2 className="text-lg font-bold text-amber-100">힌트를 확인하고 다시 선택해 보세요</h2>
+            <p className="mt-2 leading-7 text-slate-100">{question.hint}</p>
+          </div>
+        ) : null}
+
         {revealed ? (
           <div
             aria-live="assertive"
@@ -161,10 +191,10 @@ export function MissionPlay({ mission }: { mission: Mission }) {
           <button
             className="mt-7 min-h-12 rounded-xl bg-[#F5C968] px-6 py-3 text-base font-bold text-[#0D1730] disabled:cursor-not-allowed disabled:opacity-40"
             disabled={selectedAnswer === null}
-            onClick={revealAnswer}
+            onClick={handleSubmitAnswer}
             type="button"
           >
-            답안 제출
+            {hintedQuestionId === question.id ? "다시 제출" : "답안 제출"}
           </button>
         )}
 

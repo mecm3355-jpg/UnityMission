@@ -3,20 +3,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { createInitialRpgProgress } from "../../game/rpg-progress";
 import { EndingPanel } from "./ending-panel";
 import { RpgHud } from "./rpg-hud";
 
 afterEach(cleanup);
 
 describe("R06 inventory and ending UI", () => {
-  it("shows mission-derived fragments and the puzzle reward in the inventory", async () => {
+  it("shows only mission-derived fragments in the inventory", async () => {
     const user = userEvent.setup();
-    render(<RpgHud fragmentCount={3} progress={{ ...createInitialRpgProgress(), puzzleSequence: ["blue", "gold", "green"], puzzleSolved: true, harmonyKey: true }} />);
+    render(<RpgHud fragmentCount={3} />);
     await user.click(screen.getByRole("button", { name: "🎒 조각 3/5" }));
     expect(screen.getByRole("heading", { name: "아이템 인벤토리" })).toBeTruthy();
     expect(screen.getByText("평화 조각: 3 / 5")).toBeTruthy();
-    expect(screen.getByText("조화의 열쇠: 획득")).toBeTruthy();
+    expect(screen.queryByText(/조화의 열쇠/)).toBeNull();
   });
 
   it("offers the certificate and can return to exploration", async () => {

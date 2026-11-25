@@ -13,6 +13,7 @@
 - 최소 종속성 유지, lockfile 커밋, 라이브러리 위험 점검
 - 외부 링크는 신뢰할 수 있는 출처만 사용하고 새 탭이면 noopener/noreferrer
 - 저장 실패와 복원 실패로 화면 전체가 중단되지 않게 처리
+- 모든 경로에 CSP, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, 최소 권한 `Permissions-Policy` 응답 헤더 적용
 
 ## 교육 공정성
 - 정치·정책 선호를 절대 정답으로 표현 금지

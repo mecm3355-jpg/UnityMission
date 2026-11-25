@@ -8,6 +8,7 @@ import type {
 } from "../types/progress";
 
 export const PROGRESS_STORAGE_KEY = "unitymission:v1";
+const LEGACY_RPG_PROGRESS_STORAGE_KEY = "unitymission:rpg:v1";
 
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -316,6 +317,11 @@ export class ProgressStore {
 
     let serialized: string | null;
     try {
+      this.storage.removeItem(LEGACY_RPG_PROGRESS_STORAGE_KEY);
+    } catch {
+      // Legacy cleanup is best-effort and must not block the shared learning record.
+    }
+    try {
       serialized = this.storage.getItem(PROGRESS_STORAGE_KEY);
     } catch {
       return {
@@ -378,6 +384,11 @@ export class ProgressStore {
 
     try {
       this.storage.removeItem(PROGRESS_STORAGE_KEY);
+      try {
+        this.storage.removeItem(LEGACY_RPG_PROGRESS_STORAGE_KEY);
+      } catch {
+        // The retired record is inert even if the browser refuses this cleanup.
+      }
       return { persisted: true, warning: null };
     } catch {
       return { persisted: false, warning: STORAGE_UNAVAILABLE_WARNING };

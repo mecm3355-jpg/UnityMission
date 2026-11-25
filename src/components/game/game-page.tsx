@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getLevelSummary } from "../../lib/game-engine";
+import { getCompletedMissionIds, getLevelSummary } from "../../lib/game-engine";
 import { useProgress } from "../../context/progress-context";
 import { NPCS, getNextQuestNpc, getNpcById, getNpcQuestState, type NpcId, type NpcQuestState } from "../../game/npcs";
 import type { GameBridge } from "../../game/bridge";
-import { getPeaceFragmentCount, type PuzzleStoneId } from "../../game/rpg-progress";
-import { useRpgProgress } from "../../game/use-rpg-progress";
 import { useGameAudio } from "../../game/use-game-audio";
 import { WORLD_INTERACTIONS, type WorldInteractionId } from "../../game/world-interactions";
 import type { MissionId } from "../../types/content";
@@ -25,34 +23,22 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
   const [nearbyWorldId, setNearbyWorldId] = useState<WorldInteractionId | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [endingOpen, setEndingOpen] = useState(false);
-  const { activateStone, progress: rpgProgress, seeEnding } = useRpgProgress();
   const { playEffect, setMuted, setRegion, setVolume, settings: audioSettings } = useGameAudio();
-  const fragmentCount = getPeaceFragmentCount(progress?.completedMissions ?? {});
+  const fragmentCount = getCompletedMissionIds(progress?.completedMissions ?? {}).length;
   const fragmentCountRef = useRef(fragmentCount);
 
   useEffect(() => {
     fragmentCountRef.current = fragmentCount;
   }, [fragmentCount]);
 
-  const handleWorldInteract = useCallback((interactionId: WorldInteractionId) => {
-    if (interactionId === "peace-tree") {
-      if (fragmentCountRef.current === 5 && seeEnding(fragmentCountRef.current)) {
-        setEndingOpen(true);
-        setFeedback(null);
-      } else {
-        setFeedback(`평화의 나무를 깨우려면 조각 ${5 - fragmentCountRef.current}개가 더 필요합니다.`);
-      }
-      return;
+  const handleWorldInteract = useCallback(() => {
+    if (fragmentCountRef.current === 5) {
+      setEndingOpen(true);
+      setFeedback(null);
+    } else {
+      setFeedback(`평화의 나무를 깨우려면 조각 ${5 - fragmentCountRef.current}개가 더 필요합니다.`);
     }
-    const result = activateStone(interactionId as PuzzleStoneId);
-    const messages = {
-      advanced: "공명석이 빛났습니다. 다음 색을 찾아보세요.",
-      reset: "공명이 흐트러졌습니다. 푸른색부터 다시 시작하세요.",
-      solved: "환경 퍼즐 완료! 조화의 열쇠를 획득했습니다.",
-      "already-solved": "세 공명석이 이미 완벽하게 조화를 이루고 있습니다.",
-    } as const;
-    setFeedback(messages[result.outcome]);
-  }, [activateStone, seeEnding]);
+  }, []);
 
   const bridge = useMemo<GameBridge>(
     () => ({
@@ -105,8 +91,6 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
   ) as Record<NpcId, NpcQuestState>;
   const worldSnapshot = {
     fragmentCount,
-    puzzleSequence: rpgProgress.puzzleSequence,
-    puzzleSolved: rpgProgress.puzzleSolved,
     nextNpcId: nextQuestNpc?.id ?? null,
     npcQuestStates,
     questTarget: nextQuestNpc
@@ -129,21 +113,30 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
             <h1 className="truncate text-sm font-black sm:mt-1 sm:text-lg">{progress.nickname}의 평화마을</h1>
           </div>
         </div>
-        <div className="flex items-center gap-3 text-sm font-semibold">
-          <div className="game-audio-controls hidden items-center gap-2 sm:flex" aria-label="게임 소리 설정">
+        <div className="flex items-center gap-2 text-sm font-semibold sm:gap-3">
+          <div className="game-audio-controls flex items-center gap-1 sm:gap-2" aria-label="게임 소리 설정">
             <button
               aria-label={audioSettings.muted ? "게임 소리 켜기" : "게임 소리 끄기"}
               aria-pressed={audioSettings.muted}
-              className="pixel-button px-3 py-2"
+              className="pixel-button px-2 py-2 sm:px-3"
               onClick={() => setMuted(!audioSettings.muted)}
               type="button"
             >
               <span aria-hidden="true">{audioSettings.muted ? "🔇" : "🔊"}</span>
             </button>
+            <button
+              aria-label="게임 음량 줄이기"
+              className="pixel-button px-2 py-2 sm:hidden"
+              disabled={audioSettings.volume === 0}
+              onClick={() => setVolume(audioSettings.volume - 10)}
+              type="button"
+            >
+              <span aria-hidden="true">−</span>
+            </button>
             <label className="sr-only" htmlFor="game-volume">게임 음량</label>
             <input
               aria-valuetext={`${audioSettings.volume}%`}
-              className="w-20 accent-[#F5C968]"
+              className="hidden w-20 accent-[#F5C968] sm:block"
               id="game-volume"
               max="100"
               min="0"
@@ -151,6 +144,15 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
               type="range"
               value={audioSettings.volume}
             />
+            <button
+              aria-label="게임 음량 높이기"
+              className="pixel-button px-2 py-2 sm:hidden"
+              disabled={audioSettings.volume === 100}
+              onClick={() => setVolume(audioSettings.volume + 10)}
+              type="button"
+            >
+              <span aria-hidden="true">+</span>
+            </button>
           </div>
           <span className="game-status-chip whitespace-nowrap text-[11px] text-[#F9D873] sm:text-sm">Lv.{level.level} · {level.xp}XP</span>
           <Link className="pixel-button hidden px-3 py-2 sm:inline-flex" href="/dashboard">
@@ -165,7 +167,7 @@ export function GamePage({ gameLoader }: { gameLoader?: () => Promise<GameModule
           paused={dialogueNpc !== undefined || questMissionId !== null || endingOpen}
           worldSnapshot={worldSnapshot}
         />
-        <RpgHud fragmentCount={fragmentCount} progress={rpgProgress} />
+        <RpgHud fragmentCount={fragmentCount} />
         <aside className="quest-tracker absolute right-3 top-3 z-20 w-[min(48%,18rem)] p-3 sm:right-5 sm:top-5 sm:w-72 sm:p-4" aria-label="현재 퀘스트">
           <p className="text-[10px] font-black tracking-[0.18em] text-[#F9D873]">CURRENT QUEST</p>
           <h2 className="mt-1 text-sm font-black sm:text-base">

@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:e2e:rpg": "npm run build && node scripts/run-rpg-browser-smoke.mjs",
     "test:watch": "vitest"
   },
   "dependencies": {

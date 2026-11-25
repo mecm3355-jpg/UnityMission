@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { useState } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { getMissionById } from "../../content/missions";
 import { ProgressProvider, useProgress } from "../../context/progress-context";
 import { createInitialProgress, getLevelSummary } from "../../lib/game-engine";
 import { PROGRESS_STORAGE_KEY } from "../../lib/progress-storage";
@@ -42,10 +43,17 @@ describe("R05 RPG quest panel", () => {
     render(<ProgressProvider><QuestHarness /></ProgressProvider>);
 
     await user.click(await screen.findByRole("button", { name: "테스트 퀘스트 시작" }));
+    const mission = getMissionById("mission-1");
+    if (!mission) throw new Error("Test mission not found");
     for (let index = 0; index < 3; index += 1) {
       const choices = await screen.findAllByRole("radio");
-      await user.click(choices[0]);
-      await user.click(screen.getByRole("button", { name: "답안 제출" }));
+      if (index === 0) {
+        await user.click(choices[(mission.questions[index].correctIndex + 1) % 4]);
+        await user.click(screen.getByRole("button", { name: "답안 제출" }));
+        expect(await screen.findByRole("heading", { name: "힌트를 확인하고 다시 선택해 보세요" })).toBeTruthy();
+      }
+      await user.click(choices[mission.questions[index].correctIndex]);
+      await user.click(screen.getByRole("button", { name: index === 0 ? "다시 제출" : "답안 제출" }));
       expect(await screen.findByText(/정답입니다.|오답입니다./)).toBeTruthy();
       expect(screen.getByRole("link", { name: /출처 확인:/ })).toBeTruthy();
       await user.click(screen.getByRole("button", { name: index === 2 ? "퀘스트 완료" : "다음 문항" }));

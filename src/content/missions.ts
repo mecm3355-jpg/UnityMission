@@ -6,6 +6,7 @@ const OFFICIAL_SOURCE_HOSTS = new Set([
   "www.korean.go.kr",
   "legal.un.org",
   "digitallibrary.un.org",
+  "peacemaker.un.org",
   "www.icrc.org",
   "www.unesco.org",
   "www.unep.org",
@@ -128,6 +129,9 @@ export function validateMissionContent(value: unknown): ContentValidationResult 
       }
       if (!isNonEmptyString(questionValue.explanation)) {
         errors.push(`${questionPath}.explanation must be a non-empty string`);
+      }
+      if (!isNonEmptyString(questionValue.hint)) {
+        errors.push(`${questionPath}.hint must be a non-empty string`);
       }
 
       if (

@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { RpgProgress } from "../../game/rpg-progress";
 
-export function RpgHud({ fragmentCount, progress }: { fragmentCount: number; progress: RpgProgress }) {
+export function RpgHud({ fragmentCount }: { fragmentCount: number }) {
   const [open, setOpen] = useState(false);
   return (
     <aside className="absolute left-3 top-3 z-20 sm:left-5 sm:top-5" aria-label="RPG 상태">
@@ -27,9 +26,8 @@ export function RpgHud({ fragmentCount, progress }: { fragmentCount: number; pro
           </div>
           <ul className="mt-3 space-y-2 text-sm">
             <li>평화 조각: {fragmentCount} / 5</li>
-            <li className={progress.harmonyKey ? "text-emerald-200" : "text-slate-400"}>조화의 열쇠: {progress.harmonyKey ? "획득" : "미획득"}</li>
           </ul>
-          <p className="mt-3 text-xs leading-5 text-slate-300">협력 구역의 공명석을 푸른색→황금색→초록색 순서로 깨워 보세요.</p>
+          <p className="mt-3 text-xs leading-5 text-slate-300">각 교육 미션을 통과하면 평화 조각을 하나씩 획득합니다.</p>
         </div>
       ) : null}
     </aside>

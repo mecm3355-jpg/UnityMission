@@ -95,9 +95,33 @@ describe("progress data validation", () => {
       expect(validation.errors).toContain("mission-2 is completed without its prerequisite");
     }
   });
+
+  it("grandfathers a structurally valid legacy completion without deleting learning progress", () => {
+    const progress = createInitialProgress("평화별", CREATED_AT);
+    progress.updatedAt = "2026-11-23T09:10:00.000Z";
+    progress.completedMissions = {
+      "mission-1": {
+        completedAt: "2026-11-23T09:05:00.000Z",
+        bestCorrectCount: 1,
+        attemptCount: 1,
+      },
+    };
+
+    expect(validateProgressData(progress)).toEqual({ valid: true, progress, errors: [] });
+  });
 });
 
 describe("local progress store", () => {
+  it("removes the retired RPG-only storage record while loading shared progress", () => {
+    const storage = new MemoryStorage();
+    const progress = createInitialProgress("평화별", CREATED_AT);
+    storage.values.set(PROGRESS_STORAGE_KEY, JSON.stringify(progress));
+    storage.values.set("unitymission:rpg:v1", JSON.stringify({ endingSeen: true }));
+
+    expect(new ProgressStore(storage).load().progress).toEqual(progress);
+    expect(storage.getItem("unitymission:rpg:v1")).toBeNull();
+  });
+
   it("saves and restores an unfinished answer state", () => {
     const storage = new MemoryStorage();
     const store = new ProgressStore(storage);

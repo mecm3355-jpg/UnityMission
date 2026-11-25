@@ -24,6 +24,7 @@ export type MissionQuestion = {
   prompt: string;
   options: [string, string, string, string];
   correctIndex: CorrectIndex;
+  hint: string;
   explanation: string;
   source: ContentSource;
 };

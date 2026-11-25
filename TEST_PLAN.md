@@ -1,7 +1,7 @@
 # 테스트·회귀·검증 게이트
 
 ## 권장 스크립트
-`package.json` scripts에 `test: vitest run` 추가. 변경 파일이 게임 엔진/스토리지면 단위 테스트 즉시 수행. 작업 종료 전 `npm run lint && npx tsc --noEmit && npm run test && npm run build` 실행. `npm audit --omit=dev`는 별도 검토 기록용(실패 시 위험 평가; 자동 무시 금지).
+`package.json` scripts에 `test: vitest run` 유지. 변경 파일이 게임 엔진/스토리지면 단위 테스트 즉시 수행. 작업 종료 전 `npm run lint && npx tsc --noEmit && npm run test && npm run build` 실행. 실제 Chrome이 있는 환경에서는 `npm run test:e2e:rpg`로 production build·임시 서버·격리 브라우저 전체 플레이를 자동 실행한다. `npm audit --omit=dev`는 별도 검토 기록용(실패 시 위험 평가; 자동 무시 금지).
 
 ## 자동 단위 테스트 최소 12개
 1. 시작 XP=0 / Lv1
@@ -18,9 +18,12 @@
 12. 재풀이 시 최고 점수만 상승, 보상 불변
 13. 완료 전 certificate 접근 차단
 14. 완료 후 certificate 접근 허용
+15. 0~1문항 정답 시 미통과·0XP·다음 미션 잠금 유지
+16. 첫 오답 힌트 후 답안 재선택 가능
 
 ## 수동 E2E 스모크 (브라우저)
-- 신규 닉네임 → 대시보드 → 첫 퀴즈 3문항 → 해설 → XP100
+- 신규 닉네임 → 대시보드 → 첫 오답 힌트·재선택 → 2문항 이상 정답 → XP100
+- 0~1문항 정답 → 미통과·0XP·재도전 확인
 - 미션1 재진행 → XP가 100 유지되는지 확인
 - 탭 새로고침 → 진행 보존
 - 잠긴 미션 URL 직접 입력 → 접근 차단
@@ -29,7 +32,7 @@
 - 배포 URL에서 위 기본 흐름 다시 확인
 
 ## 자동화 가능한 것과 불가능한 것
-단위 테스트는 Vitest로 자동. 실제 브라우저 E2E 자동화는 Playwright 환경이 준비된 경우에만 추가(8시간 한도 초과 시 수동 스모크). 콘텐츠 정확성·수료증 출력 품질·시각적 접근성은 사람의 검토가 필요.
+단위 테스트는 Vitest로 자동. 실제 브라우저 E2E는 신규 의존성 없이 Chrome DevTools Protocol 기반 `npm run test:e2e:rpg`로 자동화한다. 콘텐츠 정확성·수료증 출력 품질·시각적 접근성은 사람의 검토가 필요.
 
 ## 실패 처리
 실패 로그와 실행 환경 보존 → 원인 분류 → 최소 수정 → 동일 테스트 다시 실행. 같은 실패의 수정 2회 초과 시 BLOCKED. 테스트 삭제·스킵·단언 약화로 통과시키지 않는다. 미실행 검증은 NOT_RUN.
